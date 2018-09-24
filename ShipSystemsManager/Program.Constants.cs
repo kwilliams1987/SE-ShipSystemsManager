@@ -1,5 +1,8 @@
 ﻿// <mdk sortorder="100" />
+using Sandbox.ModAPI.Ingame;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using VRageMath;
 
 namespace IngameScript
@@ -12,6 +15,13 @@ namespace IngameScript
         #region mdk macros
         private const String VERSION = "$MDK_DATE$, $MDK_TIME$";
         #endregion
+
+        static readonly IReadOnlyDictionary<String, Action<IMyTerminalBlock>> StatePriority = new Dictionary<String, IMyTerminalBlock>()
+        {
+            { BlockState.DECOMPRESSION,  },
+            { BlockState.INTRUDER1, },
+            {  BlockState.BATTLESTATIONS, }
+        };
 
         static class BlockFunction
         {
@@ -26,8 +36,10 @@ namespace IngameScript
 
         static class BlockState
         {
-            public static readonly String BATTLE_STATIONS = "battle";
+            public static readonly String BATTLESTATIONS = "battle";
             public static readonly String DECOMPRESSION = "decompression";
+            public static readonly String INTRUDER1 = "intruder1"; // Turrets
+            public static readonly String INTRUDER2 = "intruder1"; // Sensors
         }
 
         static class Configuration
@@ -35,12 +47,13 @@ namespace IngameScript
             public static class Decompression
             {
                 public static readonly String ZONE_LABEL = "DECOMPRESSION DANGER";
-                public static readonly Color SIGN_FOREGROUND_COLOR = new Color(255, 255, 0);
+                public static readonly Color SIGN_FOREGROUND_COLOR = new Color(0, 0, 255);
                 public static readonly Color SIGN_BACKGROUND_COLOR = new Color(0, 0, 0);
                 public static readonly String SIGN_IMAGE = "Danger";
                 public static readonly String ALERT_SOUND = "Alert 2";
+                public static readonly Single FONTSIZE = 2.9f / ZONE_LABEL.Split('\n').Length;
 
-                public static readonly Color LIGHT_COLOR = new Color(255, 255, 0);
+                public static readonly Color LIGHT_COLOR = new Color(0, 0, 255);
                 public static readonly Single LIGHT_BLINK = 3;
                 public static readonly Single LIGHT_DURATION = 66.6f;
                 public static readonly Single LIGHT_OFFSET = 0;
@@ -53,6 +66,7 @@ namespace IngameScript
                 public static readonly Color SIGN_BACKGROUND_COLOR = new Color(0, 0, 0);
                 public static readonly String SIGN_IMAGE = "Warning";
                 public static readonly String ALERT_SOUND = "Alert 1";
+                public static readonly Single FONTSIZE = 2.9f / ZONE_LABEL.Split('\n').Length;
 
                 public static readonly Color LIGHT_COLOR = new Color(255, 0, 0);
                 public static readonly Single LIGHT_BLINK = 3;
@@ -66,6 +80,8 @@ namespace IngameScript
                 public static readonly Color SIGN_FOREGROUND_COLOR = new Color(255, 0, 0);
                 public static readonly Color SIGN_BACKGROUND_COLOR = new Color(0, 0, 0);
                 public static readonly String ALERT_SOUND = "Alert 1";
+                public static readonly Single FONTSIZE = 2.9f / ZONE_LABEL.Split('\n').Length;
+                public static readonly String SIGN_IMAGE = "Warning";
 
                 public static readonly Color LIGHT_COLOR = new Color(255, 0, 0);
                 public static readonly Single LIGHT_BLINK = 3;

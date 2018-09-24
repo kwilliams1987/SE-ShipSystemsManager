@@ -9,9 +9,9 @@
     <Import_RootNamespace>GridTerminalSystemExtensions</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IMyGridTerminalSystem.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IMyTerminalBlockCconfig.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IMyTerminalBlockSelector.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IMyTerminalBlockState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyGridTerminalSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyTerminalBlockConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyTerminalBlockSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyTerminalBlockState.cs" />
   </ItemGroup>
 </Project>

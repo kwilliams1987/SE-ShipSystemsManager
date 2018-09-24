@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using VRage.Game;
 
 namespace IngameScript
 {
-    // This template is intended for extension classes. For most purposes you're going to want a normal
-    // utility class.
-    // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/extension-methods
     static class IMyGridTerminalSystemExtensions
     {
         public static List<T> GetBlocksOfType<T>(this IMyGridTerminalSystem grid, Func<T, Boolean> collect = null)
@@ -33,6 +31,21 @@ namespace IngameScript
             where T : class, IMyTerminalBlock
         {
             return grid.GetBlocksOfType<T>(v => v.IsInAnyZone(zones)).All(test);
+        }
+
+        public static List<MyDetectedEntityInfo> GetDetectedEntities(this IMySensorBlock sensorBlock, Func<MyDetectedEntityInfo, Boolean> collect = null)
+        {
+            var result = new List<MyDetectedEntityInfo>();
+            sensorBlock.DetectedEntities(result);
+
+            if (collect == null)
+            {
+                return result;
+            }
+            else
+            {
+                return result.Where(collect).ToList();
+            }
         }
     }
 }

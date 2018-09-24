@@ -1,0 +1,141 @@
+﻿using Sandbox.Game.EntityComponents;
+using Sandbox.ModAPI.Ingame;
+using Sandbox.ModAPI.Interfaces;
+using SpaceEngineers.Game.ModAPI.Ingame;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+using System.Text;
+using System;
+using VRage.Collections;
+using VRage.Game.Components;
+using VRage.Game.ModAPI.Ingame;
+using VRage.Game.ObjectBuilders.Definitions;
+using VRage.Game;
+using VRageMath;
+
+namespace IngameScript
+{
+    // This template is intended for extension classes. For most purposes you're going to want a normal
+    // utility class.
+    // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/extension-methods
+    static class Extensions
+    {
+        public static void ApplyBlockConfigs<T>(this IEnumerable<T> blocks, Dictionary<String, Object> configValues)
+            where T: IMyTerminalBlock
+        {
+            foreach (var block in blocks)
+            {
+                block.SaveState();
+
+                var door = block as IMyDoor;
+                var textPanel = block as IMyTextPanel;
+                var soundBlock = block as IMySoundBlock;
+
+                foreach (var config in configValues)
+                {
+                    if (config.Key.StartsWith("FLAGS:"))
+                    {
+                        var key = config.Key.Substring(5);
+                        block.SetConfigFlag(key, config.Value.ToString());
+                        continue;
+                    }
+
+                    switch (config.Key)
+                    {
+                        case "Closed":
+                            if (door != default(IMyDoor))
+                            {
+                                if (Object.Equals(config.Value, true))
+                                {
+                                    if (door.OpenRatio > 0)
+                                    {
+                                        door.Enabled = true;
+                                        door.CloseDoor();
+                                    }
+                                }
+                            }
+                            break;
+                        case "Locked":
+                            if (door != default(IMyDoor))
+                            {
+                                if (Object.Equals(config.Value, true))
+                                {
+                                    if (door.OpenRatio > 0)
+                                    {
+                                        door.Enabled = true;
+                                        door.CloseDoor();
+                                    }
+                                    else
+                                    {
+                                        door.Enabled = false;
+                                    }
+                                }
+                                else
+                                {
+                                    door.Enabled = true;
+                                }
+                            }
+                            break;
+                        case "PublicText":
+                            if (textPanel != default(IMyTextPanel))
+                            {
+                                textPanel.WritePublicText(config.Value.ToString());
+                            }
+                            break;
+                        case "PublicTitle":
+                            if (textPanel != default(IMyTextPanel))
+                            {
+                                textPanel.WritePublicTitle(config.Value.ToString());
+                            }
+                            break;
+                        case "Images":
+                            if (textPanel != default(IMyTextPanel))
+                            {
+                                textPanel.ClearImagesFromSelection();
+                                textPanel.AddImagesToSelection(config.Value.ToString().Split(';').ToList());
+                                textPanel.ShowTextureOnScreen();
+                            }
+                            break;
+                        case "Play":
+                            if (soundBlock != default(IMySoundBlock))
+                            {
+                                if (Object.Equals(config.Value, true))
+                                {
+                                    soundBlock.Play();
+                                }
+                                else
+                                {
+                                    soundBlock.Stop();
+                                }
+                            }
+                            break;
+                        default:
+                            if (config.Value is Color)
+                            {
+                                block.SetValueColor(config.Key, (Color)config.Value);
+                            }
+
+                            else if (config.Value is Single)
+                            {
+                                block.SetValueFloat(config.Key, (Single)config.Value);
+
+                            }
+
+                            else if (config.Value is Boolean)
+                            {
+                                block.SetValueBool(config.Key, (Boolean)config.Value);
+                            }
+
+                            else
+                            {
+                                block.SetValue(config.Key, config.Value.ToString());
+                            }
+
+                            break;
+                    }
+                }
+            }
+        }
+    }
+}

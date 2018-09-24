@@ -74,19 +74,21 @@ namespace IngameScript
         {
             // Only check air vents if pressurization is enabled.
             var pressure = GridTerminalSystem.GetBlocksOfType<IMyAirVent>().FirstOrDefault(v => v.PressurizationEnabled) != default(IMyAirVent);
-
+            
             foreach (var zone in GridTerminalSystem.GetZones())
             {
                 Output("Checking Zone \"" + zone + "\" for new triggers.");
 
                 if (pressure)
                 {
-                    HandleAirVents(zone);
+                    TestAirVents(zone);
                 }
 
-                HandleSensors(zone);
-                HandleInteriorWeapons(zone);
-                HandleBattleStations();
+                TestSensors(zone);
+                TestInteriorWeapons(zone);
+                TestBattleStations();
+
+                ApplyBlockStates();
             }
         }
 
@@ -117,6 +119,16 @@ namespace IngameScript
                 {
                     lcd.WritePublicText(message);
                 }
+            }
+        }
+
+        private void ApplyBlockStates()
+        {
+            foreach (var block in GridTerminalSystem.GetBlocksOfType<IMyTerminalBlock>(b => b.GetConfigs("zones").Any()))
+            {
+                var states = block.GetConfigs("state");
+                
+                foreach (var state in StatePriority)
             }
         }
     }

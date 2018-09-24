@@ -7,9 +7,9 @@ namespace IngameScript
 {
     static class IMyTerminalBlockCconfigExtensions
     {
-        public static Boolean HasConfigFlag(this IMyTerminalBlock block, String key, String value)
+        public static Boolean HasConfigFlag(this IMyTerminalBlock block, String key, params String[] values)
         {
-            return block.GetConfigs(key).Contains(value);
+            return values.Any(value => block.GetConfigs(key).Contains(value));
         }
 
         public static void SetConfigFlag(this IMyTerminalBlock block, String key, String value)
@@ -34,6 +34,32 @@ namespace IngameScript
             }
 
             block.SetConfigs(key, values);
+        }
+
+        public static IEnumerable<IMyTerminalBlock> SetStates(this IEnumerable<IMyTerminalBlock> blocks, params String[] states)
+        {
+            foreach (var block in blocks)
+            {
+                var blockStates = block.GetConfigs("state");
+                blockStates.AddRange(states);
+
+                block.SetConfigs("state", blockStates.Distinct());
+            }
+
+            return blocks;
+        }
+
+        public static IEnumerable<IMyTerminalBlock> ClearStates(this IEnumerable<IMyTerminalBlock> blocks, params String[] states)
+        {
+            foreach (var block in blocks)
+            {
+                var blockStates = block.GetConfigs("state");
+                blockStates.RemoveAll(s => states.Contains(s));
+
+                block.SetConfigs("state", blockStates.Distinct());
+            }
+
+            return blocks;
         }
 
         public static List<String> GetConfigs(this IMyTerminalBlock block, String key, Char denominator = ';')

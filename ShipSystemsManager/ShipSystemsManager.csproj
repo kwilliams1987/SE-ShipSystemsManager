@@ -96,10 +96,11 @@
     <Analyzer Include="c:\users\kristian\appdata\local\microsoft\visualstudio\15.0_e75797ca\extensions\nuzcqyyd.0rj\Analyzers\MDKAnalyzer.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Handlers\BattleStations.cs" />
-    <Compile Include="Handlers\InteriorWeapons.cs" />
-    <Compile Include="Handlers\Sensors.cs" />
-    <Compile Include="Handlers\AirVents.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Testers\BattleStations.cs" />
+    <Compile Include="Testers\InteriorWeapons.cs" />
+    <Compile Include="Testers\Sensors.cs" />
+    <Compile Include="Testers\AirVents.cs" />
     <Compile Include="MDK\Bootstrapper.cs" />
     <AdditionalFiles Include="MDK\MDK.options">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
