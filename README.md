@@ -50,9 +50,9 @@ A simple grid in space with:
 * Programmable Block
 * Oxygen Source
 * Two airtight rooms with:
-** Air Vent connected to Oxygen
-** Door outside
-** Light
+  * Air Vent connected to Oxygen
+  * Door outside
+  * Light
 
 Add a single door between the two airtight rooms
 
