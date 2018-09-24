@@ -3,6 +3,9 @@ A Space Engineers script to automate block states, such as doors, lights and sou
 
 The script takes a snapshot of the state of all blocks which it has control over before the first time it edits them, allowing it to restore the blocks to default state when all states are cleared.
 
+# Work in Progress
+Note that this script is still very, very work in progress and probably doesn't work at all yet.
+
 # Concepts
 ## Zones
 Each block is marked as being in zero or more "zones", these are arbitrary grouped blocks on the Grid and don't specifically have to be in the same room.
