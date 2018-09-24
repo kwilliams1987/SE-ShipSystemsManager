@@ -37,7 +37,7 @@ namespace IngameScript
                 {
                     Output("Closing " + doors.Count() + " doors to zone " + zone + ".");
 
-                    doors.ApplyBlockConfigs(new Dictionary<String, Object>()
+                    doors.ApplyConfig<IMyDoor>(new Dictionary<String, Object>()
                     {
                         { "Closed", true }
                     });
@@ -47,8 +47,8 @@ namespace IngameScript
                     Output("ALERT: Zone " + zone + " cannot be sealed, no functional doors were found!");
                 }
 
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR)
-                    .ApplyBlockConfigs(new Dictionary<String, Object>()
+                base.GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR)
+                    .ApplyConfig<IMyTextPanel>(new Dictionary<String, Object>()
                 {
                     { "FLAGS:state", BlockState.INTRUDER1 },
                     { "PublicText", Configuration.Intruder.ZONE_LABEL },
@@ -57,16 +57,16 @@ namespace IngameScript
                     { "FontSize", 2.9f / Configuration.Intruder.FONTSIZE }
                 });
                 
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING)
-                    .ApplyBlockConfigs(new Dictionary<String, Object>()
+                base.GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING)
+                    .ApplyConfig<IMyTextPanel>(new Dictionary<String, Object>()
                 {
                     { "FLAGS:state", BlockState.INTRUDER1 },
                     { "Images", Configuration.Intruder.SIGN_IMAGE },
                     { "Enabled", true }
                 });
 
-                GridTerminalSystem.GetZoneBlocksByFunction<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN)
-                    .ApplyBlockConfigs(new Dictionary<String, Object>
+                base.GridTerminalSystem.GetZoneBlocksByFunction<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN)
+                    .ApplyConfig<IMySoundBlock>(new Dictionary<String, Object>
                 {
                     { "FLAGS:state", BlockState.INTRUDER1 },
                     { "SelectedSound", Configuration.Intruder.ALERT_SOUND },

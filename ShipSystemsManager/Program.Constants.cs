@@ -16,12 +16,13 @@ namespace IngameScript
         private const String VERSION = "$MDK_DATE$, $MDK_TIME$";
         #endregion
 
-        static readonly IReadOnlyDictionary<String, Action<IMyTerminalBlock>> StatePriority = new Dictionary<String, IMyTerminalBlock>()
+        static readonly IOrderedEnumerable<StateStyler> StatePriority = new List<StateStyler>
         {
-            { BlockState.DECOMPRESSION,  },
-            { BlockState.INTRUDER1, },
-            {  BlockState.BATTLESTATIONS, }
-        };
+            new StateStyler(1, BlockState.DECOMPRESSION, StyleDecompression),
+            new StateStyler(2, BlockState.INTRUDER1, StyleIntruder),
+            new StateStyler(3, BlockState.INTRUDER2, StyleIntruder),
+            new StateStyler(3, BlockState.BATTLESTATIONS, StyleBattleStations)
+        }.OrderBy(s => s.Priority);
 
         static class BlockFunction
         {
@@ -87,6 +88,20 @@ namespace IngameScript
                 public static readonly Single LIGHT_BLINK = 3;
                 public static readonly Single LIGHT_DURATION = 33.3f;
                 public static readonly Single LIGHT_OFFSET = 0;
+            }
+        }
+
+        class StateStyler
+        {
+            public readonly Int32 Priority;
+            public readonly String Key;
+            public readonly Action<IMyTerminalBlock> Style;
+
+            public StateStyler(Int32 priority, String key, Action<IMyTerminalBlock> style)
+            {
+                Priority = priority;
+                Key = key;
+                Style = style;
             }
         }
     }

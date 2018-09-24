@@ -127,8 +127,16 @@ namespace IngameScript
             foreach (var block in GridTerminalSystem.GetBlocksOfType<IMyTerminalBlock>(b => b.GetConfigs("zones").Any()))
             {
                 var states = block.GetConfigs("state");
+                var styler = StatePriority.FirstOrDefault(s => states.Contains(s.Key));
                 
-                foreach (var state in StatePriority)
+                if (styler != default(StateStyler))
+                {
+                    styler.Style(block);
+                }
+                else
+                {
+                    StyleRestore(block);
+                }
             }
         }
     }

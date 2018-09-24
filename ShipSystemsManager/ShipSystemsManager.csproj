@@ -97,6 +97,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
+    <Compile Include="Stylers\Decompression.cs" />
+    <Compile Include="Stylers\BattleStations.cs" />
+    <Compile Include="Stylers\Intruder.cs" />
+    <Compile Include="Stylers\Restore.cs" />
     <Compile Include="Testers\BattleStations.cs" />
     <Compile Include="Testers\InteriorWeapons.cs" />
     <Compile Include="Testers\Sensors.cs" />

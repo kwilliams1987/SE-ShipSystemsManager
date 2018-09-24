@@ -35,7 +35,7 @@ namespace IngameScript
                 {
                     Output("Locking down " + doors.Count() + " doors to zone " + zone + ".");
 
-                    doors.ApplyBlockConfigs(new Dictionary<String, Object>()
+                    doors.ApplyConfig<IMyDoor>(new Dictionary<String, Object>()
                     {
                         { "Locked", true }
                     });
@@ -45,8 +45,8 @@ namespace IngameScript
                     Output("ALERT: Zone " + zone + " cannot be sealed, no functional doors were found!");
                 }
 
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR)
-                    .ApplyBlockConfigs(new Dictionary<String, Object>()
+                base.GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR)
+                    .ApplyConfig<IMyTextPanel>(new Dictionary<String, Object>()
                 {
                     { "FLAGS:state", BlockState.DECOMPRESSION },
                     { "PublicText", Configuration.Decompression.ZONE_LABEL },
@@ -55,16 +55,16 @@ namespace IngameScript
                     { "FontSize", 2.9f / Configuration.Decompression.FONTSIZE }
                 });
 
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING)
-                    .ApplyBlockConfigs(new Dictionary<String, Object>()
+                base.GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING)
+                    .ApplyConfig<IMyTextPanel>(new Dictionary<String, Object>()
                 {
                     { "FLAGS:state", BlockState.DECOMPRESSION },
                     { "Images", Configuration.Decompression.SIGN_IMAGE },
                     { "Enabled", true }
                 });
 
-                GridTerminalSystem.GetZoneBlocksByFunction<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN)
-                    .ApplyBlockConfigs(new Dictionary<String, Object>
+                base.GridTerminalSystem.GetZoneBlocksByFunction<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN)
+                    .ApplyConfig<IMySoundBlock>(new Dictionary<String, Object>
                 {
                     { "FLAGS:state", BlockState.DECOMPRESSION },
                     { "SelectedSound", Configuration.Decompression.ALERT_SOUND },
@@ -77,7 +77,7 @@ namespace IngameScript
                 { 
                     if (group.Key)
                     {
-                        group.ApplyBlockConfigs(new Dictionary<String, Object>()
+                        group.ApplyConfig<IMyLightingBlock>(new Dictionary<String, Object>()
                         {
                             { "Color", Configuration.Decompression.LIGHT_COLOR },
                             { "BlinkIntervalSeconds", Configuration.Decompression.LIGHT_BLINK },
@@ -88,7 +88,7 @@ namespace IngameScript
                     }
                     else
                     {
-                        group.ApplyBlockConfigs(new Dictionary<String, Object>()
+                        group.ApplyConfig<IMyLightingBlock>(new Dictionary<String, Object>()
                         {
                             { "Enabled", false }
                         });
