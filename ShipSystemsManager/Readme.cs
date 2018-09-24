@@ -2,10 +2,12 @@
  *   R e a d m e
  *   -----------
  * 
- * Specify which zones your blocks are located in by adding a "zones=" line to their Custom Data. Multiple zones are specified by a semi-colon.
+ * Specify which zones your blocks are located in by adding a "zones=" line to their Custom Data. 
+ * Multiple zones are specified by a semi-colon.
  * EG: zones=zone-1;zone-2;zone-3
  * 
- * Specify the function of a block by adding a "functions=" line to their Custom Data. Multiple functions can be specified with a semi-colon.
+ * Specify the function of a block by adding a "functions=" line to their Custom Data. 
+ * Multiple functions can be specified with a semi-colon.
  * EG: functions=airlock
  * 
  * Supported Functions:
