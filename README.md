@@ -38,3 +38,49 @@ Additional custom states can be added later.
 
 ## Properties
 Depending on the function of a block, one or more properties will be changed depending on state. For example, during a battle stations state, all lights will be turned off, except those explicited flagged with the `warnlight` function.
+
+## Basic Example
+Empty world with Air-tightness and Programmable Blocks enabled.
+
+A simple grid in space with:
+* Battery
+* Programmable Block
+* Oxygen Source
+* Two airtight rooms with:
+** Air Vent connected to Oxygen
+** Door outside
+** Light
+
+Add a single door between the two airtight rooms
+
+Set the custom data of each block as follows:
+* Air Vent (Room 1):
+zones=room-1
+* Door External (Room 1):
+zones=room-1
+functions=airlock
+* Light (Room 1):
+zones=room-1
+functions=warnlight
+* Air Vent (Room 2):
+zones=room-2
+* Door External (Room 2):
+zones=room-2
+functions=airlock:
+* Light (Room 2):
+zones=room-2
+functions=warnlight
+* Door Between
+zones=room-1;room-2
+functions=airlock
+
+Load the script into the programmable block and start it.
+
+Upon opening either external door:
+The script will change the light in the attached room to an alert state and attempt to close and lock all doors to stop the leak.
+Once Oxygen pressure is restored, the doors "unlock" (IE are re-enabled).
+
+Open the middle door, and then delete an external door:
+Both rooms will enter alert state, with the remaining doors being sealed.
+Once the sealed room is repressurized, it's external door will unlock but the door between the two rooms remains disabled as it's still counted as in a depressurized zone.
+The depressurized room's lights remain in alert state until the decompression is fixed.
