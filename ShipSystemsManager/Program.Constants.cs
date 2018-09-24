@@ -1,4 +1,5 @@
-﻿using System;
+﻿// <mdk sortorder="100" />
+using System;
 using VRageMath;
 
 namespace IngameScript
@@ -7,6 +8,10 @@ namespace IngameScript
     {
         public static Boolean DebugMode = true;
         public static Boolean EnableSingleTickCycle = false;
+
+        #region mdk macros
+        private const String VERSION = "$MDK_DATE$, $MDK_TIME$";
+        #endregion
 
         static class BlockFunction
         {

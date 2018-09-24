@@ -24,43 +24,50 @@ namespace IngameScript
 
         public void Main(String argument, UpdateType updateSource)
         {
-            switch (updateSource)
+            if (String.IsNullOrWhiteSpace(argument))
             {
-                case UpdateType.Update1:
-                    if (EnableSingleTickCycle)
+                // Perform a tick.
+                if ((updateSource & UpdateType.Update1) != UpdateType.None)
+                {
+                    // Running in high speed mode is not recommended!
+                    if (!EnableSingleTickCycle)
                     {
-                        Tick();
-                    }
-                    else
-                    {
+                        // Throw an exception to prevent further cycles.
                         throw new Exception("Running the program at one cycle per tick is not recommended.");
                     }
-                    return;                    
-                case UpdateType.Update10:
-                case UpdateType.Update100:
-                    Tick();
+                }
+
+                if ((updateSource & UpdateType.Update100) != UpdateType.None)
+                {
+                    // Script is running in slow mode.
+                    Output("Script is running in slow mode (once per 6 seconds).");
+                }
+
+                Tick();
+            }
+            else
+            {
+                // Set or clear argument flags.
+                Flags(argument);
+            }
+        }
+
+        private void Flags(String argument)
+        {
+            var arguments = argument.Split(' ');
+            switch (arguments.FirstOrDefault())
+            {
+                case "activate":
+                    var newstate = String.Join(" ", arguments.Skip(1));
+
+                    Me.SetConfigFlag("custom-states", newstate);
                     return;
+                case "deactivate":
+                    var oldstate = String.Join(" ", arguments.Skip(1));
 
-                default:
-                    var arguments = argument.Split(' ');
-                    switch (arguments.FirstOrDefault())
-                    {
-                        case "":
-
-                            return;
-                        case "activate":
-                            var newstate = String.Join(" ", arguments.Skip(1));
-
-                            Me.SetConfigFlag("custom-states", newstate);
-                            return;
-                        case "deactivate":
-                            var oldstate = String.Join(" ", arguments.Skip(1));
-
-                            Me.ClearConfigFlag("custom-states", oldstate);
-                            return;
-                    }
+                    Me.ClearConfigFlag("custom-states", oldstate);
                     return;
-            }            
+            }
         }
 
         private void Tick()

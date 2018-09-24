@@ -5,7 +5,13 @@ VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipSystemsManager", "ShipSystemsManager\ShipSystemsManager.csproj", "{7577EDAA-27FF-4D32-814B-A1077F8DCDA4}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "GridTerminalSystemExtensions", "GridTerminalSystemExtensions\GridTerminalSystemExtensions.shproj", "{E5C4993A-A316-4C0D-9199-DD5D0380EFB9}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		GridTerminalSystemExtensions\GridTerminalSystemExtensions.projitems*{7577edaa-27ff-4d32-814b-a1077f8dcda4}*SharedItemsImports = 4
+		GridTerminalSystemExtensions\GridTerminalSystemExtensions.projitems*{e5c4993a-a316-4c0d-9199-dd5d0380efb9}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 	EndGlobalSection

@@ -20,7 +20,7 @@
  * 
  * LCD Displays:
  * doorsign 
- * - Indicates a small Text LCD above a door. It's text will change read BATTLE STATIONS, DECOMPRESSION or other similar text messages.
+ * - Indicates a small Text LCD above a door. It's text will read BATTLE STATIONS, DECOMPRESSION or other similar messages.
  * battle 
  * - Indicates a large LCD which will display a graphic during a BATTLE STATIONS state.
  * warnsign 
