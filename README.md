@@ -58,24 +58,24 @@ Add a single door between the two airtight rooms
 
 Set the custom data of each block as follows:
 * Air Vent (Room 1):
- * `zones=room-1`
+  * `zones=room-1`
 * Door External (Room 1):
- * `zones=room-1`
- * `functions=airlock`
+  * `zones=room-1`
+  * `functions=airlock`
 * Light (Room 1):
- * `zones=room-1`
- * `functions=warnlight`
+  * `zones=room-1`
+  * `functions=warnlight`
 * Air Vent (Room 2):
- * `zones=room-2`
+  * `zones=room-2`
 * Door External (Room 2):
- * `zones=room-2`
- * `functions=airlock` 
+  * `zones=room-2`
+  * `functions=airlock` 
 * Light (Room 2):
- * `zones=room-2`
- * `functions=warnlight`
+  * `zones=room-2`
+  * `functions=warnlight`
 * Door Between:
- * `zones=room-1;room-2`
- * `functions=airlock`
+  * `zones=room-1;room-2`
+  * `functions=airlock`
 
 Load the script into the programmable block and start it.
 
