@@ -8,9 +8,6 @@ using VRageMath;
 
 namespace IngameScript
 {
-    // This template is intended for extension classes. For most purposes you're going to want a normal
-    // utility class.
-    // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/extension-methods
     static class Extensions
     {
         public static void ApplyConfig<T>(this T block, Dictionary<String, Object> configValues)
@@ -21,6 +18,7 @@ namespace IngameScript
             var door = block as IMyDoor;
             var textPanel = block as IMyTextPanel;
             var soundBlock = block as IMySoundBlock;
+            var warhead = block as IMyWarhead;
 
             foreach (var config in configValues)
             {
@@ -36,6 +34,19 @@ namespace IngameScript
                                     door.Enabled = true;
                                     door.CloseDoor();
                                 }
+                            }
+                        }
+                        break;
+                    case "Countdown":
+                        if (warhead != default(IMyWarhead))
+                        {
+                            if (Object.Equals(config.Value, true))
+                            {
+                                warhead.StartCountdown();
+                            }
+                            else
+                            {
+                                warhead.StopCountdown();
                             }
                         }
                         break;

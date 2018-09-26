@@ -97,12 +97,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
-    <Compile Include="Stylers\Decompression.cs" />
-    <Compile Include="Stylers\BattleStations.cs" />
-    <Compile Include="Stylers\Intruder.cs" />
-    <Compile Include="Stylers\Restore.cs" />
+    <Compile Include="Stylers\BaseStyler.cs" />
+    <Compile Include="Stylers\BattleStationsStyler.cs" />
+    <Compile Include="Stylers\DecompressionStyler.cs" />
+    <Compile Include="Stylers\DefaultStyler.cs" />
+    <Compile Include="Stylers\IntruderStyler.cs" />
+    <Compile Include="Stylers\SelfDestructStyler.cs" />
     <Compile Include="Testers\BattleStations.cs" />
     <Compile Include="Testers\InteriorWeapons.cs" />
+    <Compile Include="Testers\SelfDestruct.cs" />
     <Compile Include="Testers\Sensors.cs" />
     <Compile Include="Testers\AirVents.cs" />
     <Compile Include="MDK\Bootstrapper.cs" />

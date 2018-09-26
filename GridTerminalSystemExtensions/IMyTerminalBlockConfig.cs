@@ -74,7 +74,14 @@ namespace IngameScript
 
         public static T GetConfig<T>(this IMyTerminalBlock block, String key)
         {
-            var value = block.GetConfig()[key];
+            var config = block.GetConfig();
+            var value = "";
+
+            if (config.ContainsKey(key))
+            {
+                value = block.GetConfig()[key];
+            }
+
             if (String.IsNullOrWhiteSpace(value))
             {
                 return default(T);
@@ -87,7 +94,13 @@ namespace IngameScript
 
         public static String GetConfig(this IMyTerminalBlock block, String key, Boolean multiline = false)
         {
-            var value = block.GetConfig()[key];
+            var config = block.GetConfig();
+            var value = "";
+
+            if (config.ContainsKey(key))
+            {
+                value = block.GetConfig()[key];
+            }
 
             if (String.IsNullOrWhiteSpace(value))
             {
@@ -111,7 +124,13 @@ namespace IngameScript
                 textvalue = textvalue.Replace("\n", "#N#");
             }
 
-            var lines = block.CustomData.Split('\n').ToList();
+            var customData = block.CustomData;
+            if (String.IsNullOrWhiteSpace(customData))
+            {
+                customData = "";
+            }
+
+            var lines = customData.Split('\n').ToList();
             var found = false;
 
             for (var l = 0; l < lines.Count; l++)
@@ -144,7 +163,11 @@ namespace IngameScript
         {
             var config = new Dictionary<String, String>();
 
-            var lines = block.CustomData.Split('\n').Where(l => l.Contains(':'));
+            var customData = block.CustomData;
+            if (String.IsNullOrWhiteSpace(customData))
+                customData = "";
+
+            var lines = customData.Split('\n').Where(l => l.Contains(':'));
             foreach (var line in lines)
             {
                 var split = line.Split(':');

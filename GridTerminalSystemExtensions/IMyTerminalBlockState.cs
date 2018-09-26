@@ -68,7 +68,7 @@ namespace IngameScript
         /// </summary>
         public static void RestoreState(this IMyTerminalBlock block)
         {
-            if (block.GetConfig<Boolean>("saved"))
+            if (!block.GetConfig<Boolean>("saved"))
                 return;
 
             var properties = new List<ITerminalProperty>();

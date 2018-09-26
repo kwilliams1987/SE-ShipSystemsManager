@@ -30,51 +30,6 @@ namespace IngameScript
                     .SetStates(BlockState.INTRUDER1);
 
                 return;
-
-                // TODO: Move to Program.ApplyBlockStates
-                var doors = GridTerminalSystem.GetZoneBlocksByFunction<IMyDoor>(zone, BlockFunction.DOOR_AIRLOCK, true);
-                if (doors.Any())
-                {
-                    Output("Closing " + doors.Count() + " doors to zone " + zone + ".");
-
-                    doors.ApplyConfig<IMyDoor>(new Dictionary<String, Object>()
-                    {
-                        { "Closed", true }
-                    });
-                }
-                else
-                {
-                    Output("ALERT: Zone " + zone + " cannot be sealed, no functional doors were found!");
-                }
-
-                base.GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR)
-                    .ApplyConfig<IMyTextPanel>(new Dictionary<String, Object>()
-                {
-                    { "FLAGS:state", BlockState.INTRUDER1 },
-                    { "PublicText", Configuration.Intruder.ZONE_LABEL },
-                    { "FontColor", Configuration.Intruder.SIGN_FOREGROUND_COLOR },
-                    { "BackgroundColor", Configuration.Intruder.SIGN_BACKGROUND_COLOR },
-                    { "FontSize", 2.9f / Configuration.Intruder.FONTSIZE }
-                });
-                
-                base.GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING)
-                    .ApplyConfig<IMyTextPanel>(new Dictionary<String, Object>()
-                {
-                    { "FLAGS:state", BlockState.INTRUDER1 },
-                    { "Images", Configuration.Intruder.SIGN_IMAGE },
-                    { "Enabled", true }
-                });
-
-                base.GridTerminalSystem.GetZoneBlocksByFunction<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN)
-                    .ApplyConfig<IMySoundBlock>(new Dictionary<String, Object>
-                {
-                    { "FLAGS:state", BlockState.INTRUDER1 },
-                    { "SelectedSound", Configuration.Intruder.ALERT_SOUND },
-                    { "LoopPeriod", 3600 },
-                    { "Enabled", true },
-                    { "Play", true }
-                });
-
             }
             else
             {
@@ -107,65 +62,6 @@ namespace IngameScript
                     .ClearStates(BlockState.INTRUDER1);
 
                 return;
-
-                // TODO: Move to Program.ApplyBlockStates
-
-                // Group doors by zoning, test each group once and restore only doors in passing zone groups.
-                var doorGroups = GridTerminalSystem.GetZoneBlocksByFunction<IMyDoor>(zone, BlockFunction.DOOR_AIRLOCK).GroupBy(d => d.GetZones());
-                foreach (var group in doorGroups)
-                {
-                    foreach (var block in group)
-                    {
-                        block.ClearConfigFlag("state", BlockState.INTRUDER1);
-                    }
-
-                    if (GridTerminalSystem.AdjacentZonesTest<IMyAirVent>(v => v.CanPressurize, group.Key.ToArray()))
-                    {
-                        group.RestoreStates();
-                    }
-                }
-
-                var doorSignGroups = GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR).GroupBy(d => d.GetZones());
-                foreach (var group in doorSignGroups)
-                {
-                    foreach (var block in group)
-                    {
-                        block.ClearConfigFlag("state", BlockState.INTRUDER1);
-                    }
-
-                    if (GridTerminalSystem.AdjacentZonesTest<IMyAirVent>(v => v.CanPressurize, group.Key.ToArray()))
-                    {
-                        group.RestoreStates();
-                    }
-                }
-
-                var signGroups = GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING).GroupBy(d => d.GetZones());
-                foreach (var group in signGroups)
-                {
-                    foreach (var block in group)
-                    {
-                        block.ClearConfigFlag("state", BlockState.INTRUDER1);
-                    }
-
-                    if (GridTerminalSystem.AdjacentZonesTest<IMyAirVent>(v => v.CanPressurize, group.Key.ToArray()))
-                    {
-                        group.RestoreStates();
-                    }
-                }
-
-                var soundBlockGroups = GridTerminalSystem.GetZoneBlocksByFunction<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN).GroupBy(s => s.GetZones());
-                foreach (var group in soundBlockGroups)
-                {
-                    foreach (var block in group)
-                    {
-                        block.ClearConfigFlag("state", BlockState.INTRUDER1);
-                    }
-
-                    if (GridTerminalSystem.AdjacentZonesTest<IMyAirVent>(v => v.CanPressurize, group.Key.ToArray()))
-                    {
-                        group.RestoreStates();
-                    }
-                }
             }
         }
     }

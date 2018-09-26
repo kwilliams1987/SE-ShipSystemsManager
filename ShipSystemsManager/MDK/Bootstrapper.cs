@@ -4,6 +4,8 @@ using Sandbox.Game.Entities.Blocks;
 using Sandbox.Game.GameSystems;
 using Sandbox.ModAPI.Ingame;
 using SpaceEngineers.Game.Entities.Blocks;
+// using IngameScript.Mockups;
+// using IngameScript.Mockups.Blocks;
 
 namespace IngameScript.MDK
 {
@@ -23,32 +25,55 @@ namespace IngameScript.MDK
         {
             // In order for your program to actually run, you will need to provide a mockup of all the facilities 
             // your script uses from the game, since they're not available outside of the game.
-
-            var grid = new MyGridTerminalSystem();
-            var vent = new MyAirVent()
+            /* Disabled mockups
+            var grid = new MockGridTerminalSystem();
+            var programmableBlock = new MockProgrammableBlock()
             {
-                DisplayNameText = "Air Vent (Deck 1)",
-                ShowInTerminal = false
+                DisplayNameText = "Programmable Block [SSM]"
             };
-            vent.SetConfig("zones", "deck-1");
 
-            var light = new MyInteriorLight()
             {
-                Name = "Normal Light (Deck 1)",
-                ShowInTerminal = false
-            };
-            light.SetConfig("zones", "deck-1");
+                var vent = new MockAirVent()
+                {
+                    DisplayNameText = "Air Vent (Deck 1)",
+                    ShowInTerminal = false,
+                    IsDepressurizing = false
+                };
+                vent.SetConfig("zones", "deck-1");
 
-            grid.Add(vent);
-            grid.Add(light);
+                var light = new MockInteriorLight()
+                {
+                    Name = "Normal Light (Deck 1)",
+                    ShowInTerminal = false
+                };
+                light.SetConfig("zones", "deck-1");
+                light.SetConfig("functions", "warnlight");
+
+                grid.Add(vent);
+                grid.Add(light);
+            }
             
             var program = MDKFactory.CreateProgram<Program>(new MDKFactory.ProgramConfig()
             {
                 Echo = message => Console.WriteLine("[{0}] {1}", DateTime.Now.ToString("U"), message),
-                GridTerminalSystem = grid
+                GridTerminalSystem = grid,
+                ProgrammableBlock = programmableBlock
             });
 
             MDKFactory.Run(program, updateType: UpdateType.Update10);
+
+            // TODO: Test States.
+
+            var vents = grid.GetBlocksOfType<MockAirVent>(v => v.IsInZone("deck-1"));
+            foreach (var vent in vents)
+            {
+                vent.IsDepressurizing = true;
+            }
+
+            MDKFactory.Run(program, updateType: UpdateType.Update10);
+
+            // TODO: Test States.
+            */
         }
     }
 

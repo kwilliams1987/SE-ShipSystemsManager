@@ -1,15 +1,28 @@
-﻿using Sandbox.ModAPI.Ingame;
+﻿// <mdk sortorder="2" />
+using Sandbox.ModAPI.Ingame;
 using SpaceEngineers.Game.ModAPI.Ingame;
 using System.Linq;
 using System;
+using System.Collections.Generic;
 
 namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
+        readonly IOrderedEnumerable<BaseStyler> StatePriority;
+
         public Program()
         {
             Runtime.UpdateFrequency = UpdateFrequency.Update10;
+
+            StatePriority = new List<BaseStyler>
+            {
+                new SelfDestructStyler(GridTerminalSystem),
+                new DecompressionStyler(),
+                new IntruderStyler(BlockState.INTRUDER1), // Intruders detected by turrets.
+                new IntruderStyler(BlockState.INTRUDER2), // Intruders detected by sensors.
+                new BattleStationsStyler()
+            }.OrderBy(s => s.Priority);
         }
 
         public void Save()
@@ -55,18 +68,44 @@ namespace IngameScript
         private void Flags(String argument)
         {
             var arguments = argument.Split(' ');
-            switch (arguments.FirstOrDefault())
+            if (arguments.Count() > 1)
             {
-                case "activate":
-                    var newstate = String.Join(" ", arguments.Skip(1));
+                var state = String.Join(" ", argument.Skip(1));
+                switch (arguments.FirstOrDefault())
+                {
+                    case "activate":
+                        switch (state)
+                        {
+                            case "destruct":
+                                var warheads = GridTerminalSystem.GetBlocksOfType<IMyWarhead>(w => w.HasFunction(BlockFunction.WARHEAD_DESTRUCT) && w.IsFunctional);
+                                if (!warheads.Any())
+                                {
+                                    Output("WARNING: Self Destruct is unavailable.");
+                                }
+                                break;
+                        }
 
-                    Me.SetConfigFlag("custom-states", newstate);
-                    return;
-                case "deactivate":
-                    var oldstate = String.Join(" ", arguments.Skip(1));
+                        if (!String.IsNullOrWhiteSpace(state))
+                            Me.SetConfigFlag("custom-states", state);
+                        return;
 
-                    Me.ClearConfigFlag("custom-states", oldstate);
-                    return;
+                    case "deactivate":
+                        if (!String.IsNullOrWhiteSpace(state))
+                            Me.ClearConfigFlag("custom-states", state);
+                        return;
+
+
+                    case "toggle":
+                        if (Me.HasConfigFlag("custom-states", state))
+                        {
+                            Flags("deactivate " + state);
+                        }
+                        else
+                        {
+                            Flags("activate " + state);
+                        }
+                        return;
+                }
             }
         }
 
@@ -86,12 +125,19 @@ namespace IngameScript
 
                 TestSensors(zone);
                 TestInteriorWeapons(zone);
-                TestBattleStations();
-
-                ApplyBlockStates();
             }
+
+            TestSelfDestruct();
+            TestBattleStations();
+
+            ApplyBlockStates();
         }
 
+        /// <summary>
+        /// Output the provided message to the Programmable Block debug UI and any other LCDs with the "debug lcd" function enabled.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="append"></param>
         private void Output(String message, Boolean append = true)
         {
             message = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + message;
@@ -127,16 +173,14 @@ namespace IngameScript
             foreach (var block in GridTerminalSystem.GetBlocksOfType<IMyTerminalBlock>(b => b.GetConfigs("zones").Any()))
             {
                 var states = block.GetConfigs("state");
-                var styler = StatePriority.FirstOrDefault(s => states.Contains(s.Key));
+                var styler = StatePriority.FirstOrDefault(s => states.Contains(s.State));
                 
-                if (styler != default(StateStyler))
+                if (styler == default(BaseStyler))
                 {
-                    styler.Style(block);
+                    styler = new DefaultStyler();
                 }
-                else
-                {
-                    StyleRestore(block);
-                }
+
+                styler.Style(block);
             }
         }
     }
