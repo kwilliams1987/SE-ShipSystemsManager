@@ -16,7 +16,7 @@ namespace IngameScript
         private const String VERSION = "$MDK_DATE$, $MDK_TIME$";
         #endregion
 
-        static class BlockFunction
+        public static class BlockFunction
         {
             public static readonly String DOOR_AIRLOCK = "airlock";
             public static readonly String DOOR_SECURITY = "security";
@@ -28,7 +28,7 @@ namespace IngameScript
             public static readonly String WARHEAD_DESTRUCT = "selfdestruct";
         }
 
-        static class BlockState
+        public static class BlockState
         {
             public static readonly String BATTLESTATIONS = "battle";
             public static readonly String DECOMPRESSION = "decompression";

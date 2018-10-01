@@ -10,20 +10,10 @@ namespace IngameScript
     {
         class DecompressionStyler : BaseStyler
         {
-            static readonly String ZONE_LABEL = "DECOMPRESSION DANGER";
-            static readonly Color SIGN_FOREGROUND_COLOR = new Color(0, 0, 255);
-            static readonly Color SIGN_BACKGROUND_COLOR = new Color(0, 0, 0);
-            static readonly String SIGN_IMAGE = "Danger";
-            static readonly String ALERT_SOUND = "Alert 2";
-            static readonly Single FONTSIZE = 2.9f / ZONE_LABEL.Split('\n').Length;
+            protected override String StylePrefix => "decompression";
 
-            static readonly Color LIGHT_COLOR = new Color(0, 0, 255);
-            static readonly Single LIGHT_BLINK = 3;
-            static readonly Single LIGHT_DURATION = 66.6f;
-            static readonly Single LIGHT_OFFSET = 0;
-
-            public DecompressionStyler()
-                : base(1, BlockState.DECOMPRESSION) { }
+            public DecompressionStyler(IMyProgrammableBlock block)
+                : base(1, BlockState.DECOMPRESSION, block) { }
 
             public override void Style(IMyTerminalBlock block)
             {
@@ -44,10 +34,10 @@ namespace IngameScript
                     {
                         lcd.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "PublicText", ZONE_LABEL },
-                            { "FontColor", SIGN_FOREGROUND_COLOR },
-                            { "BackgroundColor", SIGN_BACKGROUND_COLOR },
-                            { "FontSize", 2.9f / FONTSIZE }
+                            { "PublicText", GetStyle<String>("text") },
+                            { nameof(IMyTextPanel.FontColor), GetStyle<Color>("text.color") },
+                            { nameof(IMyTextPanel.BackgroundColor), GetStyle<Color>("sign.color") },
+                            { nameof(IMyTextPanel.FontSize), GetStyle<Single>("text.size") }
                         });
                     }
 
@@ -55,8 +45,8 @@ namespace IngameScript
                     {
                         lcd.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "Images", SIGN_IMAGE },
-                            { "Enabled", true }
+                            { "Images", GetStyle<String>("sign.images") },
+                            { nameof(IMyTextPanel.Enabled), true }
                         });
                     }
                 }
@@ -68,17 +58,17 @@ namespace IngameScript
                     {
                         soundBlock.ApplyConfig(new Dictionary<String, Object>
                         {
-                            { "SelectedSound", ALERT_SOUND },
-                            { "LoopPeriod", 3600 },
-                            { "Enabled", true },
-                            { "Play", true }
+                            { nameof(IMySoundBlock.SelectedSound), GetStyle<String>("sound") },
+                            { nameof(IMySoundBlock.LoopPeriod), 3600 },
+                            { nameof(IMySoundBlock.Enabled), true },
+                            { nameof(IMySoundBlock.Play), true }
                         });
                     }
                     else
                     {
                         soundBlock.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "Play", false }
+                            { nameof(IMySoundBlock.Play), false }
                         });
                     }
 
@@ -92,18 +82,18 @@ namespace IngameScript
                     {
                         light.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "Color", LIGHT_COLOR },
-                            { "BlinkIntervalSeconds", LIGHT_BLINK },
-                            { "BlinkLength", LIGHT_DURATION },
-                            { "BlinkOffset", LIGHT_OFFSET },
-                            { "Enabled", true },
+                            { nameof(IMyInteriorLight.Color), GetStyle<Color>("light.color") },
+                            { nameof(IMyInteriorLight.BlinkIntervalSeconds), GetStyle<Single>("light.interval") },
+                            { nameof(IMyInteriorLight.BlinkLength), GetStyle<Single>("light.duration") },
+                            { nameof(IMyInteriorLight.BlinkOffset), GetStyle<Single>("light.offset") },
+                            { nameof(IMyInteriorLight.Enabled), true },
                         });
                     }
                     else
                     {
                         light.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "Enabled", false }
+                            { nameof(IMyInteriorLight.Enabled), false }
                         });
                     }
 

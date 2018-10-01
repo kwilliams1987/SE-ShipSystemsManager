@@ -26,7 +26,7 @@ namespace IngameScript
                 GridTerminalSystem.GetZoneBlocksByFunction<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN)
                     .SetStates(BlockState.DECOMPRESSION);
 
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyInteriorLight>(zone, BlockFunction.LIGHT_WARNING)
+                GridTerminalSystem.GetZoneBlocks<IMyInteriorLight>(zone)
                     .SetStates(BlockState.DECOMPRESSION);
 
                 return;

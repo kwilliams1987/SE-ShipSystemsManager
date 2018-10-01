@@ -10,13 +10,11 @@ namespace IngameScript
     {
         class SelfDestructStyler: BattleStationsStyler
         {
-            static readonly String ZONE_LABEL = "SELF DESTRUCT in {0}";
-            static readonly String SIGN_IMAGE = "Danger";
-            static readonly Single WARHEAD_TIMER = 180;
+            protected override String StylePrefix => "destruct";
+            private IMyGridTerminalSystem Grid { get; }
 
-            private readonly IMyGridTerminalSystem Grid;
-
-            public SelfDestructStyler(IMyGridTerminalSystem grid)
+            public SelfDestructStyler(IMyProgrammableBlock block, IMyGridTerminalSystem grid)
+                : base(block)
             {
                 Priority = 1;
                 State = BlockState.SELFDESTRUCT;
@@ -32,7 +30,7 @@ namespace IngameScript
                     .Min(w => w.DetonationTime);
                 
                 if (countdown == default(Single))
-                    countdown = WARHEAD_TIMER;
+                    countdown = GetStyle<Single>("timer");
 
                 if (warhead != default(IMyWarhead) && warhead.HasFunction(BlockFunction.WARHEAD_DESTRUCT))
                 {
@@ -41,8 +39,8 @@ namespace IngameScript
                         warhead.SaveState();
                         warhead.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "IsArmed", true },
-                            { "DetonationTime", countdown },
+                            { nameof(IMyWarhead.IsArmed), true },
+                            { nameof(IMyWarhead.DetonationTime), countdown },
                             { "Countdown", true }
                         });
                     }
@@ -51,7 +49,7 @@ namespace IngameScript
                 var lcd = block as IMyTextPanel;
                 if (lcd != default(IMyTextPanel))
                 {
-                    var label = String.Format(ZONE_LABEL, TimeSpan.FromSeconds(countdown));
+                    var label = String.Format(GetStyle<String>("text"), TimeSpan.FromSeconds(countdown));
                     var fontSize = label.Split('\n').Length;
 
                     if (lcd.HasFunction(BlockFunction.SIGN_WARNING))
@@ -59,7 +57,7 @@ namespace IngameScript
                         lcd.ApplyConfig(new Dictionary<String, Object>()
                         {
                             { "PublicText", label },
-                            { "FontSize", fontSize }
+                            { nameof(IMyTextPanel.FontSize), fontSize }
                         });
                     }
 
@@ -67,8 +65,8 @@ namespace IngameScript
                     {
                         lcd.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "Images", SIGN_IMAGE },
-                            { "Enabled", true }
+                            { "Images", GetStyle<String>("sign.images") },
+                            { nameof(IMyTextPanel.Enabled), true }
                         });
                     }
                 }

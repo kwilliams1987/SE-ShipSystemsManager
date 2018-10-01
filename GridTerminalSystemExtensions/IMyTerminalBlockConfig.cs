@@ -14,7 +14,7 @@ namespace IngameScript
 
         public static void SetConfigFlag(this IMyTerminalBlock block, String key, String value)
         {
-            var values = block.GetConfigs(key);
+            var values = block.GetConfigs(key).ToList();
 
             if (!values.Contains(value))
             {
@@ -26,7 +26,7 @@ namespace IngameScript
 
         public static void ClearConfigFlag(this IMyTerminalBlock block, String key, String value)
         {
-            var values = block.GetConfigs(key);
+            var values = block.GetConfigs(key).ToList();
 
             if (values.Contains(value))
             {
@@ -40,7 +40,7 @@ namespace IngameScript
         {
             foreach (var block in blocks)
             {
-                var blockStates = block.GetConfigs("state");
+                var blockStates = block.GetConfigs("state").ToList();
                 blockStates.AddRange(states);
 
                 block.SetConfigs("state", blockStates.Distinct());
@@ -53,7 +53,7 @@ namespace IngameScript
         {
             foreach (var block in blocks)
             {
-                var blockStates = block.GetConfigs("state");
+                var blockStates = block.GetConfigs("state").ToList();
                 blockStates.RemoveAll(s => states.Contains(s));
 
                 block.SetConfigs("state", blockStates.Distinct());
@@ -62,14 +62,14 @@ namespace IngameScript
             return blocks;
         }
 
-        public static List<String> GetConfigs(this IMyTerminalBlock block, String key, Char denominator = ';')
+        public static IEnumerable<String> GetConfigs(this IMyTerminalBlock block, String key, Char denominator = ';')
         {
-            return block.GetConfigs<String>(key, denominator);
+            return block.GetConfigs<String>(key, denominator).Where(z => !String.IsNullOrWhiteSpace(z));
         }
 
-        public static List<T> GetConfigs<T>(this IMyTerminalBlock block, String key, Char denominator = ';')
+        public static IEnumerable<T> GetConfigs<T>(this IMyTerminalBlock block, String key, Char denominator = ';')
         {
-            return block.GetConfig(key).Split(denominator).Select(c => (T)Convert.ChangeType(c, typeof(T))).ToList();
+            return block.GetConfig(key).Split(denominator).Where(c => !String.IsNullOrWhiteSpace(c)).Select(c => (T)Convert.ChangeType(c, typeof(T)));
         }
 
         public static T GetConfig<T>(this IMyTerminalBlock block, String key)
@@ -149,7 +149,7 @@ namespace IngameScript
                 lines.Add(key + ":" + textvalue);
             }
 
-            block.CustomData = String.Join("\n", lines);
+            block.CustomData = String.Join("\n", lines).Trim();
         }
 
         public static void SetConfigs(this IMyTerminalBlock block, String key, IEnumerable<Object> values, Char denominator = ';')

@@ -1,16 +1,22 @@
 ﻿using System;
+using IngameScript.Mockups;
+using IngameScript.Mockups.Asserts;
+using IngameScript.Mockups.Blocks;
 using Malware.MDKUtilities;
-using Sandbox.Game.Entities.Blocks;
-using Sandbox.Game.GameSystems;
 using Sandbox.ModAPI.Ingame;
-using SpaceEngineers.Game.Entities.Blocks;
-// using IngameScript.Mockups;
-// using IngameScript.Mockups.Blocks;
+using SpaceEngineers.Game.ModAPI.Ingame;
+using VRage.Game.ModAPI;
+using VRageMath;
 
 namespace IngameScript.MDK
 {
     public class TestBootstrapper
     {
+        static class Styler
+        {
+            public static T Get<T>(String key) => (T)Program.BaseStyler.DefaultStyles[key];
+        }
+        
         // All the files in this folder, as well as all files containing the file ".debug.", will be excluded
         // from the build process. You can use this to create utilites for testing your scripts directly in 
         // Visual Studio.
@@ -25,7 +31,7 @@ namespace IngameScript.MDK
         {
             // In order for your program to actually run, you will need to provide a mockup of all the facilities 
             // your script uses from the game, since they're not available outside of the game.
-            /* Disabled mockups
+
             var grid = new MockGridTerminalSystem();
             var programmableBlock = new MockProgrammableBlock()
             {
@@ -35,22 +41,48 @@ namespace IngameScript.MDK
             {
                 var vent = new MockAirVent()
                 {
+                    Status= VentStatus.Pressurized,
                     DisplayNameText = "Air Vent (Deck 1)",
                     ShowInTerminal = false,
-                    IsDepressurizing = false
+                    IsDepressurizing = false,
+                    CanPressurize = true
                 };
                 vent.SetConfig("zones", "deck-1");
 
-                var light = new MockInteriorLight()
+                var alertLight = new MockInteriorLight()
+                {
+                    Name = "Alert Light (Deck 1)",
+                    ShowInTerminal = false
+                };
+                alertLight.SetConfig("zones", "deck-1");
+                alertLight.SetConfig("functions", "warnlight");
+
+                var normalLight = new MockInteriorLight()
                 {
                     Name = "Normal Light (Deck 1)",
                     ShowInTerminal = false
                 };
-                light.SetConfig("zones", "deck-1");
-                light.SetConfig("functions", "warnlight");
+                normalLight.SetConfig("zones", "deck-1");
+
+                var debugLcd = new MockTextPanel()
+                {
+                    Name = "Debug Panel"
+                };
+                debugLcd.SetConfig("functions", "debug lcd");
+
+                var doorLcd = new MockTextPanel()
+                {
+                    Name = "Door Sign (Deck 1)"
+                };
+                doorLcd.WritePublicText("DECK 1");
+                doorLcd.SetConfig("zones", "deck-1");
+                doorLcd.SetConfig("functions", "doorsign");
 
                 grid.Add(vent);
-                grid.Add(light);
+                grid.Add(alertLight);
+                grid.Add(normalLight);
+                grid.Add(debugLcd);
+                grid.Add(doorLcd);
             }
             
             var program = MDKFactory.CreateProgram<Program>(new MDKFactory.ProgramConfig()
@@ -60,67 +92,52 @@ namespace IngameScript.MDK
                 ProgrammableBlock = programmableBlock
             });
 
+            Console.WriteLine("Executing Run #1 (Normal)");
             MDKFactory.Run(program, updateType: UpdateType.Update10);
+            {
+                var lights = grid.GetZoneBlocks<MockInteriorLight>("deck-1");
 
-            // TODO: Test States.
+                foreach (var light in lights)
+                {
+                    Assert.That(light.Color.PackedValue == new Color(255,255,255).PackedValue, $"Light {light.EntityId} does not have the expected color.");
+                    Assert.That(light.BlinkIntervalSeconds == 0, $"Light {light.EntityId} does not have the expected blink interval.");
+                    Assert.That(light.BlinkLength == 0, $"Light {light.EntityId} does not have the expected blink length.");
+                    Assert.That(light.BlinkOffset == 0, $"Light {light.EntityId} does not have the expected blink offset.");
+                }
+            }
 
-            var vents = grid.GetBlocksOfType<MockAirVent>(v => v.IsInZone("deck-1"));
+            var vents = grid.GetZoneBlocks<MockAirVent>("deck-1");
             foreach (var vent in vents)
             {
                 vent.IsDepressurizing = true;
+                vent.CanPressurize = false;
             }
 
+            Console.WriteLine("Executing Run #2 (Decompression - Deck 1)");
             MDKFactory.Run(program, updateType: UpdateType.Update10);
 
-            // TODO: Test States.
-            */
-        }
-    }
-
-    internal class MyGridProgramRuntimeInfo : IMyGridProgramRuntimeInfo
-    {
-        public TimeSpan TimeSinceLastRun
-        {
-            get
             {
-                switch (UpdateFrequency)
+                var lights = grid.GetZoneBlocks<MockInteriorLight>("deck-1");
+
+                foreach (var light in lights)
                 {
-                    case UpdateFrequency.Update1:
-                        return TimeSpan.FromSeconds(1f / 60);
-                    case UpdateFrequency.Update10:
-                        return TimeSpan.FromSeconds(1f / 6);
-                    case UpdateFrequency.Update100:
-                        return TimeSpan.FromSeconds(6f);
-                    default:
-                        return TimeSpan.Zero;
+                    if (light.HasFunction(Program.BlockFunction.LIGHT_WARNING))
+                    {
+                        Assert.That(light.Color.PackedValue == Styler.Get<Color>("decompression.light.color").PackedValue, $"Light {light.EntityId} does not have the expected color.");
+                        Assert.That(light.BlinkIntervalSeconds == Styler.Get<Single>("decompression.light.interval"), $"Light {light.EntityId} does not have the expected blink interval.");
+                        Assert.That(light.BlinkLength == Styler.Get<Single>("decompression.light.duration"), $"Light {light.EntityId} does not have the expected blink length.");
+                        Assert.That(light.BlinkOffset == Styler.Get<Single>("decompression.light.offset"), $"Light {light.EntityId} does not have the expected blink offset.");
+                        Assert.That(light.Enabled, $"Light {light.EntityId} should be enabled.");
+                    }
+                    else
+                    {
+                        Assert.That(!light.Enabled, $"Light {light.EntityId} should not be enabled.");
+                    }
                 }
             }
-        }
 
-        public Double LastRunTimeMs { get; protected set; }
-
-        public Int32 MaxInstructionCount { get; protected set; }
-
-        public Int32 CurrentInstructionCount { get; protected set; }
-
-        public Int32 MaxMethodCallCount { get; protected set; }
-
-        public Int32 CurrentMethodCallCount { get; protected set; }
-
-        public UpdateFrequency UpdateFrequency { get; set; }
-
-        public Int32 MaxCallChainDepth { get; set; }
-
-        public Int32 CurrentCallChainDepth { get; set; }
-
-        public MyGridProgramRuntimeInfo(UpdateFrequency updateFrequency)
-        {
-            UpdateFrequency = updateFrequency;
-            LastRunTimeMs = 0;
-            MaxInstructionCount = 0;
-            CurrentInstructionCount = 0;
-            MaxMethodCallCount = 0;
-            CurrentMethodCallCount = 0;
+            Console.WriteLine("Press any key to exit.");
+            Console.ReadKey(true);
         }
     }
 }

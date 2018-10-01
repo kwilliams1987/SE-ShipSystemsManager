@@ -10,17 +10,9 @@ namespace IngameScript
     {
         class IntruderStyler : BaseStyler
         {
-            static readonly String ZONE_LABEL = "INTRUDER ALERT";
-            static readonly Color SIGN_FOREGROUND_COLOR = new Color(255, 0, 0);
-            static readonly Color SIGN_BACKGROUND_COLOR = new Color(0, 0, 0);
-            static readonly String SIGN_IMAGE = "Danger";
-            static readonly String ALERT_SOUND = "Alert 1";
-            static readonly Single FONTSIZE = 2.9f / ZONE_LABEL.Split('\n').Length;
-
-            static readonly Color LIGHT_COLOR = new Color(255, 0, 0);
-
-            public IntruderStyler(String blockState)
-                : base(2, blockState) { }
+            protected override String StylePrefix => "intruder";
+            public IntruderStyler(IMyProgrammableBlock block, String blockState)
+                : base(2, blockState, block) { }
 
             public override void Style(IMyTerminalBlock block)
             {
@@ -42,10 +34,10 @@ namespace IngameScript
                     {
                         lcd.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "PublicText", ZONE_LABEL },
-                            { "FontColor", SIGN_FOREGROUND_COLOR },
-                            { "BackgroundColor", SIGN_BACKGROUND_COLOR },
-                            { "FontSize", 2.9f / FONTSIZE }
+                            { "PublicText", GetStyle<String>("text") },
+                            { nameof(IMyTextPanel.FontColor), GetStyle<Color>("text.color") },
+                            { nameof(IMyTextPanel.BackgroundColor), GetStyle<Color>("sign.color") },
+                            { nameof(IMyTextPanel.FontSize), GetStyle<Single>("text.size") }
                         });
                     }
 
@@ -53,8 +45,8 @@ namespace IngameScript
                     {
                         lcd.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "Images", SIGN_IMAGE },
-                            { "Enabled", true }
+                            { "Images", GetStyle<Color>("sign.images") },
+                            { nameof(IMyTextPanel.Enabled), true }
                         });
                     }
 
@@ -68,17 +60,17 @@ namespace IngameScript
                     {
                         soundBlock.ApplyConfig(new Dictionary<String, Object>
                     {
-                        { "SelectedSound", ALERT_SOUND },
-                        { "LoopPeriod", 3600 },
-                        { "Enabled", true },
-                        { "Play", true }
+                        { nameof(IMySoundBlock.SelectedSound), GetStyle<Color>("sound") },
+                        { nameof(IMySoundBlock.LoopPeriod), 3600 },
+                        { nameof(IMySoundBlock.Enabled), true },
+                        { nameof(IMySoundBlock.Play), true }
                     });
                     }
                     else
                     {
                         soundBlock.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "Play", false }
+                            { nameof(IMySoundBlock.Play), false }
                         });
                     }
 

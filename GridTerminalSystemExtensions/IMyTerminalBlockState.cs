@@ -99,7 +99,7 @@ namespace IngameScript
                 lcd.WritePublicText(lcd.GetConfig("PublicText"), true);
                 lcd.WritePublicTitle(lcd.GetConfig("PublicTitle"));
 
-                var images = lcd.GetConfigs("SelectedImages");
+                var images = lcd.GetConfigs("SelectedImages").ToList();
 
                 lcd.ClearImagesFromSelection();
                 lcd.AddImagesToSelection(images);

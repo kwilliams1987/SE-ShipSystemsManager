@@ -1,4 +1,5 @@
 ﻿using Sandbox.ModAPI.Ingame;
+using System;
 
 namespace IngameScript
 {
@@ -6,8 +7,10 @@ namespace IngameScript
     {
         class DefaultStyler : BaseStyler
         {
-            public DefaultStyler()
-                : base(1000, "") { }
+            protected override String StylePrefix => "";
+
+            public DefaultStyler(IMyProgrammableBlock block)
+                : base(1000, "", block) { }
 
             public override void Style(IMyTerminalBlock block)
             {

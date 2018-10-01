@@ -8,18 +8,24 @@ namespace IngameScript
 {
     static class IMyGridTerminalSystemExtensions
     {
-        public static List<T> GetBlocksOfType<T>(this IMyGridTerminalSystem grid, Func<T, Boolean> collect = null)
+        public static IEnumerable<T> GetBlocksOfType<T>(this IMyGridTerminalSystem grid, Func<T, Boolean> collect = null)
             where T : class, IMyTerminalBlock
         {
             var result = new List<T>();
             grid.GetBlocksOfType(result, collect);
             return result;
         }
-
-        public static List<T> GetZoneBlocksByFunction<T>(this IMyGridTerminalSystem grid, String zone, String function, Boolean all = false)
+        
+        public static IEnumerable<T> GetZoneBlocks<T>(this IMyGridTerminalSystem grid, String zone, Boolean all = false)
             where T : class, IMyTerminalBlock
         {
-            return grid.GetBlocksOfType<T>(p => (p.IsWorking || all) && p.IsInZone(zone) && p.HasFunction(function));
+            return grid.GetBlocksOfType<T>(p => (p.IsWorking || all) && p.IsInZone(zone));
+        }
+
+        public static IEnumerable<T> GetZoneBlocksByFunction<T>(this IMyGridTerminalSystem grid, String zone, String function, Boolean all = false)
+            where T : class, IMyTerminalBlock
+        {
+            return grid.GetZoneBlocks<T>(zone, all).Where(p => p.HasFunction(function));
         }
 
         public static List<String> GetZones(this IMyGridTerminalSystem grid)

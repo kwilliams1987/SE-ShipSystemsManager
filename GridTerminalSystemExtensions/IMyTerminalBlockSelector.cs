@@ -7,7 +7,7 @@ namespace IngameScript
 {
     static class IMyTerminalBlockSelectorExtensions
     {
-        public static List<String> GetFunctions(this IMyTerminalBlock block)
+        public static IEnumerable<String> GetFunctions(this IMyTerminalBlock block)
         {
             return block.GetConfigs("functions");
         }
@@ -17,7 +17,7 @@ namespace IngameScript
             return block.GetFunctions().Contains(function);
         }
 
-        public static List<String> GetZones(this IMyTerminalBlock block)
+        public static IEnumerable<String> GetZones(this IMyTerminalBlock block)
         {
             return block.GetConfigs("zones");
         }

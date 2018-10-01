@@ -17,11 +17,11 @@ namespace IngameScript
 
             StatePriority = new List<BaseStyler>
             {
-                new SelfDestructStyler(GridTerminalSystem),
-                new DecompressionStyler(),
-                new IntruderStyler(BlockState.INTRUDER1), // Intruders detected by turrets.
-                new IntruderStyler(BlockState.INTRUDER2), // Intruders detected by sensors.
-                new BattleStationsStyler()
+                new SelfDestructStyler(Me, GridTerminalSystem),
+                new DecompressionStyler(Me),
+                new IntruderStyler(Me, BlockState.INTRUDER1), // Intruders detected by turrets.
+                new IntruderStyler(Me, BlockState.INTRUDER2), // Intruders detected by sensors.
+                new BattleStationsStyler(Me)
             }.OrderBy(s => s.Priority);
         }
 
@@ -68,10 +68,10 @@ namespace IngameScript
         private void Flags(String argument)
         {
             var arguments = argument.Split(' ');
-            if (arguments.Count() > 1)
+            if (arguments.Count() > 0)
             {
                 var state = String.Join(" ", argument.Skip(1));
-                switch (arguments.FirstOrDefault())
+                switch (arguments.First())
                 {
                     case "activate":
                         switch (state)
@@ -105,6 +105,36 @@ namespace IngameScript
                             Flags("activate " + state);
                         }
                         return;
+                    case "customize":
+
+                        switch (arguments.ElementAtOrDefault(1))
+                        {
+                            case "":
+                            case "preserve":
+                                Output("Writing default styler settings to the Programmable Block CustomData attribute (preserving existing).");
+
+                                var configs = Me.GetConfig();
+                                foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
+                                {
+                                    if (!configs.ContainsKey(styler.Key))
+                                    {
+                                        Me.SetConfig(styler.Key, styler.Value);
+                                    }
+                                }
+                                break;
+                            case "overwrite":
+                                Output("Writing default styler settings to the Programmable Block CustomData attribute (overwriting existing).");
+
+                                foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
+                                {
+                                    Me.SetConfig(styler.Key, styler.Value);
+                                }
+                                break;
+                            case "reset":
+                                Me.CustomData = "";
+                                break;
+                        }
+                        break;
                 }
             }
         }
@@ -177,7 +207,7 @@ namespace IngameScript
                 
                 if (styler == default(BaseStyler))
                 {
-                    styler = new DefaultStyler();
+                    styler = new DefaultStyler(Me);
                 }
 
                 styler.Style(block);
