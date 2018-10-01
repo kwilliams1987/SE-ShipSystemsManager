@@ -31,13 +31,13 @@ Each block has one or more functions, which depend on the block type.
 ### LCD Displays
 * `doorsign` This specifies the LCD above a door, and will change text to read BATTLE STATIONS, DECOMPRESSION or other similar text messages.
 * `battle` This specifies a large LCD which will display a graphic during a BATTLE STATIONS state.
-* `warnsign` This specifies a large LCD which will display an appropriate graphic during any state which provides on.
+* `warnsign` This specifies a large LCD which will display an appropriate graphic during any state which provides one.
 
 ### Sound Blocks
 * `siren` These sound blocks will play a sound loop appropriate to the current ship state.
 
 ### Lights
-* `warnlight` These lights will change color and blink depending on the current ship state.
+* `warnlight` These lights will change color and blink style depending on the current ship state.
 * **Special Case**: During many ship state triggers, any lights not marked with a `warnlight` state will be disabled.
 
 ## States
@@ -51,7 +51,9 @@ Additional custom states can be added later.
 The Programmable Block can be sent arguments to affect it's behaviour.
 Running the script with no arguments is the same as a normal "Tick" cycle.
 ### activate [state]
-This will set a custom state on the block, for example `activate battle` will enable the "Battle Stations" state.
+This will set a custom state on the block.
+* `activate battle` will enable the "Battle Stations" state.
+* `activate destruct` will start the "Self Destruct" system.
 ### deactivate [state]
 This will clear a custom state on the block, for example `deactivate battle` will cancel the "Battle Stations" alerts.
 ### toggle [state]
@@ -123,3 +125,7 @@ Open the middle door, and then delete an external door:
 	*  It's external door will unlock
 	*  The door between the two rooms will remain disabled (it's still counted as in a depressurized zone)
 *  The depressurized room's lights remain in alert state until the decompression is fixed.
+
+## Debugging
+If you're having issues with the script, you can check the Programmable Block debug output.
+You can also add a Text Panel to the current Grid with `function=debug lcd` in it's Custom Data for more verbose information.
