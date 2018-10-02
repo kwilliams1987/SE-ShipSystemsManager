@@ -1,0 +1,151 @@
+﻿IMyCollector
+IMyConveyor
+IMyConveyorSorter
+IMyCryoChamber
+IMyDecoy
+IMyDoor
+IMyGyro
+IMyJumpDrive
+IMyLargeTurretBase
+IMyLaserAntenna
+IMyLightingBlock
+IMyMotorStator
+IMyOreDetector
+IMyOxygenGenerator
+IMyOxygenTank
+IMyPistonBase
+IMyProgrammableBlock
+IMyProjector
+IMyRadioAntenna
+IMyReactor
+IMyRefinery
+IMyRemoteControl
+IMySensorBlock
+IMyShipConnector
+IMyShipController
+IMyShipDrill
+IMyShipGrinder
+IMyShipWelder
+IMySmallGatlingGun
+IMySmallMissileLauncher
+IMySmallMissileLauncherReload
+IMyTextPanel
+IMyThrust
+IMyWarhead
+
+
+
+        /*
+         TODO: Move these Custom properties to the BlockSerialization project.
+        return;
+
+        foreach (var config in configValues)
+        {
+            switch (config.Key)
+            {
+                case nameof(Serialization.CustomProperties.Closed):
+                    if (door != default(IMyDoor))
+                    {
+                        if (Object.Equals(config.Value, true))
+                        {
+                            if (door.OpenRatio > 0)
+                            {
+                                door.Enabled = true;
+                                door.CloseDoor();
+                            }
+                        }
+                    }
+                    break;
+                case "Countdown":
+                    if (warhead != default(IMyWarhead))
+                    {
+                        if (Object.Equals(config.Value, true))
+                        {
+                            warhead.StartCountdown();
+                        }
+                        else
+                        {
+                            warhead.StopCountdown();
+                        }
+                    }
+                    break;
+                case nameof(Serialization.CustomProperties.Locked):
+                    if (door != default(IMyDoor))
+                    {
+                        if (Object.Equals(config.Value, true))
+                        {
+                            if (door.OpenRatio > 0)
+                            {
+                                door.Enabled = true;
+                                door.CloseDoor();
+                            }
+                            else
+                            {
+                                door.Enabled = false;
+                            }
+                        }
+                        else
+                        {
+                            door.Enabled = true;
+                        }
+                    }
+                    break;
+                case nameof(Serialization.CustomProperties.PublicText):
+                    if (textPanel != default(IMyTextPanel))
+                    {
+                        textPanel.WritePublicText(config.Value.ToString());
+                    }
+                    break;
+                case "PublicTitle":
+                    if (textPanel != default(IMyTextPanel))
+                    {
+                        textPanel.WritePublicTitle(config.Value.ToString());
+                    }
+                    break;
+                case nameof(Serialization.CustomProperties.Images):
+                    if (textPanel != default(IMyTextPanel))
+                    {
+                        textPanel.ClearImagesFromSelection();
+                        textPanel.AddImagesToSelection(config.Value.ToString().Split(';').ToList());
+                        textPanel.ShowTextureOnScreen();
+                    }
+                    break;
+                case "Play":
+                    if (soundBlock != default(IMySoundBlock))
+                    {
+                        if (Object.Equals(config.Value, true))
+                        {
+                            soundBlock.Play();
+                        }
+                        else
+                        {
+                            soundBlock.Stop();
+                        }
+                    }
+                    break;
+                default:
+                    if (config.Value is Color)
+                    {
+                        block.SetValueColor(config.Key, (Color)config.Value);
+                    }
+
+                    else if (config.Value is Single)
+                    {
+                        block.SetValueFloat(config.Key, (Single)config.Value);
+
+                    }
+
+                    else if (config.Value is Boolean)
+                    {
+                        block.SetValueBool(config.Key, (Boolean)config.Value);
+                    }
+
+                    else
+                    {
+                        block.SetValue(config.Key, config.Value.ToString());
+                    }
+
+                    break;
+            }
+        }
+        */

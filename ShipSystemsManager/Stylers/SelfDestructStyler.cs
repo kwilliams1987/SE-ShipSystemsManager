@@ -1,5 +1,4 @@
 ﻿using Sandbox.ModAPI.Ingame;
-using SpaceEngineers.Game.ModAPI.Ingame;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,12 +35,11 @@ namespace IngameScript
                 {
                     if (!warhead.IsCountingDown)
                     {
-                        warhead.SaveState();
                         warhead.ApplyConfig(new Dictionary<String, Object>()
                         {
                             { nameof(IMyWarhead.IsArmed), true },
                             { nameof(IMyWarhead.DetonationTime), countdown },
-                            { "Countdown", true }
+                            { nameof(Serialization.CustomProperties.Countdown), true }
                         });
                     }
                 }
@@ -56,7 +54,7 @@ namespace IngameScript
                     {
                         lcd.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "PublicText", label },
+                            { nameof(Serialization.CustomProperties.PublicText), label },
                             { nameof(IMyTextPanel.FontSize), fontSize }
                         });
                     }
@@ -65,7 +63,7 @@ namespace IngameScript
                     {
                         lcd.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "Images", GetStyle<String>("sign.images") },
+                            { nameof(Serialization.CustomProperties.Images), GetStyle<String>("sign.images") },
                             { nameof(IMyTextPanel.Enabled), true }
                         });
                     }

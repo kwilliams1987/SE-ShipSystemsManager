@@ -14,7 +14,7 @@ namespace IngameScript
 
             public override void Style(IMyTerminalBlock block)
             {
-                block.RestoreState();
+                block.RestoreConfig();
             }
         }
     }

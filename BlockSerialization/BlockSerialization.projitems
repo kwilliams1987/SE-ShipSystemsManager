@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>2907d914-251e-4c86-9557-ea5ca325c0d8</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>BlockSerialization</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CustomProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SerializationExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyCockpitSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyCameraBlockSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyBeaconSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyBatteryBlockSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyAssemblerSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyFunctionalBlockSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyTerminalBlockSerializer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Todo.txt" />
+  </ItemGroup>
+</Project>

@@ -12,6 +12,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)IMyGridTerminalSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMyTerminalBlockConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMyTerminalBlockSelector.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IMyTerminalBlockState.cs" />
   </ItemGroup>
 </Project>

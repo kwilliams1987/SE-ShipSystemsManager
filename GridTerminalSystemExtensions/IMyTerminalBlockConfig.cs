@@ -79,7 +79,7 @@ namespace IngameScript
 
             if (config.ContainsKey(key))
             {
-                value = block.GetConfig()[key];
+                value = config[key];
             }
 
             if (String.IsNullOrWhiteSpace(value))
@@ -99,7 +99,7 @@ namespace IngameScript
 
             if (config.ContainsKey(key))
             {
-                value = block.GetConfig()[key];
+                value = config[key];
             }
 
             if (String.IsNullOrWhiteSpace(value))

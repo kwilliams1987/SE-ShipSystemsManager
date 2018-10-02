@@ -9,9 +9,13 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "GridTerminalSystemExtension
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MDK-Mockups", "..\..\..\..\source\repos\MDK-Mockups\MDK-Mockups.shproj", "{33863C91-80F6-4ABC-A735-3934A61D494C}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BlockSerialization", "BlockSerialization\BlockSerialization.shproj", "{2907D914-251E-4C86-9557-EA5CA325C0D8}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		BlockSerialization\BlockSerialization.projitems*{2907d914-251e-4c86-9557-ea5ca325c0d8}*SharedItemsImports = 13
 		..\..\..\..\source\repos\MDK-Mockups\MDK-Mockups.projitems*{33863c91-80f6-4abc-a735-3934a61d494c}*SharedItemsImports = 13
+		BlockSerialization\BlockSerialization.projitems*{7577edaa-27ff-4d32-814b-a1077f8dcda4}*SharedItemsImports = 4
 		GridTerminalSystemExtensions\GridTerminalSystemExtensions.projitems*{7577edaa-27ff-4d32-814b-a1077f8dcda4}*SharedItemsImports = 4
 		..\..\..\..\source\repos\MDK-Mockups\MDK-Mockups.projitems*{7577edaa-27ff-4d32-814b-a1077f8dcda4}*SharedItemsImports = 4
 		GridTerminalSystemExtensions\GridTerminalSystemExtensions.projitems*{e5c4993a-a316-4c0d-9199-dd5d0380efb9}*SharedItemsImports = 13

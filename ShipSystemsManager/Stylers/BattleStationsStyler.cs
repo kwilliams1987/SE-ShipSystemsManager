@@ -22,7 +22,7 @@ namespace IngameScript
                 {
                     door.ApplyConfig(new Dictionary<String, Object>()
                     {
-                        { "Closed", true }
+                        { nameof(Serialization.CustomProperties.Closed), true }
                     });
 
                     return;
@@ -35,7 +35,7 @@ namespace IngameScript
                     {
                         lcd.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "PublicText", GetStyle<String>("text") },
+                            { nameof(Serialization.CustomProperties.PublicText), GetStyle<String>("text") },
                             { nameof(IMyTextPanel.Font), GetStyle<String>("text.font") },
                             { nameof(IMyTextPanel.FontColor), GetStyle<Color>("text.color") },
                             { nameof(IMyTextPanel.BackgroundColor), GetStyle<Color>("sign.color") },
@@ -47,7 +47,7 @@ namespace IngameScript
                     {
                         lcd.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { "Images", GetStyle<String>("sign.images") },
+                            { nameof(Serialization.CustomProperties.Images), GetStyle<String>("sign.images") },
                             { nameof(IMyTextPanel.Enabled), true }
                         });
                     }
