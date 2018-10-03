@@ -7,22 +7,46 @@ namespace IngameScript
 {
     public static class SerializationExtensions
     {
-        private static Serialization.IMyTerminalBlockSerializer GetSerializer<T>()
+        private static Serialization.IMyTerminalBlockSerializer GetSerializer<T>(T block)
              where T : IMyTerminalBlock
         {
             var serializer = default(Serialization.IMyTerminalBlockSerializer);
 
-            if (typeof(T) == typeof(IMyAssembler))
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyAssembler)
                 serializer = new Serialization.IMyAssemblerSerializer();
 
-            if (typeof(T) == typeof(IMyBatteryBlock))
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyBatteryBlock)
                 serializer = new Serialization.IMyBatteryBlockSerializer();
 
-            if (typeof(T) == typeof(IMyCameraBlock))
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyCameraBlock)
                 serializer = new Serialization.IMyCameraBlockSerializer();
 
-            if (typeof(T) == typeof(IMyCockpit))
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyCockpit)
                 serializer = new Serialization.IMyCockpitSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyCollector)
+                serializer = new Serialization.IMyCollectorSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyConveyorSorter)
+                serializer = new Serialization.IMyConveyorSorterSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyDoor)
+                serializer = new Serialization.IMyDoorSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyGyro)
+                serializer = new Serialization.IMyGyroSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyLargeTurretBase)
+                serializer = new Serialization.IMyLargeTurretBaseSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyLaserAntenna)
+                serializer = new Serialization.IMyLaserAntennaSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyLightingBlock)
+                serializer = new Serialization.IMyLightingBlockSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyFunctionalBlock)
+                serializer = new Serialization.IMyFunctionalBlockSerializer();
 
             if (serializer == default(Serialization.IMyTerminalBlockSerializer))
                 serializer = new Serialization.IMyTerminalBlockSerializer<T>();
@@ -31,15 +55,15 @@ namespace IngameScript
         }
 
         public static void RestoreConfig<T>(this T block)
-             where T : IMyTerminalBlock => GetSerializer<T>().RestoreState(block);
+             where T : IMyTerminalBlock => GetSerializer(block).RestoreState(block);
 
         public static void ApplyConfig<T>(this T block, Dictionary<String, Object> configValues)
-             where T : IMyTerminalBlock => GetSerializer<T>().SetState(block, configValues);
+             where T : IMyTerminalBlock => GetSerializer(block).SetState(block, configValues);
 
         public static void ApplyConfig<T>(this IEnumerable<T> blocks, Dictionary<String, Object> configValues)
             where T : IMyTerminalBlock
         {
-            var serializer = GetSerializer<T>();
+            var serializer = GetSerializer(blocks.FirstOrDefault());
             foreach (var block in blocks)
             {
                 serializer.SetState(block, configValues);

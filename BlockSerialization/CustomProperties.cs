@@ -13,6 +13,7 @@ namespace IngameScript
             public const String Locked = "";
             public const String PublicText = "";
             public const String Countdown = "";
+            public const String FilterList = "";
         }
     }
 }

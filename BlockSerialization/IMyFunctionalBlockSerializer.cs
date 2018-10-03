@@ -6,6 +6,8 @@ namespace IngameScript
 {
     partial class Serialization
     {
+        public class IMyFunctionalBlockSerializer: IMyFunctionalBlockSerializer<IMyFunctionalBlock> { }
+
         public class IMyFunctionalBlockSerializer<T> : IMyTerminalBlockSerializer<T>
                 where T : IMyFunctionalBlock
         {
