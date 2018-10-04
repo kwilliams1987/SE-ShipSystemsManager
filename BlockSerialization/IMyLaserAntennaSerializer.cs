@@ -21,9 +21,19 @@ namespace IngameScript
             {
                 base.Deserialize(block, values);
 
-                block.AttachedProgrammableBlock = Convert.ToInt64(values[nameof(block.AttachedProgrammableBlock)]);
-                block.IsPermanent = Convert.ToBoolean(values[nameof(block.IsPermanent)]);
-                block.Range = Convert.ToSingle(values[nameof(block.Range)]);
+                foreach (var value in values)
+                {
+                    switch (value.Key)
+                    {
+                        case nameof(block.AttachedProgrammableBlock):
+                            // TODO: Check if Entity ID is a Programmable Block on the current grid.
+                            block.AttachedProgrammableBlock = Convert.ToInt64(value.Value); break;
+                        case nameof(block.IsPermanent):
+                            block.IsPermanent = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.Range):
+                            block.Range = Convert.ToSingle(value.Value); break;
+                    }
+                }
             }
         }
     }

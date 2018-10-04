@@ -1,31 +1,4 @@
-﻿IMyConveyorSorter *
-
-IMyMotorStator
-IMyOreDetector
-IMyOxygenGenerator
-IMyOxygenTank
-IMyPistonBase
-IMyProgrammableBlock
-IMyProjector
-IMyRadioAntenna
-IMyReactor
-IMyRefinery
-IMyRemoteControl
-IMySensorBlock
-IMyShipConnector
-IMyShipController
-IMyShipDrill
-IMyShipGrinder
-IMyShipWelder
-IMySmallGatlingGun
-IMySmallMissileLauncher
-IMySmallMissileLauncherReload
-IMyTextPanel
-IMyThrust
-IMyWarhead
-
-
-
+﻿
         /*
          TODO: Move these Custom properties to the BlockSerialization project.
         return;
@@ -45,26 +18,6 @@ IMyWarhead
                         {
                             warhead.StopCountdown();
                         }
-                    }
-                    break;
-                case nameof(Serialization.CustomProperties.PublicText):
-                    if (textPanel != default(IMyTextPanel))
-                    {
-                        textPanel.WritePublicText(config.Value.ToString());
-                    }
-                    break;
-                case "PublicTitle":
-                    if (textPanel != default(IMyTextPanel))
-                    {
-                        textPanel.WritePublicTitle(config.Value.ToString());
-                    }
-                    break;
-                case nameof(Serialization.CustomProperties.Images):
-                    if (textPanel != default(IMyTextPanel))
-                    {
-                        textPanel.ClearImagesFromSelection();
-                        textPanel.AddImagesToSelection(config.Value.ToString().Split(';').ToList());
-                        textPanel.ShowTextureOnScreen();
                     }
                     break;
                 case "Play":

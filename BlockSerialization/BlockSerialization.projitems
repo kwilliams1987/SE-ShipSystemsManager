@@ -10,8 +10,27 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)CustomProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyGravityGeneratorSphereSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMySoundBlockSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyGravityGeneratorSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyWarheadSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyThrustSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyTextPanelSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMySmallGatlingGunSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMySmallMissileLauncherSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyShipWelderSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyShipDrillSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyShipConnectorSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMySensorBlockSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyReactorSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMyCollectorSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMyConveyorSorterSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyRadioAntennaSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyPistonBaseSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyGasTankSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyGasGeneratorSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyOreDetectorSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMyMotorStatorSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMyLightingBlockSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMyLaserAntennaSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMyLargeTurretBaseSerializer.cs" />

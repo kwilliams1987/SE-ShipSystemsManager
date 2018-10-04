@@ -25,13 +25,26 @@ namespace IngameScript
             {
                 base.Deserialize(block, values);
 
-                block.Radius = Convert.ToSingle(values[nameof(block.Radius)]);
-                block.Intensity = Convert.ToSingle(values[nameof(block.Intensity)]);
-                block.Falloff = Convert.ToSingle(values[nameof(block.Falloff)]);
-                block.BlinkIntervalSeconds = Convert.ToSingle(values[nameof(block.BlinkIntervalSeconds)]);
-                block.BlinkLength = Convert.ToSingle(values[nameof(block.BlinkLength)]);
-                block.BlinkOffset = Convert.ToSingle(values[nameof(block.BlinkOffset)]);
-                block.Color = new VRageMath.Color(Convert.ToInt64(values[nameof(block.Color)]));
+                foreach (var value in values)
+                {
+                    switch (value.Key)
+                    {
+                        case nameof(block.Radius):
+                            block.Radius = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Intensity):
+                            block.Intensity = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Falloff):
+                            block.Falloff = Convert.ToSingle(value.Value); break;
+                        case nameof(block.BlinkIntervalSeconds):
+                            block.BlinkIntervalSeconds = Convert.ToSingle(value.Value); break;
+                        case nameof(block.BlinkLength):
+                            block.BlinkLength = Convert.ToSingle(value.Value); break;
+                        case nameof(block.BlinkOffset):
+                            block.BlinkOffset = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Color):
+                            block.Color = new VRageMath.Color(Convert.ToInt64(value.Value)); break;
+                    }
+                }
             }
         }
     }

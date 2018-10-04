@@ -20,14 +20,25 @@ namespace IngameScript
             protected override void Deserialize(IMyLargeTurretBase block, Dictionary<String, Object> values)
             {
                 base.Deserialize(block, values);
-
-                block.Azimuth = Convert.ToSingle(values[nameof(block.Azimuth)]);
-                block.Elevation = Convert.ToSingle(values[nameof(block.Elevation)]);
-                block.EnableIdleRotation = Convert.ToBoolean(values[nameof(block.EnableIdleRotation)]);
-
-                block.SyncAzimuth();
-                block.SyncElevation();
-                block.SyncEnableIdleRotation();
+                
+                foreach (var value in values)
+                {
+                    switch (value.Key)
+                    {
+                        case nameof(block.Azimuth):
+                            block.Azimuth = Convert.ToSingle(value.Value);
+                            block.SyncAzimuth();
+                            break;
+                        case nameof(block.Elevation):
+                            block.Elevation = Convert.ToSingle(value.Value);
+                            block.SyncElevation();
+                            break;
+                        case nameof(block.EnableIdleRotation):
+                            block.EnableIdleRotation = Convert.ToBoolean(value.Value);
+                            block.SyncEnableIdleRotation();
+                            break;
+                    }
+                }
             }
         }
     }

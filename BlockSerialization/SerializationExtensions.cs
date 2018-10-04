@@ -1,4 +1,5 @@
 ﻿using Sandbox.ModAPI.Ingame;
+using SpaceEngineers.Game.ModAPI.Ingame;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,8 +34,20 @@ namespace IngameScript
             if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyDoor)
                 serializer = new Serialization.IMyDoorSerializer();
 
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyGasGenerator)
+                serializer = new Serialization.IMyGasGeneratorSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyGasTank)
+                serializer = new Serialization.IMyGasTankSerializer();
+
             if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyGyro)
                 serializer = new Serialization.IMyGyroSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyGravityGenerator)
+                serializer = new Serialization.IMyGravityGeneratorSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyGravityGeneratorSphere)
+                serializer = new Serialization.IMyGravityGeneratorSphereSerializer();
 
             if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyLargeTurretBase)
                 serializer = new Serialization.IMyLargeTurretBaseSerializer();
@@ -44,6 +57,51 @@ namespace IngameScript
 
             if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyLightingBlock)
                 serializer = new Serialization.IMyLightingBlockSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyMotorStator)
+                serializer = new Serialization.IMyMotorStatorSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyOreDetector)
+                serializer = new Serialization.IMyOreDetectorSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyPistonBase)
+                serializer = new Serialization.IMyPistonBaseSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyRadioAntenna)
+                serializer = new Serialization.IMyRadioAntennaSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyReactor)
+                serializer = new Serialization.IMyReactorSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMySensorBlock)
+                serializer = new Serialization.IMySensorBlockSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyShipConnector)
+                serializer = new Serialization.IMyShipConnectorSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyShipDrill)
+                serializer = new Serialization.IMyShipDrillSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyShipWelder)
+                serializer = new Serialization.IMyShipWelderSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMySmallGatlingGun)
+                serializer = new Serialization.IMySmallGatlingGunSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMySmallMissileLauncher)
+                serializer = new Serialization.IMySmallMissileLauncherSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMySoundBlock)
+                serializer = new Serialization.IMySoundBlockSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyTextPanel)
+                serializer = new Serialization.IMyTextPanelSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyThrust)
+                serializer = new Serialization.IMyThrustSerializer();
+
+            if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyWarhead)
+                serializer = new Serialization.IMyWarheadSerializer();
 
             if (serializer == default(Serialization.IMyTerminalBlockSerializer) && block is IMyFunctionalBlock)
                 serializer = new Serialization.IMyFunctionalBlockSerializer();

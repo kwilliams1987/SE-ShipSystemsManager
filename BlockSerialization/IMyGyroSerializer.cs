@@ -23,11 +23,22 @@ namespace IngameScript
             {
                 base.Deserialize(block, values);
 
-                block.GyroPower = Convert.ToSingle(values[nameof(block.GyroPower)]);
-                block.GyroOverride = Convert.ToBoolean(values[nameof(block.GyroOverride)]);
-                block.Yaw = Convert.ToSingle(values[nameof(block.Yaw)]);
-                block.Pitch = Convert.ToSingle(values[nameof(block.Pitch)]);
-                block.Roll = Convert.ToSingle(values[nameof(block.Roll)]);
+                foreach (var value in values)
+                {
+                    switch (value.Key)
+                    {
+                        case nameof(block.GyroPower):
+                            block.GyroPower = Convert.ToSingle(value.Value); break;
+                        case nameof(block.GyroOverride):
+                            block.GyroOverride = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.Yaw):
+                            block.Yaw = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Pitch):
+                            block.Pitch = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Roll):
+                            block.Roll = Convert.ToSingle(value.Value); break;
+                    }
+                }
             }
         }
     }
