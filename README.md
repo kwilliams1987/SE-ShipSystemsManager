@@ -9,6 +9,7 @@ The script is completely automated, polling every 10 frames.
 *Doing so will either cause excess performance impact, or reduce the speed at which the script can react to emergencies.*
 ## Special Thanks
 Big shout out to [Malware](https://github.com/malware-dev) for his [Space Engineers Visual Studio Developers Kit](https://github.com/malware-dev/MDK-SE).
+
 Without this I'd have never had the patience to go though with such an ambitious project!
 
 # Work in Progress
@@ -83,7 +84,7 @@ A simple grid in space with:
   * 1x door leading into space.
   * 2x Light.
 
-Add a single door between the two airtight rooms
+Add a single door between the two airtight rooms.
 
 Set the custom data of each block as follows:
 * Air Vent (Room 1):
@@ -104,8 +105,8 @@ Set the custom data of each block as follows:
 * Light 1 (Room 2):
   * `zones=room-2`
   * `functions=warnlight`
-* Light 2 (Room 1):
-	* `zones=room-1`
+* Light 2 (Room 2):
+	* `zones=room-2`
 * Door Between:
   * `zones=room-1;room-2`
   * `functions=airlock`
@@ -128,4 +129,5 @@ Open the middle door, and then delete an external door:
 
 ## Debugging
 If you're having issues with the script, you can check the Programmable Block debug output.
+
 You can also add a Text Panel to the current Grid with `function=debug lcd` in it's Custom Data for more verbose information.
