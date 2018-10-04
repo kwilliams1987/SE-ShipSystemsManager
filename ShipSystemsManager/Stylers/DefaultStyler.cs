@@ -12,10 +12,7 @@ namespace IngameScript
             public DefaultStyler(IMyProgrammableBlock block)
                 : base(1000, "", block) { }
 
-            public override void Style(IMyTerminalBlock block)
-            {
-                block.RestoreConfig();
-            }
+            public override void Style(IMyTerminalBlock block) => block.RestoreConfig();
         }
     }
 }

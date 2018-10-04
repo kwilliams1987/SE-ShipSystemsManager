@@ -14,7 +14,7 @@ namespace IngameScript
 
             if (sensors.Any(s => s.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
             {
-                Output("Sensor detected enemy in zone " + zone + "!");
+                Output($"Sensor detected enemy in zone {zone}!");
 
                 GridTerminalSystem.GetZoneBlocksByFunction<IMyDoor>(zone, BlockFunction.DOOR_SECURITY, true)
                     .SetStates(BlockState.INTRUDER2);

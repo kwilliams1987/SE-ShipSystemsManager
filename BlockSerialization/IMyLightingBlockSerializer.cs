@@ -42,7 +42,15 @@ namespace IngameScript
                         case nameof(block.BlinkOffset):
                             block.BlinkOffset = Convert.ToSingle(value.Value); break;
                         case nameof(block.Color):
-                            block.Color = new VRageMath.Color(Convert.ToInt64(value.Value)); break;
+                            if (value.Value.GetType() == typeof(VRageMath.Color))
+                            {
+                                block.Color = (VRageMath.Color) value.Value;
+                            }
+                            else
+                            {
+                                block.Color = new VRageMath.Color(Convert.ToInt64(value.Value));
+                            }
+                            break;
                     }
                 }
             }

@@ -19,7 +19,7 @@ namespace IngameScript
                 values.Add(nameof(block.FontColor), block.FontColor.PackedValue);
                 values.Add(nameof(block.FontSize), block.FontSize);
                 values.Add(nameof(block.ShowText), block.ShowText);
-                values.Add(nameof(CustomProperties.PublicText), block.GetPublicText().Replace("\n", "#NL#"));
+                values.Add(nameof(CustomProperties.PublicText), block.GetPublicText());
                 values.Add(nameof(CustomProperties.PublicTitle), block.GetPublicTitle());
 
                 var images = new List<String>();
@@ -36,7 +36,15 @@ namespace IngameScript
                     switch (value.Key)
                     {
                         case nameof(block.BackgroundColor):
-                            block.BackgroundColor = new VRageMath.Color(Convert.ToInt64(value.Value)); break;
+                            if (value.Value.GetType() == typeof(VRageMath.Color))
+                            {
+                                block.BackgroundColor = (VRageMath.Color)value.Value;
+                            }
+                            else
+                            {
+                                block.BackgroundColor = new VRageMath.Color(Convert.ToInt64(value.Value));
+                            }
+                            break;
                         case nameof(block.ChangeInterval):
                             block.ChangeInterval = Convert.ToSingle(value.Value); break;
                         case nameof(block.Font):
@@ -47,7 +55,15 @@ namespace IngameScript
                                 block.Font = font;
                             break;
                         case nameof(block.FontColor):
-                            block.FontColor = new VRageMath.Color(Convert.ToInt64(value.Value)); break;
+                            if (value.Value.GetType() == typeof(VRageMath.Color))
+                            {
+                                block.FontColor = (VRageMath.Color)value.Value;
+                            }
+                            else
+                            {
+                                block.FontColor = new VRageMath.Color(Convert.ToInt64(value.Value));
+                            }
+                            break;
                         case nameof(block.FontSize):
                             block.FontSize = Convert.ToSingle(value.Value); break;
                         case nameof(block.ShowText):
@@ -62,7 +78,7 @@ namespace IngameScript
                             }
                             break;
                         case nameof(CustomProperties.PublicText):
-                            block.WritePublicText(value.Value.ToString().Replace("#NL#", "\n"), false);
+                            block.WritePublicText(value.Value.ToString(), false);
                             break;
                         case nameof(CustomProperties.PublicTitle):
                             block.WritePublicTitle(value.Value.ToString(), false);

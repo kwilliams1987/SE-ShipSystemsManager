@@ -15,7 +15,7 @@ namespace IngameScript
 
             if (interiorTurrets.Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
             {
-                Output("Turret detected enemy in zone " + zone + "!");
+                Output($"Turret detected enemy in zone {zone}!");
 
                 GridTerminalSystem.GetZoneBlocksByFunction<IMyDoor>(zone, BlockFunction.DOOR_SECURITY, true)
                     .SetStates(BlockState.INTRUDER1);

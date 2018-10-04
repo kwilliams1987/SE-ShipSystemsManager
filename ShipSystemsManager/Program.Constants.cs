@@ -10,7 +10,6 @@ namespace IngameScript
     partial class Program
     {
         public static Boolean DebugMode = true;
-        public static Boolean EnableSingleTickCycle = false;
 
         #region mdk macros
         private const String VERSION = "$MDK_DATE$, $MDK_TIME$";
@@ -33,7 +32,7 @@ namespace IngameScript
             public static readonly String BATTLESTATIONS = "battle";
             public static readonly String DECOMPRESSION = "decompression";
             public static readonly String INTRUDER1 = "intruder1"; // Turrets
-            public static readonly String INTRUDER2 = "intruder1"; // Sensors
+            public static readonly String INTRUDER2 = "intruder2"; // Sensors
             public static readonly String SELFDESTRUCT = "selfdestruct";
         }
     }

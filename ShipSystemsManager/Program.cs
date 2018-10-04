@@ -24,17 +24,7 @@ namespace IngameScript
                 new BattleStationsStyler(Me)
             }.OrderBy(s => s.Priority);
         }
-
-        public void Save()
-        {
-            // Called when the program needs to save its state. Use
-            // this method to save your state to the Storage field
-            // or some other means. 
-            // 
-            // This method is optional and can be removed if not
-            // needed.
-        }
-
+        
         public void Main(String argument, UpdateType updateSource)
         {
             if (String.IsNullOrWhiteSpace(argument))
@@ -43,10 +33,13 @@ namespace IngameScript
                 if ((updateSource & UpdateType.Update1) != UpdateType.None)
                 {
                     // Running in high speed mode is not recommended!
-                    if (!EnableSingleTickCycle)
+                    if (!Me.GetConfig<Boolean>("FastMode"))
                     {
+                        Output("Running the program at one cycle per tick is not recommended.");
+                        Output("Add \"FastMode:true\" to the Programmable Block CustomData to enable this mode.");
+
                         // Throw an exception to prevent further cycles.
-                        throw new Exception("Running the program at one cycle per tick is not recommended.");
+                        throw new Exception();
                     }
                 }
 
@@ -146,7 +139,7 @@ namespace IngameScript
             
             foreach (var zone in GridTerminalSystem.GetZones())
             {
-                Output("Checking Zone \"" + zone + "\" for new triggers.");
+                Output($"Checking Zone \"{zone}\" for new triggers.");
 
                 if (pressure)
                 {
@@ -170,7 +163,7 @@ namespace IngameScript
         /// <param name="append"></param>
         private void Output(String message, Boolean append = true)
         {
-            message = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + message;
+            message = $"[{DateTime.Now:HH:mm:ss}] {message}";
             Echo(message);
 
             var lcds = GridTerminalSystem.GetBlocksOfType<IMyTextPanel>(p => p.HasFunction("debug lcd"));

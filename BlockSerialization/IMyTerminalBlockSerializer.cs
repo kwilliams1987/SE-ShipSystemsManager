@@ -7,6 +7,8 @@ namespace IngameScript
 {
     partial class Serialization
     {
+        private const String LineBreak = "#N#";
+
         public interface IMyTerminalBlockSerializer
         {
             Dictionary<String, Object> GetState(IMyTerminalBlock block);
@@ -41,17 +43,17 @@ namespace IngameScript
 
             public void SaveState(IMyTerminalBlock block)
             {
-                if (block.CustomData.Split('n').Any(l => l == "saved:true"))
+                if (block.CustomData.Split('\n').Any(l => l == "saved:true"))
                     return;
 
                 var states = GetState(block);
-                var config = "saved:true\n";
+                var config = "\nsaved:true\n";
                 foreach (var state in states)
                 {
-                    config += state.Key + ":" + state.Value.ToString().Replace("\n", "#N#") + "\n";
+                    config += state.Key + ":" + state.Value.ToString().Replace("\n", LineBreak) + "\n";
                 }
 
-                block.CustomData += config;
+                block.CustomData += config + "\n";
             }
 
             public void RestoreState(IMyTerminalBlock block)
@@ -61,7 +63,7 @@ namespace IngameScript
                 foreach (var line in block.CustomData.Split('\n').Where(l => l.Contains(":")))
                 {
                     var pair = line.Split(':');
-                    values.Add(pair.ElementAt(0), String.Join(":", pair.Skip(1)).Replace("#N#", "\n"));
+                    values.Add(pair.ElementAt(0), String.Join(":", pair.Skip(1)).Replace(LineBreak, "\n"));
                 }
 
                 SetState(block, values);

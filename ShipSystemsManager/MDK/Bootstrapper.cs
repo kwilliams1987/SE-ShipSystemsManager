@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using IngameScript.Mockups;
 using IngameScript.Mockups.Asserts;
 using IngameScript.Mockups.Blocks;
@@ -106,8 +107,7 @@ namespace IngameScript.MDK
                 }
             }
 
-            var vents = grid.GetZoneBlocks<MockAirVent>("deck-1");
-            foreach (var vent in vents)
+            foreach (var vent in grid.GetZoneBlocks<MockAirVent>("deck-1"))
             {
                 vent.IsDepressurizing = true;
                 vent.CanPressurize = false;
@@ -136,6 +136,33 @@ namespace IngameScript.MDK
                 }
             }
 
+            foreach (var vent in grid.GetZoneBlocks<MockAirVent>("deck-1"))
+            {
+                vent.IsDepressurizing = false;
+                vent.CanPressurize = true;
+            }
+
+            Console.WriteLine("Executing Run #3 (Normal)");
+            MDKFactory.Run(program, updateType: UpdateType.Update10);
+            {
+                var lights = grid.GetZoneBlocks<MockInteriorLight>("deck-1");
+
+                foreach (var light in lights)
+                {
+                    Assert.That(light.Color.PackedValue == new Color(255, 255, 255).PackedValue, $"Light {light.EntityId} does not have the expected color.");
+                    Assert.That(light.BlinkIntervalSeconds == 0, $"Light {light.EntityId} does not have the expected blink interval.");
+                    Assert.That(light.BlinkLength == 0, $"Light {light.EntityId} does not have the expected blink length.");
+                    Assert.That(light.BlinkOffset == 0, $"Light {light.EntityId} does not have the expected blink offset.");
+                }
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("-----------------------------------");
+
+            Console.Write(grid.GetBlocksOfType<IMyTextPanel>(t => t.HasFunction("debug lcd")).FirstOrDefault()?.GetPublicText() ?? ">> NO LCD FOUND <<");
+
+            Console.WriteLine();
+            Console.WriteLine("-----------------------------------");
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey(true);
         }

@@ -12,7 +12,7 @@ namespace IngameScript
             var vents = GridTerminalSystem.GetBlocksOfType<IMyAirVent>(v => v.IsWorking && v.IsInZone(zone) && !v.Depressurize);
             if (vents.Any(v => !v.CanPressurize))
             {
-                Output("Depressurization detected in " + vents.Count() + " Air Vents.");
+                Output($"Depressurization detected in {vents.Count()} Air Vents in zone {zone}.");
 
                 GridTerminalSystem.GetZoneBlocksByFunction<IMyDoor>(zone, BlockFunction.DOOR_AIRLOCK, true)
                     .SetStates(BlockState.DECOMPRESSION);
@@ -45,6 +45,8 @@ namespace IngameScript
                 GridTerminalSystem.GetZoneBlocksByFunction<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN)
                     .ClearStates(BlockState.DECOMPRESSION);
 
+                GridTerminalSystem.GetZoneBlocks<IMyInteriorLight>(zone)
+                    .ClearStates(BlockState.DECOMPRESSION);
                 return;
             }
         }
