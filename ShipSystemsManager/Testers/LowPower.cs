@@ -1,5 +1,5 @@
 ﻿using Sandbox.ModAPI.Ingame;
-using SpaceEngineers.Game.ModAPI.Ingame;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace IngameScript
@@ -13,23 +13,18 @@ namespace IngameScript
 
             var power = GridTerminalSystem.GetBlocksOfType<IMyBatteryBlock>(b => b.IsFunctional && !b.OnlyRecharge && b.Enabled).Average(b => b.CurrentStoredPower / b.MaxStoredPower);
 
+            var blocks = new List<IMyTerminalBlock>();
+            blocks.AddRange(GetBlocks<IMyAssembler>());
+            blocks.AddRange(GetBlocks<IMyLightingBlock>());
+            blocks.AddRange(GetBlocks<IMyRefinery>());
+
             if (power < 0.1f)
             {
-                GridTerminalSystem.GetBlocksOfType<IMyAssembler>()
-                    .SetStates(BlockState.LOWPOWER);
-                GridTerminalSystem.GetBlocksOfType<IMyLightingBlock>()
-                    .SetStates(BlockState.LOWPOWER);
-                GridTerminalSystem.GetBlocksOfType<IMyRefinery>()
-                    .SetStates(BlockState.LOWPOWER);
+                blocks.SetStates(BlockState.LOWPOWER);
             }
             else
             {
-                GridTerminalSystem.GetBlocksOfType<IMyAssembler>()
-                    .ClearStates(BlockState.LOWPOWER);
-                GridTerminalSystem.GetBlocksOfType<IMyLightingBlock>()
-                    .ClearStates(BlockState.LOWPOWER);
-                GridTerminalSystem.GetBlocksOfType<IMyRefinery>()
-                    .ClearStates(BlockState.LOWPOWER);
+                blocks.ClearStates(BlockState.LOWPOWER);
             }
         }
     }

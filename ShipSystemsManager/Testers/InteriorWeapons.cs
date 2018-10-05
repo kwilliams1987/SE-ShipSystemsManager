@@ -11,57 +11,26 @@ namespace IngameScript
     {
         private void TestInteriorWeapons(String zone)
         {
-            var interiorTurrets = GridTerminalSystem.GetBlocksOfType<IMyLargeInteriorTurret>(t => t.IsWorking && t.IsInZone(zone));
+            var interiorTurrets = GetBlocks<IMyLargeInteriorTurret>(t => t.IsWorking && t.IsInZone(zone));
+            var blocks = new List<IMyTerminalBlock>();
+            blocks.AddRange(GetZoneBlocks<IMyDoor>(zone, BlockFunction.DOOR_SECURITY, true));
+            blocks.AddRange(GetZoneBlocks<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR));
+            blocks.AddRange(GetZoneBlocks<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING));
+            blocks.AddRange(GetZoneBlocks<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN));
 
             if (interiorTurrets.Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
             {
                 Output($"Turret detected enemy in zone {zone}!");
 
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyDoor>(zone, BlockFunction.DOOR_SECURITY, true)
-                    .SetStates(BlockState.INTRUDER1);
-
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR)
-                    .SetStates(BlockState.INTRUDER1);
-
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING)
-                    .SetStates(BlockState.INTRUDER1);
-
-                GridTerminalSystem.GetZoneBlocksByFunction<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN)
-                    .SetStates(BlockState.INTRUDER1);
-
-                return;
+                blocks.SetStates(BlockState.INTRUDER1);
             }
             else
             {
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyDoor>(zone, BlockFunction.DOOR_SECURITY, true)
-                    .GroupBy(d => d.GetZones())
-                    .Where(g => !GridTerminalSystem.GetBlocksOfType<IMyLargeInteriorTurret>(t => t.IsWorking && t.IsInAnyZone(g.Key.ToArray()))
-                    .Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
+                blocks.GroupBy(b => b.GetZones())
+                    .Where(g => !GetBlocks<IMyLargeInteriorTurret>(t => t.IsWorking && t.IsInAnyZone(g.Key.ToArray()))
+                        .Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
                     .SelectMany(g => g)
                     .ClearStates(BlockState.INTRUDER1);
-
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR)
-                    .GroupBy(s => s.GetZones())
-                    .Where(g => !GridTerminalSystem.GetBlocksOfType<IMyLargeInteriorTurret>(t => t.IsWorking && t.IsInAnyZone(g.Key.ToArray()))
-                    .Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
-                    .SelectMany(g => g)
-                    .ClearStates(BlockState.INTRUDER1);
-
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING)
-                    .GroupBy(d => d.GetZones())
-                    .Where(g => !GridTerminalSystem.GetBlocksOfType<IMyLargeInteriorTurret>(s => s.IsWorking && s.IsInAnyZone(g.Key.ToArray()))
-                    .Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
-                    .SelectMany(g => g)
-                    .ClearStates(BlockState.INTRUDER1);
-
-                GridTerminalSystem.GetZoneBlocksByFunction<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN)
-                    .GroupBy(d => d.GetZones())
-                    .Where(g => !GridTerminalSystem.GetBlocksOfType<IMyLargeInteriorTurret>(s => s.IsWorking && s.IsInAnyZone(g.Key.ToArray()))
-                    .Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
-                    .SelectMany(g => g)
-                    .ClearStates(BlockState.INTRUDER1);
-
-                return;
             }
         }
     }

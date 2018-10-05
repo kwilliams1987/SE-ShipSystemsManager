@@ -70,7 +70,7 @@ namespace IngameScript
                         switch (state)
                         {
                             case "destruct":
-                                var warheads = GridTerminalSystem.GetBlocksOfType<IMyWarhead>(w => w.HasFunction(BlockFunction.WARHEAD_DESTRUCT) && w.IsFunctional);
+                                var warheads = GetBlocks<IMyWarhead>(w => w.HasFunction(BlockFunction.WARHEAD_DESTRUCT) && w.IsFunctional);
                                 if (!warheads.Any())
                                 {
                                     Output("WARNING: Self Destruct is unavailable.");
@@ -209,8 +209,8 @@ namespace IngameScript
         private void Tick()
         {
             // Only check air vents if pressurization is enabled.
-            var pressure = GridTerminalSystem.GetBlocksOfType<IMyAirVent>().FirstOrDefault(v => v.PressurizationEnabled) != default(IMyAirVent);
-            var batteries = GridTerminalSystem.GetBlocksOfType<IMyBatteryBlock>().Any();
+            var pressure = GetBlocks<IMyAirVent>().FirstOrDefault(v => v.PressurizationEnabled) != default(IMyAirVent);
+            var batteries = GetBlocks<IMyBatteryBlock>().Any();
             
             foreach (var zone in GridTerminalSystem.GetZones())
             {
@@ -246,7 +246,7 @@ namespace IngameScript
             message = $"[{DateTime.Now:HH:mm:ss}] {message}";
             Echo(message);
 
-            var lcds = GridTerminalSystem.GetBlocksOfType<IMyTextPanel>(p => p.HasFunction("debug lcd"));
+            var lcds = GetBlocks<IMyTextPanel>(p => p.HasFunction("debug lcd"));
             var text = "";
 
             foreach (var lcd in lcds)
@@ -280,7 +280,7 @@ namespace IngameScript
 
         private void ApplyBlockStates()
         {
-            foreach (var block in GridTerminalSystem.GetBlocksOfType<IMyTerminalBlock>(b => b.GetConfig<Boolean>("state-changed")))
+            foreach (var block in GetBlocks<IMyTerminalBlock>(b => b.GetConfig<Boolean>("state-changed")))
             {
                 var states = block.GetConfigs("state");
                 var styler = StatePriority.FirstOrDefault(s => states.Contains(s.State));
@@ -294,5 +294,21 @@ namespace IngameScript
                 block.SetConfig("state-changed", false);
             }
         }
+
+        private IEnumerable<T> GetZoneBlocks<T>(String zone, String function = "", Boolean all = true)
+            where T: class, IMyTerminalBlock
+        {
+            if (String.IsNullOrWhiteSpace(function))
+            {
+                return GridTerminalSystem.GetZoneBlocks<T>(zone, all);
+            }
+            else
+            {
+                return GridTerminalSystem.GetZoneBlocksByFunction<T>(zone, function, all);
+            }
+        }
+
+        private IEnumerable<T> GetBlocks<T>(Func<T, Boolean> collect = null)
+            where T : class, IMyTerminalBlock => GridTerminalSystem.GetBlocksOfType(collect);
     }
 }

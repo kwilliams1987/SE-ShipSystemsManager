@@ -3,6 +3,7 @@ using SpaceEngineers.Game.ModAPI.Ingame;
 using System.Linq;
 using System;
 using VRage.Game;
+using System.Collections.Generic;
 
 namespace IngameScript
 {
@@ -10,55 +11,24 @@ namespace IngameScript
     {
         private void TestSensors(String zone)
         {
-            var sensors = GridTerminalSystem.GetBlocksOfType<IMySensorBlock>(s => s.IsWorking && s.IsInZone(zone) && s.DetectEnemy);
+            var sensors = GetBlocks<IMySensorBlock>(s => s.IsWorking && s.IsInZone(zone) && s.DetectEnemy);
+            var blocks = new List<IMyTerminalBlock>();
+            blocks.AddRange(GetZoneBlocks<IMyDoor>(zone, BlockFunction.DOOR_SECURITY, true));
+            blocks.AddRange(GetZoneBlocks<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR));
+            blocks.AddRange(GetZoneBlocks<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING));
+            blocks.AddRange(GetZoneBlocks<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN));
 
-            if (sensors.Any(s => s.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
+            if (sensors.Any(t => t.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
             {
                 Output($"Sensor detected enemy in zone {zone}!");
 
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyDoor>(zone, BlockFunction.DOOR_SECURITY, true)
-                    .SetStates(BlockState.INTRUDER2);
-
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR)
-                    .SetStates(BlockState.INTRUDER2);
-
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING)
-                    .SetStates(BlockState.INTRUDER2);
-
-                GridTerminalSystem.GetZoneBlocksByFunction<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN)
-                    .SetStates(BlockState.INTRUDER2);
+                blocks.SetStates(BlockState.INTRUDER2);
             }
             else
             {
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyDoor>(zone, BlockFunction.DOOR_SECURITY, true)
-                    .GroupBy(d => d.GetZones())
-                    .Where(g => !GridTerminalSystem
-                        .GetBlocksOfType<IMySensorBlock>(s => s.IsWorking && s.IsInAnyZone(g.Key.ToArray()))
-                        .Any(s => s.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
-                    .SelectMany(g => g)
-                    .ClearStates(BlockState.INTRUDER2);
-
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR)
-                    .GroupBy(d => d.GetZones())
-                    .Where(g => !GridTerminalSystem
-                        .GetBlocksOfType<IMySensorBlock>(s => s.IsWorking && s.IsInAnyZone(g.Key.ToArray()))
-                        .Any(s => s.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
-                    .SelectMany(g => g)
-                    .ClearStates(BlockState.INTRUDER2);
-
-                GridTerminalSystem.GetZoneBlocksByFunction<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING)
-                    .GroupBy(d => d.GetZones())
-                    .Where(g => !GridTerminalSystem
-                        .GetBlocksOfType<IMySensorBlock>(s => s.IsWorking && s.IsInAnyZone(g.Key.ToArray()))
-                        .Any(s => s.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
-                    .SelectMany(g => g)
-                    .ClearStates(BlockState.INTRUDER2);
-
-                GridTerminalSystem.GetZoneBlocksByFunction<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN)
-                    .GroupBy(d => d.GetZones())
-                    .Where(g => !GridTerminalSystem
-                        .GetBlocksOfType<IMySensorBlock>(s => s.IsWorking && s.IsInAnyZone(g.Key.ToArray()))
-                        .Any(s => s.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
+                blocks.GroupBy(b => b.GetZones())
+                    .Where(g => !GetBlocks<IMySensorBlock>(t => t.IsWorking && t.IsInAnyZone(g.Key.ToArray()) && t.DetectEnemy)
+                        .All(t => !t.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
                     .SelectMany(g => g)
                     .ClearStates(BlockState.INTRUDER2);
             }
