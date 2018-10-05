@@ -101,9 +101,11 @@
     <Compile Include="Stylers\DecompressionStyler.cs" />
     <Compile Include="Stylers\DefaultStyler.cs" />
     <Compile Include="Stylers\IntruderStyler.cs" />
+    <Compile Include="Stylers\LowPowerStyler.cs" />
     <Compile Include="Stylers\SelfDestructStyler.cs" />
     <Compile Include="Testers\BattleStations.cs" />
     <Compile Include="Testers\InteriorWeapons.cs" />
+    <Compile Include="Testers\LowPower.cs" />
     <Compile Include="Testers\SelfDestruct.cs" />
     <Compile Include="Testers\Sensors.cs" />
     <Compile Include="Testers\AirVents.cs" />

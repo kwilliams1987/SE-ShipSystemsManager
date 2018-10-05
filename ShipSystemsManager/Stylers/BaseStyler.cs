@@ -51,6 +51,8 @@ namespace IngameScript
                 { "intruder.light.color", new Color(255, 0, 0) },
                 { "intruder.sound", "Alert 1" },
 
+                { "lowpower.light.intensity", 0.3f },
+                { "lowpower.light.radius", 0.3f }
             };
 
             protected IMyProgrammableBlock ProgrammableBlock { get; }

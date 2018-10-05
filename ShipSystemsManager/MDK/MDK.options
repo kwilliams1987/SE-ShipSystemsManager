@@ -6,7 +6,7 @@
   <installpath>%APPDATA%\..\local\microsoft\visualstudio\15.0_e75797ca\extensions\nuzcqyyd.0rj</installpath>
   <outputpath>%APPDATA%\SpaceEngineers\IngameScripts\local</outputpath>
   <trimtypes>no</trimtypes>
-  <minify>yes</minify>
+  <minify>no</minify>
   <ignore>
     <folder>mdk</folder>
   </ignore>

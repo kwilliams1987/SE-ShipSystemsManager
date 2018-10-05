@@ -25,10 +25,12 @@ namespace IngameScript
             public static readonly String SOUNDBLOCK_SIREN = "siren";
             public static readonly String LIGHT_WARNING = "warnlight";
             public static readonly String WARHEAD_DESTRUCT = "selfdestruct";
+            public static readonly String EMERGENCYPOWER = "lowpower";
         }
 
         public static class BlockState
         {
+            public static readonly String LOWPOWER = "lowpower";
             public static readonly String BATTLESTATIONS = "battle";
             public static readonly String DECOMPRESSION = "decompression";
             public static readonly String INTRUDER1 = "intruder1"; // Turrets

@@ -13,7 +13,7 @@ namespace IngameScript
             protected override String StylePrefix => "decompression";
 
             public DecompressionStyler(IMyProgrammableBlock block)
-                : base(1, BlockState.DECOMPRESSION, block) { }
+                : base(2, BlockState.DECOMPRESSION, block) { }
 
             public override void Style(IMyTerminalBlock block)
             {

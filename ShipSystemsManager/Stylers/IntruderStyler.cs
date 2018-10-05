@@ -12,7 +12,7 @@ namespace IngameScript
         {
             protected override String StylePrefix => "intruder";
             public IntruderStyler(IMyProgrammableBlock block, String blockState)
-                : base(2, blockState, block) { }
+                : base(3, blockState, block) { }
 
             public override void Style(IMyTerminalBlock block)
             {

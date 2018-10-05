@@ -98,8 +98,8 @@ namespace IngameScript
                             Flags("activate " + state);
                         }
                         return;
-                    case "customize":
 
+                    case "customize":
                         switch (arguments.ElementAtOrDefault(1))
                         {
                             case "":
@@ -124,8 +124,82 @@ namespace IngameScript
                                 }
                                 break;
                             case "reset":
-                                Me.CustomData = "";
+                                var config = Me.CustomData.Split('\n');
+                                var newConfig = new List<String>();
+                                var styles = BaseStyler.DefaultStyles.Select(s => s.Key);
+                                
+                                foreach (var line in config)
+                                {
+                                    if (!line.Contains(':') || !styles.Contains(line.Split(':')[0]))
+                                        newConfig.Add(line);
+                                }
+
+                                Me.CustomData = String.Join("\n", newConfig);
                                 break;
+                        }
+                        break;
+
+                    case "grouptozone":
+                        {
+                            var args = String.Join(" ", arguments.Skip(1)).Split(';');
+                            if (args.Count() != 2)
+                            {
+                                Output("grouptozone failed: Incorrect argument count.");
+                                break;
+                            }
+
+                            var group = args.ElementAt(0);
+                            var zone = args.ElementAt(1);
+
+                            var blockGroup = GridTerminalSystem.GetBlockGroupWithName(group);
+
+                            if (blockGroup == default(IMyBlockGroup))
+                            {
+                                Output($"grouptozone failed: Group \"{group}\" was not found.");
+                                return;
+                            }
+
+                            var blocks = new List<IMyTerminalBlock>();
+                            blockGroup.GetBlocks(blocks);
+
+                            foreach (var block in blocks)
+                            {
+                                block.SetConfigFlag("zones", zone);
+                            }
+
+                            Output($"Added {blocks.Count()} blocks to zone {zone}.");
+                        }
+                        break;
+                        
+                    case "grouptofunction":
+                        {
+                            var args = String.Join(" ", arguments.Skip(1)).Split(';');
+                            if (args.Count() != 2)
+                            {
+                                Output("grouptofunction failed: Incorrect argument count.");
+                                break;
+                            }
+
+                            var group = args.ElementAt(0);
+                            var function = args.ElementAt(1);
+
+                            var blockGroup = GridTerminalSystem.GetBlockGroupWithName(group);
+
+                            if (blockGroup == default(IMyBlockGroup))
+                            {
+                                Output($"grouptofunction failed: Group \"{group}\" was not found.");
+                                return;
+                            }
+
+                            var blocks = new List<IMyTerminalBlock>();
+                            blockGroup.GetBlocks(blocks);
+
+                            foreach (var block in blocks)
+                            {
+                                block.SetConfigFlag("functions", function);
+                            }
+
+                            Output($"Added {function} to {blocks.Count()} blocks.");
                         }
                         break;
                 }
@@ -136,6 +210,7 @@ namespace IngameScript
         {
             // Only check air vents if pressurization is enabled.
             var pressure = GridTerminalSystem.GetBlocksOfType<IMyAirVent>().FirstOrDefault(v => v.PressurizationEnabled) != default(IMyAirVent);
+            var batteries = GridTerminalSystem.GetBlocksOfType<IMyBatteryBlock>().Any();
             
             foreach (var zone in GridTerminalSystem.GetZones())
             {
@@ -148,6 +223,11 @@ namespace IngameScript
 
                 TestSensors(zone);
                 TestInteriorWeapons(zone);
+            }
+
+            if (batteries)
+            {
+                TestLowPower();
             }
 
             TestSelfDestruct();
@@ -167,6 +247,7 @@ namespace IngameScript
             Echo(message);
 
             var lcds = GridTerminalSystem.GetBlocksOfType<IMyTextPanel>(p => p.HasFunction("debug lcd"));
+            var text = "";
 
             foreach (var lcd in lcds)
             {
@@ -176,13 +257,19 @@ namespace IngameScript
 
                 if (append)
                 {
-                    var text = lcd.GetPublicText().Split('\n').ToList();
-                    if (text.Count() > 34)
+                    if (text == "")
                     {
-                        text.RemoveAt(0);
+                        // Do scrolling logic only once.
+                        var lines = lcd.GetPublicText().Split('\n').ToList();
+                        if (lines.Count() > 34)
+                        {
+                            lines.RemoveAt(0);
+                        }
+                        lines.Add(message);
+                        text = String.Join("\n", lines);
                     }
-                    text.Add(message);
-                    lcd.WritePublicText(String.Join("\n", text));
+
+                    lcd.WritePublicText(text);
                 }
                 else
                 {
@@ -193,7 +280,7 @@ namespace IngameScript
 
         private void ApplyBlockStates()
         {
-            foreach (var block in GridTerminalSystem.GetBlocksOfType<IMyTerminalBlock>(b => b.GetConfigs("zones").Any()))
+            foreach (var block in GridTerminalSystem.GetBlocksOfType<IMyTerminalBlock>(b => b.GetConfig<Boolean>("state-changed")))
             {
                 var states = block.GetConfigs("state");
                 var styler = StatePriority.FirstOrDefault(s => states.Contains(s.State));
@@ -204,6 +291,7 @@ namespace IngameScript
                 }
 
                 styler.Style(block);
+                block.SetConfig("state-changed", false);
             }
         }
     }

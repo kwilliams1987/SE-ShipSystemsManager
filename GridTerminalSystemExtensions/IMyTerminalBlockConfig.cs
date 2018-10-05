@@ -7,13 +7,16 @@ namespace IngameScript
 {
     static class IMyTerminalBlockCconfigExtensions
     {
-        public static Boolean HasConfigFlag(this IMyTerminalBlock block, String key, params String[] values)
-        {
-            return values.Any(value => block.GetConfigs(key).Contains(value));
-        }
+        public static Boolean HasConfigFlag(this IMyTerminalBlock block, String key, params String[] values) => values.Any(value => block.GetConfigs(key).Contains(value));
 
         public static void SetConfigFlag(this IMyTerminalBlock block, String key, String value)
         {
+            if (key.Contains(';'))
+                throw new Exception("Config keys cannot contain semi-colons.");
+
+            if (value.Contains(';'))
+                throw new Exception("Config values cannot contain semi-colons.");
+
             var values = block.GetConfigs(key).ToList();
 
             if (!values.Contains(value))
@@ -26,6 +29,12 @@ namespace IngameScript
 
         public static void ClearConfigFlag(this IMyTerminalBlock block, String key, String value)
         {
+            if (key.Contains(';'))
+                throw new Exception("Config keys cannot contain semi-colons.");
+
+            if (value.Contains(';'))
+                throw new Exception("Config values cannot contain semi-colons.");
+
             var values = block.GetConfigs(key).ToList();
 
             if (values.Contains(value))
@@ -41,9 +50,15 @@ namespace IngameScript
             foreach (var block in blocks)
             {
                 var blockStates = block.GetConfigs("state").ToList();
+                var count = blockStates.Count;
                 blockStates.AddRange(states);
 
-                block.SetConfigs("state", blockStates.Distinct());
+                blockStates = blockStates.Distinct().ToList();
+                if (count != blockStates.Count())
+                {
+                    block.SetConfigs("state", blockStates);
+                    block.SetConfig("state-changed", true);
+                }
             }
 
             return blocks;
@@ -54,9 +69,14 @@ namespace IngameScript
             foreach (var block in blocks)
             {
                 var blockStates = block.GetConfigs("state").ToList();
+                var count = blockStates.Count;
                 blockStates.RemoveAll(s => states.Contains(s));
 
-                block.SetConfigs("state", blockStates.Distinct());
+                if (count != blockStates.Distinct().Count())
+                {
+                    block.SetConfigs("state", blockStates.Distinct());
+                    block.SetConfig("state-changed", true);
+                }
             }
 
             return blocks;
