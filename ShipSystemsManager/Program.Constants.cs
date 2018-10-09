@@ -1,15 +1,12 @@
 ﻿// <mdk sortorder="1" />
-using Sandbox.ModAPI.Ingame;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using VRageMath;
 
 namespace IngameScript
 {
     partial class Program
     {
-        public static Boolean DebugMode = true;
+        private readonly IOrderedEnumerable<BaseStyler> StatePriority;
 
         #region mdk macros
         private const String VERSION = "$MDK_DATE$, $MDK_TIME$";

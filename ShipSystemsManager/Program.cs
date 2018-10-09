@@ -9,8 +9,6 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        readonly IOrderedEnumerable<BaseStyler> StatePriority;
-
         public Program()
         {
             Runtime.UpdateFrequency = UpdateFrequency.Update10;
@@ -19,8 +17,8 @@ namespace IngameScript
             {
                 new SelfDestructStyler(Me, GridTerminalSystem),
                 new DecompressionStyler(Me),
-                new IntruderStyler(Me, BlockState.INTRUDER1), // Intruders detected by turrets.
-                new IntruderStyler(Me, BlockState.INTRUDER2), // Intruders detected by sensors.
+                new IntruderStyler(Me, BlockState.INTRUDER1), // Turrets
+                new IntruderStyler(Me, BlockState.INTRUDER2), // Sensors
                 new BattleStationsStyler(Me)
             }.OrderBy(s => s.Priority);
         }
