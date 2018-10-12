@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Timers;
 using IngameScript.Mockups;
 using IngameScript.Mockups.Asserts;
 using IngameScript.Mockups.Blocks;
@@ -33,59 +36,120 @@ namespace IngameScript.MDK
             // In order for your program to actually run, you will need to provide a mockup of all the facilities 
             // your script uses from the game, since they're not available outside of the game.
 
+            var nextEntityId = 1L;
+            var timer = new Timer();
             var grid = new MockGridTerminalSystem();
+
             var programmableBlock = new MockProgrammableBlock()
             {
-                DisplayNameText = "Programmable Block [SSM]"
+                CustomName = "Programmable Block [SSM]"
             };
 
+            grid.Add(new MockTextPanel()
             {
-                var vent = new MockAirVent()
+                EntityId = nextEntityId++,
+                CustomName = "Debug Panel",
+                CustomData = "functions:debug lcd"
+            });
+
+            var zones = new List<Zone>();
+            var airlock = new MockDoor()
+            {
+                EntityId = nextEntityId++,
+                CustomName = "Zone 1/2 Airlock",
+                CustomData = "functions:airlock"
+            };
+
+            airlock.OpenDoor();
+
+            {
+                var room = new Zone("zone-1");
+                room.AddBlock(airlock);
+
+                room.AddBlock(new MockAirVent()
                 {
-                    Status= VentStatus.Pressurized,
-                    DisplayNameText = "Air Vent (Deck 1)",
+                    EntityId = nextEntityId++,
+                    Status = VentStatus.Pressurized,
+                    CustomName = "Air Vent (Zone 1)",
                     ShowInTerminal = false,
                     IsDepressurizing = false,
                     CanPressurize = true
-                };
-                vent.SetConfig("zones", "deck-1");
+                });
 
-                var alertLight = new MockInteriorLight()
+                room.AddBlock(new MockInteriorLight()
                 {
-                    Name = "Alert Light (Deck 1)",
-                    ShowInTerminal = false
-                };
-                alertLight.SetConfig("zones", "deck-1");
-                alertLight.SetConfig("functions", "warnlight");
+                    EntityId = nextEntityId++,
+                    CustomName = "Alert Light (Zone 1)",
+                    ShowInTerminal = false,
+                    CustomData = "functions:warnlight"
+                });
 
-                var normalLight = new MockInteriorLight()
+                room.AddBlock(new MockInteriorLight()
                 {
-                    Name = "Normal Light (Deck 1)",
-                    ShowInTerminal = false
-                };
-                normalLight.SetConfig("zones", "deck-1");
+                    EntityId = nextEntityId++,
+                    CustomName = "Normal Light (Zone 1)",
+                    ShowInTerminal = false,
+                });
 
-                var debugLcd = new MockTextPanel()
+                room.AddBlock(new MockTextPanel()
                 {
-                    Name = "Debug Panel"
-                };
-                debugLcd.SetConfig("functions", "debug lcd");
+                    EntityId = nextEntityId++,
+                    CustomName = "Door Sign (Zone 1)",
+                    CustomData = "functions:doorsign"
+                });
 
-                var doorLcd = new MockTextPanel()
-                {
-                    Name = "Door Sign (Deck 1)"
-                };
-                doorLcd.WritePublicText("DECK 1");
-                doorLcd.SetConfig("zones", "deck-1");
-                doorLcd.SetConfig("functions", "doorsign");
+                room.OfType<IMyTextPanel>().First(b => b.Name == "Door Sign (Zone 1)")
+                    .WritePublicText("ZONE 1");
 
-                grid.Add(vent);
-                grid.Add(alertLight);
-                grid.Add(normalLight);
-                grid.Add(debugLcd);
-                grid.Add(doorLcd);
+                zones.Add(room);
+
+                room.AddToGrid(grid);
             }
-            
+
+            {
+                var room = new Zone("zone-2");
+                room.AddBlock(airlock);
+
+                room.AddBlock(new MockAirVent()
+                {
+                    EntityId = nextEntityId++,
+                    Status = VentStatus.Pressurized,
+                    CustomName = "Air Vent (Zone 2)",
+                    ShowInTerminal = false,
+                    IsDepressurizing = false,
+                    CanPressurize = true
+                });
+
+                room.AddBlock(new MockInteriorLight()
+                {
+                    EntityId = nextEntityId++,
+                    CustomName = "Alert Light (Zone 2)",
+                    ShowInTerminal = false,
+                    CustomData = "functions:warnlight"
+                });
+
+                room.AddBlock(new MockInteriorLight()
+                {
+                    EntityId = nextEntityId++,
+                    CustomName = "Normal Light (Zone 2)",
+                    ShowInTerminal = false,
+                });
+
+                room.AddBlock(new MockTextPanel()
+                {
+                    EntityId = nextEntityId++,
+                    CustomName = "Door Sign (Zone 2)",
+                    CustomData = "functions:doorsign"
+                });
+
+                room.OfType<IMyTextPanel>().First(b => b.Name == "Door Sign (Zone 2)")
+                    .WritePublicText("ZONE 2");
+
+                zones.Add(room);
+
+                room.AddToGrid(grid);
+            }
+
             var program = MDKFactory.CreateProgram<Program>(new MDKFactory.ProgramConfig()
             {
                 Echo = message => Console.WriteLine("[{0}] {1}", DateTime.Now.ToString("U"), message),
@@ -95,76 +159,193 @@ namespace IngameScript.MDK
 
             Console.WriteLine("Executing Run #1 (Normal)");
             MDKFactory.Run(program, updateType: UpdateType.Update10);
+            Console.WriteLine($"Execution time: {program.Runtime.LastRunTimeMs}ms.");
+            
+            foreach (var light in grid.GetBlocksOfType<IMyInteriorLight>())
             {
-                var lights = grid.GetZoneBlocks<MockInteriorLight>("deck-1");
-
-                foreach (var light in lights)
+                Console.WriteLine($"Testing Light {light.EntityId}.");
+                Assert.That(light.Color == new Color(255,255,255), $"Light {light.EntityId} does not have the expected color.");
+                Assert.That(light.BlinkIntervalSeconds == 0, $"Light {light.EntityId} does not have the expected blink interval.");
+                Assert.That(light.BlinkLength == 0, $"Light {light.EntityId} does not have the expected blink length.");
+                Assert.That(light.BlinkOffset == 0, $"Light {light.EntityId} does not have the expected blink offset.");
+            }
+                                
+            foreach (var lcd in grid.GetBlocksOfType<IMyTextPanel>())
+            {
+                Console.WriteLine($"Testing LCD {lcd.EntityId}.");
+                switch (lcd.Name)
                 {
-                    Assert.That(light.Color.PackedValue == new Color(255,255,255).PackedValue, $"Light {light.EntityId} does not have the expected color.");
-                    Assert.That(light.BlinkIntervalSeconds == 0, $"Light {light.EntityId} does not have the expected blink interval.");
-                    Assert.That(light.BlinkLength == 0, $"Light {light.EntityId} does not have the expected blink length.");
-                    Assert.That(light.BlinkOffset == 0, $"Light {light.EntityId} does not have the expected blink offset.");
+                    case "Door Sign (Zone 1)":
+                        Assert.That(lcd.GetPublicText() == "ZONE 1", $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        break;
+                    case "Door Sign (Zone 2)":
+                        Assert.That(lcd.GetPublicText() == "ZONE 2", $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        break;
                 }
             }
 
-            foreach (var vent in grid.GetZoneBlocks<MockAirVent>("deck-1"))
+            foreach (var door in grid.GetBlocksOfType<IMyDoor>())
+            {
+                if (door.IsInAllZones("zone-1", "zone-2"))
+                {
+                    Assert.That(door.Status == DoorStatus.Open, $"Airlock joined to Zone 1 and a 2 should be open.");
+                }
+            }
+            
+            foreach (var vent in grid.GetZoneBlocks<MockAirVent>("zone-1"))
             {
                 vent.IsDepressurizing = true;
                 vent.CanPressurize = false;
             }
 
-            Console.WriteLine("Executing Run #2 (Decompression - Deck 1)");
-            MDKFactory.Run(program, updateType: UpdateType.Update10);
-
+            Console.WriteLine("Executing Run #2 (Decompression - Zone 1)");
+            MDKFactory.Run(program, updateType: UpdateType.Update10);            
+            Console.WriteLine($"Execution time: {program.Runtime.LastRunTimeMs}ms.");
+            
+            foreach (var light in grid.GetZoneBlocks<MockInteriorLight>("zone-1"))
             {
-                var lights = grid.GetZoneBlocks<MockInteriorLight>("deck-1");
-
-                foreach (var light in lights)
+                Console.WriteLine($"Testing Light {light.EntityId}.");
+                if (light.HasFunction(Program.BlockFunction.LIGHT_WARNING))
                 {
-                    if (light.HasFunction(Program.BlockFunction.LIGHT_WARNING))
-                    {
-                        Assert.That(light.Color.PackedValue == Styler.Get<Color>("decompression.light.color").PackedValue, $"Light {light.EntityId} does not have the expected color.");
-                        Assert.That(light.BlinkIntervalSeconds == Styler.Get<Single>("decompression.light.interval"), $"Light {light.EntityId} does not have the expected blink interval.");
-                        Assert.That(light.BlinkLength == Styler.Get<Single>("decompression.light.duration"), $"Light {light.EntityId} does not have the expected blink length.");
-                        Assert.That(light.BlinkOffset == Styler.Get<Single>("decompression.light.offset"), $"Light {light.EntityId} does not have the expected blink offset.");
-                        Assert.That(light.Enabled, $"Light {light.EntityId} should be enabled.");
-                    }
-                    else
-                    {
-                        Assert.That(!light.Enabled, $"Light {light.EntityId} should not be enabled.");
-                    }
+                    Assert.That(light.Color == Styler.Get<Color>("decompression.light.color"), $"Light {light.EntityId} does not have the expected color.");
+                    Assert.That(light.BlinkIntervalSeconds == Styler.Get<Single>("decompression.light.interval"), $"Light {light.EntityId} does not have the expected blink interval.");
+                    Assert.That(light.BlinkLength == Styler.Get<Single>("decompression.light.duration"), $"Light {light.EntityId} does not have the expected blink length.");
+                    Assert.That(light.BlinkOffset == Styler.Get<Single>("decompression.light.offset"), $"Light {light.EntityId} does not have the expected blink offset.");
+                    Assert.That(light.Enabled, $"Light {light.EntityId} should be enabled.");
+                }
+                else
+                {
+                    Assert.That(!light.Enabled, $"Light {light.EntityId} should not be enabled.");
                 }
             }
 
-            foreach (var vent in grid.GetZoneBlocks<MockAirVent>("deck-1"))
+            foreach (var lcd in grid.GetZoneBlocks<IMyTextPanel>("zone-1"))
+            {
+                Console.WriteLine($"Testing LCD {lcd.EntityId}.");
+                switch (lcd.Name)
+                {
+                    case "Door Sign (Zone 1)":
+                        Assert.That(lcd.GetPublicText() == Styler.Get<String>("decompression.text"), $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        break;
+                }
+            }
+
+            foreach (var door in grid.GetBlocksOfType<IMyDoor>())
+            {
+                Console.WriteLine($"Testing door {door.EntityId}.");
+                if (door.IsInAllZones("zone-1", "zone-2"))
+                {
+                    Assert.That(door.Status == DoorStatus.Closed || door.Status == DoorStatus.Closed, $"Airlock joined to Zone 1 and a 2 should be closed or closing.");
+                    Assert.That(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be enabled.");
+                }
+            }
+
+            Console.WriteLine("Executing Run #4 (Decompression - Zone 1)");
+            MDKFactory.Run(program, updateType: UpdateType.Update10);
+            Console.WriteLine($"Execution time: {program.Runtime.LastRunTimeMs}ms.");
+
+            foreach (var door in grid.GetBlocksOfType<IMyDoor>())
+            {
+                Console.WriteLine($"Testing door {door.EntityId}.");
+                if (door.IsInAllZones("zone-1", "zone-2"))
+                {
+                    Assert.That(door.Status == DoorStatus.Closed, $"Airlock joined to Zone 1 and a 2 should be closed.");
+                    Assert.That(door.Enabled == false, $"Airlock joined to Zone 1 and a 2 should be disabled.");
+                }
+            }
+
+            foreach (var vent in grid.GetZoneBlocks<MockAirVent>("zone-1"))
             {
                 vent.IsDepressurizing = false;
                 vent.CanPressurize = true;
             }
 
-            Console.WriteLine("Executing Run #3 (Normal)");
+            Console.WriteLine("Executing Run #4 (Normal)");
             MDKFactory.Run(program, updateType: UpdateType.Update10);
-            {
-                var lights = grid.GetZoneBlocks<MockInteriorLight>("deck-1");
+            Console.WriteLine($"Execution time: {program.Runtime.LastRunTimeMs}ms.");
 
-                foreach (var light in lights)
+            foreach (var light in grid.GetZoneBlocks<MockInteriorLight>("zone-1"))
+            {
+                Console.WriteLine($"Testing Light {light.EntityId}.");
+                Assert.That(light.Color == new Color(255, 255, 255), $"Light {light.EntityId} does not have the expected color.");
+                Assert.That(light.BlinkIntervalSeconds == 0, $"Light {light.EntityId} does not have the expected blink interval.");
+                Assert.That(light.BlinkLength == 0, $"Light {light.EntityId} does not have the expected blink length.");
+                Assert.That(light.BlinkOffset == 0, $"Light {light.EntityId} does not have the expected blink offset.");
+            }
+
+            var lcds = grid.GetZoneBlocks<IMyTextPanel>("zone-1");
+
+            foreach (var lcd in lcds)
+            {
+                Console.WriteLine($"Testing LCD {lcd.EntityId}.");
+                switch (lcd.Name)
                 {
-                    Assert.That(light.Color.PackedValue == new Color(255, 255, 255).PackedValue, $"Light {light.EntityId} does not have the expected color.");
-                    Assert.That(light.BlinkIntervalSeconds == 0, $"Light {light.EntityId} does not have the expected blink interval.");
-                    Assert.That(light.BlinkLength == 0, $"Light {light.EntityId} does not have the expected blink length.");
-                    Assert.That(light.BlinkOffset == 0, $"Light {light.EntityId} does not have the expected blink offset.");
+                    case "Door Sign (Zone 1)":
+                        Assert.That(lcd.GetPublicText() == "ZONE 1", $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        break;
                 }
             }
 
             Console.WriteLine();
             Console.WriteLine("-----------------------------------");
-
-            Console.Write(grid.GetBlocksOfType<IMyTextPanel>(t => t.HasFunction("debug lcd")).FirstOrDefault()?.GetPublicText() ?? ">> NO LCD FOUND <<");
-
-            Console.WriteLine();
+            Console.WriteLine("DEBUG LCD OUTPUT:");
+            Console.WriteLine("-----------------------------------");
+            Console.WriteLine(grid.GetBlocksOfType<IMyTextPanel>(t => t.HasFunction("debug lcd")).FirstOrDefault()?.GetPublicText().Trim() ?? ">> NO LCD FOUND <<");
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey(true);
+        }
+
+        private class Zone : IReadOnlyList<IMyTerminalBlock>
+        {
+            public String Name { get; }
+            public IEnumerable<String> AdjacentZones => Blocks.SelectMany(b => b.GetZones()).Distinct().Where(z => z != Name);
+            public List<IMyTerminalBlock> Blocks { get; } = new List<IMyTerminalBlock>();
+
+            public Int32 Count => ((IReadOnlyList<IMyTerminalBlock>)Blocks).Count;
+
+            public IMyTerminalBlock this[Int32 index] => ((IReadOnlyList<IMyTerminalBlock>)Blocks)[index];
+
+            public Zone(String name)
+                : base()
+            {
+                Name = name;
+            }
+
+            public void AddBlock(IMyTerminalBlock block)
+            {
+                Blocks.Add(block);
+                block.SetConfigFlag("zones", Name);
+            }
+
+            public void RemoveBlock(IMyTerminalBlock block)
+            {
+                Blocks.Remove(block);
+                block.ClearConfigFlag("zones", Name);
+            }
+
+            public void AddBlocks(IEnumerable<IMyTerminalBlock> blocks)
+            {
+                Blocks.AddRange(blocks);
+                foreach (var block in blocks)
+                {
+                    block.SetConfigFlag("zones", Name);
+                }
+            }
+
+            public void AddToGrid(MockGridTerminalSystem grid)
+            {
+                var existing = new List<IMyTerminalBlock>();
+                grid.GetBlocks(existing);
+
+                foreach (var block in Blocks.Where(b => !existing.Contains(b)))
+                {
+                    grid.Add(block);
+                }
+            }
+
+            public IEnumerator<IMyTerminalBlock> GetEnumerator() => ((IReadOnlyList<IMyTerminalBlock>)Blocks).GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => ((IReadOnlyList<IMyTerminalBlock>)Blocks).GetEnumerator();
         }
     }
 }

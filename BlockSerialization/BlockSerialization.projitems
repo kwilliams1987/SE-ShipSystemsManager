@@ -45,7 +45,4 @@
     <Compile Include="$(MSBuildThisFileDirectory)IMyFunctionalBlockSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMyTerminalBlockSerializer.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)Todo.txt" />
-  </ItemGroup>
 </Project>
