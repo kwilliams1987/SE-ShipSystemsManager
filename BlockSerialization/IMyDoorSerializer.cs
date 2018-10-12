@@ -48,7 +48,6 @@ namespace IngameScript
 
                 base.Deserialize(block, values);
             }
-
         }
     }
 }

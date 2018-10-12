@@ -33,7 +33,7 @@ namespace IngameScript
                         case nameof(block.IsArmed):
                             block.IsArmed = Convert.ToBoolean(value.Value); break;
 
-                        case nameof(CustomProperties.Countdown):
+                        case CustomProperties.Countdown:
                             if (Object.Equals(true, value.Value))
                             {
                                 block.StartCountdown();

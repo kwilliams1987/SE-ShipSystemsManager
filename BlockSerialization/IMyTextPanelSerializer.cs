@@ -19,12 +19,12 @@ namespace IngameScript
                 values.Add(nameof(block.FontColor), block.FontColor.PackedValue);
                 values.Add(nameof(block.FontSize), block.FontSize);
                 values.Add(nameof(block.ShowText), block.ShowText);
-                values.Add(nameof(CustomProperties.PublicText), block.GetPublicText());
-                values.Add(nameof(CustomProperties.PublicTitle), block.GetPublicTitle());
+                values.Add(CustomProperties.PublicText, block.GetPublicText());
+                values.Add(CustomProperties.PublicTitle, block.GetPublicTitle());
 
                 var images = new List<String>();
                 block.GetSelectedImages(images);
-                values.Add(nameof(CustomProperties.Images), String.Join(";", images));
+                values.Add(CustomProperties.Images, String.Join(";", images));
             }
 
             protected override void Deserialize(IMyTextPanel block, Dictionary<String, Object> values)
@@ -77,13 +77,13 @@ namespace IngameScript
                                 block.ShowTextureOnScreen();
                             }
                             break;
-                        case nameof(CustomProperties.PublicText):
+                        case CustomProperties.PublicText:
                             block.WritePublicText(value.Value.ToString(), false);
                             break;
-                        case nameof(CustomProperties.PublicTitle):
+                        case CustomProperties.PublicTitle:
                             block.WritePublicTitle(value.Value.ToString(), false);
                             break;
-                        case nameof(CustomProperties.Images):
+                        case CustomProperties.Images:
                             var images = value.Value.ToString().Split(';').ToList();
                             block.ClearImagesFromSelection();
                             block.AddImagesToSelection(images, true);

@@ -39,7 +39,7 @@ namespace IngameScript
                         {
                             { nameof(IMyWarhead.IsArmed), true },
                             { nameof(IMyWarhead.DetonationTime), countdown },
-                            { nameof(Serialization.CustomProperties.Countdown), true }
+                            { Serialization.CustomProperties.Countdown, true }
                         });
                     }
                 }
@@ -54,7 +54,7 @@ namespace IngameScript
                     {
                         lcd.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { nameof(Serialization.CustomProperties.PublicText), label },
+                            { Serialization.CustomProperties.PublicText, label },
                             { nameof(IMyTextPanel.FontSize), fontSize }
                         });
                     }
@@ -63,7 +63,7 @@ namespace IngameScript
                     {
                         lcd.ApplyConfig(new Dictionary<String, Object>()
                         {
-                            { nameof(Serialization.CustomProperties.Images), GetStyle<String>("sign.images") },
+                            { Serialization.CustomProperties.Images, GetStyle<String>("sign.images") },
                             { nameof(IMyTextPanel.Enabled), true }
                         });
                     }

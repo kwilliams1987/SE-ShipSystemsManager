@@ -28,9 +28,9 @@ namespace IngameScript
             return grid.GetZoneBlocks<T>(zone, all).Where(p => p.HasFunction(function));
         }
 
-        public static List<String> GetZones(this IMyGridTerminalSystem grid)
+        public static IEnumerable<String> GetZones(this IMyGridTerminalSystem grid)
         {
-            return grid.GetBlocksOfType<IMyTerminalBlock>().SelectMany(b => b.GetZones()).Distinct().ToList();
+            return grid.GetBlocksOfType<IMyTerminalBlock>().SelectMany(b => b.GetZones()).Distinct();
         }
 
         public static Boolean AdjacentZonesTest<T>(this IMyGridTerminalSystem grid, Func<T, Boolean> test, params String[] zones)

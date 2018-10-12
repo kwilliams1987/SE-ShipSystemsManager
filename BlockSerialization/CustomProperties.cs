@@ -8,13 +8,13 @@ namespace IngameScript
     {
         public static class CustomProperties
         {
-            public const String Images = "";
-            public const String Closed = "";
-            public const String Locked = "";
-            public const String PublicText = "";
-            public const String PublicTitle = "";
-            public const String Countdown = "";
-            public const String FilterList = "";
+            public const String Images = nameof(Images);
+            public const String Closed = nameof(Closed);
+            public const String Locked = nameof(Locked);
+            public const String PublicText = nameof(PublicText);
+            public const String PublicTitle = nameof(PublicTitle);
+            public const String Countdown = nameof(Countdown);
+            public const String FilterList = nameof(FilterList);
         }
     }
 }

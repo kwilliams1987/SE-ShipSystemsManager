@@ -28,6 +28,10 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
+                        case nameof(IMySoundBlock.Play):
+                            block.Play(); break;
+                        case nameof(IMySoundBlock.Stop):
+                            block.Stop(); break;
                         case nameof(block.LoopPeriod):
                             block.LoopPeriod = Convert.ToSingle(value.Value); break;
                         case nameof(block.Range):

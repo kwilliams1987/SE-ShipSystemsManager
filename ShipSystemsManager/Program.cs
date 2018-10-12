@@ -11,7 +11,7 @@ namespace IngameScript
     {
         public Program()
         {
-            Runtime.UpdateFrequency = UpdateFrequency.Update10;
+            Runtime.UpdateFrequency = UpdateFrequency.Update100;
 
             StatePriority = new List<BaseStyler>
             {
@@ -41,12 +41,6 @@ namespace IngameScript
                     }
                 }
 
-                if ((updateSource & UpdateType.Update100) != UpdateType.None)
-                {
-                    // Script is running in slow mode.
-                    Output("Script is running in slow mode (once per 6 seconds).");
-                }
-
                 Tick();
             }
             else
@@ -54,6 +48,8 @@ namespace IngameScript
                 // Set or clear argument flags.
                 Flags(argument);
             }
+            
+            Output($"{Runtime.CurrentInstructionCount}/{Runtime.MaxInstructionCount} instructions. {Runtime.LastRunTimeMs}ms");
         }
 
         private void Flags(String argument)
@@ -206,11 +202,15 @@ namespace IngameScript
 
         private void Tick()
         {
+            Output($"Running tick.");
             // Only check air vents if pressurization is enabled.
             var pressure = GetBlocks<IMyAirVent>().FirstOrDefault(v => v.PressurizationEnabled) != default(IMyAirVent);
             var batteries = GetBlocks<IMyBatteryBlock>().Any();
-            
-            foreach (var zone in GridTerminalSystem.GetZones())
+            var zones = GridTerminalSystem.GetZones();
+
+            Output($"Found {zones.Count()} zones.");
+
+            foreach (var zone in zones)
             {
                 Output($"Checking Zone \"{zone}\" for new triggers.");
 
@@ -245,12 +245,13 @@ namespace IngameScript
             Echo(message);
 
             var lcds = GetBlocks<IMyTextPanel>(p => p.HasFunction("debug lcd"));
+            Echo($"[{DateTime.Now:HH:mm:ss}] Found {lcds.Count()} Debug LCD panels.");
             var text = "";
 
             foreach (var lcd in lcds)
             {
                 lcd.WritePublicTitle("ShipSystemsManager Diagnostics");
-                lcd.FontSize = 1.5f;
+                lcd.FontSize = 0.5f;
                 lcd.Font = "DEBUG";
 
                 if (append)
@@ -259,7 +260,7 @@ namespace IngameScript
                     {
                         // Do scrolling logic only once.
                         var lines = lcd.GetPublicText().Split('\n').ToList();
-                        if (lines.Count() > 34)
+                        if (lines.Count() > 32)
                         {
                             lines.RemoveAt(0);
                         }
