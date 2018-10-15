@@ -67,7 +67,7 @@ namespace IngameScript
                 
                 foreach (var key in keys)
                 {
-                    values.Add(key.Name, storage.Get(key));
+                    values.Add(key.Name, storage.Get(key).ToObject());
                 }
 
                 SetState(block, values, storage);

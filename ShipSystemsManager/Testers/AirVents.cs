@@ -22,11 +22,14 @@ namespace IngameScript
             {
                 Output($"Depressurization detected in {vents.Count()} Air Vents in zone {zone}.");
 
-                blocks.SetStates(BlockState.DECOMPRESSION);
+                SetStates(blocks, BlockState.DECOMPRESSION);
+
+                foreach (var door in blocks.OfType<IMyDoor>().Where(d => d.Enabled)) // These doors are not locked yet.
+                    GridStorage.Set(BlockKey(door), "state-changed", true);
             }
             else
             {
-                blocks.ClearStates(BlockState.DECOMPRESSION);
+                ClearStates(blocks.Where(b => b.GetZones().All(z => !GetBlocks<IMyAirVent>(v => v.IsInZone(z) && !v.CanPressurize).Any())), BlockState.DECOMPRESSION);
             }
         }
     }

@@ -120,15 +120,14 @@ namespace IngameScript
                             var styler = new DefaultStyler(Me);
                             foreach (var block in GridTerminalSystem.GetBlocksOfType<IMyTerminalBlock>())
                             {
-                                using (var config = block.GetConfig())
-                                    config.SetValue("state", "");
-
+                                ClearStates(block);
                                 styler.Style(block, GridStorage);
                             }
+
                             Storage = "";
 
                             using (var config = Me.GetConfig())
-                                config.SetValue("custom-states", "");
+                                config.ClearValue("custom-states");
                         }
                         else
                         {
@@ -332,20 +331,18 @@ namespace IngameScript
 
         private void ApplyBlockStates()
         {
-            foreach (var block in GetBlocks<IMyTerminalBlock>())
+            foreach (var block in GetBlocks<IMyTerminalBlock>().Where(b => GridStorage.Get(BlockKey(b), "state-changed").ToBoolean()))
             {
-                using (var config = block.GetConfig())
+                var states = GetStates(block);
+                var styler = StatePriority.FirstOrDefault(s => states.Contains(s.State));
+
+                if (styler == default(BaseStyler))
                 {
-                    var states = config.GetValues("state");
-                    var styler = StatePriority.FirstOrDefault(s => states.Contains(s.State));
-
-                    if (styler == default(BaseStyler))
-                    {
-                        styler = new DefaultStyler(Me);
-                    }
-
-                    styler.Style(block, GridStorage);
+                    styler = new DefaultStyler(Me);
                 }
+
+                styler.Style(block, GridStorage);
+                GridStorage.Set(BlockKey(block), "state-changed", false);
             }
         }
 

@@ -22,15 +22,14 @@ namespace IngameScript
             {
                 Output($"Sensor detected enemy in zone {zone}!");
 
-                blocks.SetStates(BlockState.INTRUDER2);
+                SetStates(blocks, BlockState.INTRUDER2);
             }
             else
             {
-                blocks.GroupBy(b => b.GetZones())
+                ClearStates(blocks.GroupBy(b => b.GetZones())
                     .Where(g => !GetBlocks<IMySensorBlock>(t => t.IsWorking && t.IsInAnyZone(g.Key.ToArray()) && t.DetectEnemy)
                         .All(t => !t.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
-                    .SelectMany(g => g)
-                    .ClearStates(BlockState.INTRUDER2);
+                    .SelectMany(g => g), BlockState.INTRUDER2);
             }
         }
     }

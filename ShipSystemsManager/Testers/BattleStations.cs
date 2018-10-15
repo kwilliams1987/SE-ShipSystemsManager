@@ -1,6 +1,7 @@
 ﻿using Sandbox.ModAPI.Ingame;
 using SpaceEngineers.Game.ModAPI.Ingame;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace IngameScript
 {
@@ -15,13 +16,13 @@ namespace IngameScript
             blocks.AddRange(GetBlocks<IMySoundBlock>(s => s.HasFunction(BlockFunction.SOUNDBLOCK_SIREN)));
             blocks.AddRange(GetBlocks<IMyLightingBlock>());
 
-            if (Me.HasConfigFlag("custom-states", "battle"))
+            if (SelfStorage.GetValues("custom-states").Contains("battle"))
             {
-                blocks.SetStates(BlockState.BATTLESTATIONS);
+                SetStates(blocks, BlockState.BATTLESTATIONS);
             }
             else
             {
-                blocks.ClearStates(BlockState.BATTLESTATIONS);
+                ClearStates(blocks, BlockState.BATTLESTATIONS);
             }
         }
     }

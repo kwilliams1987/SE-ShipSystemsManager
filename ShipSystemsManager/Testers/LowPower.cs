@@ -20,11 +20,11 @@ namespace IngameScript
 
             if (power < 0.1f)
             {
-                blocks.SetStates(BlockState.LOWPOWER);
+                SetStates(blocks, BlockState.LOWPOWER);
             }
             else
             {
-                blocks.ClearStates(BlockState.LOWPOWER);
+                ClearStates(blocks, BlockState.LOWPOWER);
             }
         }
     }

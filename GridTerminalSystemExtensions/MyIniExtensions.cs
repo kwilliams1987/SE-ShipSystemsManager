@@ -6,6 +6,83 @@ namespace IngameScript
 {
     public static class MyIniExtensions
     {
+        public static Object ToObject(this MyIniValue value)
+        {
+            var asInt16 = default(Int16);
+            if (value.TryGetInt16(out asInt16))
+            {
+                return asInt16;
+            }
+
+            var asUInt16 = default(UInt16);
+            if (value.TryGetUInt16(out asUInt16))
+            {
+                return asUInt16;
+            }
+
+            var asInt32 = default(Int32);
+            if (value.TryGetInt32(out asInt32))
+            {
+                return asInt32;
+            }
+
+            var asUInt32 = default(UInt32);
+            if (value.TryGetUInt32(out asUInt32))
+            {
+                return asUInt32;
+            }
+
+            var asInt64 = default(Int64);
+            if (value.TryGetInt64(out asInt64))
+            {
+                return asInt64;
+            }
+
+            var asUInt64 = default(UInt64);
+            if (value.TryGetUInt64(out asUInt64))
+            {
+                return asUInt64;
+            }
+
+            var asSingle = default(Single);
+            if (value.TryGetSingle(out asSingle))
+            {
+                return asSingle;
+            }
+
+            var asBoolean = default(Boolean);
+            if (value.TryGetBoolean(out asBoolean))
+            {
+                return asBoolean;
+            }
+
+            var asDouble = default(Double);
+            if (value.TryGetDouble(out asDouble))
+            {
+                return asDouble;
+            }
+
+            var asByte = default(Byte);
+            if (value.TryGetByte(out asByte))
+            {
+                return asByte;
+            }
+
+            var asSByte = default(SByte);
+            if (value.TryGetSByte(out asSByte))
+            {
+                return asSByte;
+            }
+
+            var asString = default(String);
+            if (value.TryGetString(out asString))
+            {
+                return asString;
+            }
+
+            return null;
+        }
+
         public static T ToType<T>(this MyIniValue value)
         {
             var type = typeof(T);
@@ -43,7 +120,7 @@ namespace IngameScript
             }
             else if (type == typeof(Color))
             {
-                return (T)Convert.ChangeType(new Color(value.ToSingle()), type);
+                return (T)Convert.ChangeType(new Color(value.ToUInt32()), type);
             }
             else if (type == typeof(Boolean))
             {

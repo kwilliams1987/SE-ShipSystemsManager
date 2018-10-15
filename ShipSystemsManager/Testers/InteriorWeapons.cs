@@ -22,15 +22,14 @@ namespace IngameScript
             {
                 Output($"Turret detected enemy in zone {zone}!");
 
-                blocks.SetStates(BlockState.INTRUDER1);
+                SetStates(blocks, BlockState.INTRUDER1);
             }
             else
             {
-                blocks.GroupBy(b => b.GetZones())
+                ClearStates(blocks.GroupBy(b => b.GetZones())
                     .Where(g => !GetBlocks<IMyLargeInteriorTurret>(t => t.IsWorking && t.IsInAnyZone(g.Key.ToArray()))
                         .Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
-                    .SelectMany(g => g)
-                    .ClearStates(BlockState.INTRUDER1);
+                    .SelectMany(g => g), BlockState.INTRUDER1);
             }
         }
     }

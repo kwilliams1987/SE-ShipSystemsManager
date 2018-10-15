@@ -42,7 +42,7 @@ namespace IngameScript
                             }
                             else
                             {
-                                block.BackgroundColor = new VRageMath.Color(Convert.ToInt64(value.Value));
+                                block.BackgroundColor = new VRageMath.Color(Convert.ToUInt32(value.Value));
                             }
                             break;
                         case nameof(block.ChangeInterval):
@@ -61,7 +61,7 @@ namespace IngameScript
                             }
                             else
                             {
-                                block.FontColor = new VRageMath.Color(Convert.ToInt64(value.Value));
+                                block.FontColor = new VRageMath.Color(Convert.ToUInt32(value.Value));
                             }
                             break;
                         case nameof(block.FontSize):

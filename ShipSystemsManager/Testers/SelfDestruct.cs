@@ -1,6 +1,7 @@
 ﻿using Sandbox.ModAPI.Ingame;
 using SpaceEngineers.Game.ModAPI.Ingame;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace IngameScript
 {
@@ -16,13 +17,13 @@ namespace IngameScript
             blocks.AddRange(GetBlocks<IMyLightingBlock>());
             blocks.AddRange(GetBlocks<IMyWarhead>(w => w.HasFunction(BlockFunction.WARHEAD_DESTRUCT)));
 
-            if (Me.HasConfigFlag("custom-states", "destruct"))
+            if (SelfStorage.GetValues("custom-states").Contains("destruct"))
             {
-                blocks.SetStates(BlockState.SELFDESTRUCT);
+                SetStates(blocks, BlockState.SELFDESTRUCT);
             }
             else
             {
-                blocks.ClearStates(BlockState.SELFDESTRUCT);
+                ClearStates(blocks, BlockState.SELFDESTRUCT);
             }
         }
     }

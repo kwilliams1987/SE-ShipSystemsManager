@@ -18,7 +18,6 @@ namespace IngameScript
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
-
                 var door = block as IMyDoor;
                 if (door != default(IMyDoor) && door.HasFunction(BlockFunction.DOOR_AIRLOCK))
                 {
