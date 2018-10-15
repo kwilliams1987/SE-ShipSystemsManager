@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using VRage.Game.ModAPI.Ingame.Utilities;
 
 namespace IngameScript
 {
@@ -20,9 +21,9 @@ namespace IngameScript
                 Grid = grid;
             }
 
-            public override void Style(IMyTerminalBlock block)
+            public override void Style(IMyTerminalBlock block, MyIni storage)
             {
-                base.Style(block);
+                base.Style(block, storage);
 
                 var warhead = block as IMyWarhead;
                 var countdown = Grid.GetBlocksOfType<IMyWarhead>(w => w.IsCountingDown && w.HasFunction(BlockFunction.WARHEAD_DESTRUCT))
@@ -40,7 +41,7 @@ namespace IngameScript
                             { nameof(IMyWarhead.IsArmed), true },
                             { nameof(IMyWarhead.DetonationTime), countdown },
                             { Serialization.CustomProperties.Countdown, true }
-                        });
+                        }, storage);
                     }
                 }
 
@@ -56,7 +57,7 @@ namespace IngameScript
                         {
                             { Serialization.CustomProperties.PublicText, label },
                             { nameof(IMyTextPanel.FontSize), fontSize }
-                        });
+                        }, storage);
                     }
 
                     if (lcd.HasFunction(BlockFunction.SIGN_WARNING))
@@ -65,7 +66,7 @@ namespace IngameScript
                         {
                             { Serialization.CustomProperties.Images, GetStyle<String>("sign.images") },
                             { nameof(IMyTextPanel.Enabled), true }
-                        });
+                        }, storage);
                     }
                 }
             }

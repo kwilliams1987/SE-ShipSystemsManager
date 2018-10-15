@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using VRage.Game.ModAPI.Ingame.Utilities;
 
 namespace IngameScript
 {
@@ -14,7 +15,7 @@ namespace IngameScript
             public LowPowerStyler(IMyProgrammableBlock block)
                 : base(5, BlockState.LOWPOWER, block) { }
 
-            public override void Style(IMyTerminalBlock block)
+            public override void Style(IMyTerminalBlock block, MyIni storage)
             {
                 if (block is IMyAssembler)
                 {
@@ -23,7 +24,7 @@ namespace IngameScript
                         block.ApplyConfig(new Dictionary<String, Object>
                         {
                             { nameof(IMyLightingBlock.Enabled), false }
-                        });
+                        }, storage);
                     }
                 }
 
@@ -36,14 +37,14 @@ namespace IngameScript
                             { nameof(IMyLightingBlock.Enabled), true },
                             { nameof(IMyLightingBlock.Intensity), GetStyle<Single>("light.intensity") },
                             { nameof(IMyLightingBlock.Radius), GetStyle<Single>("light.radius") }
-                        });
+                        }, storage);
                     }
                     else
                     {
                         block.ApplyConfig(new Dictionary<String, Object>
                         {
                             { nameof(IMyLightingBlock.Enabled), false }
-                        });
+                        }, storage);
                     }
                 }
 
@@ -54,7 +55,7 @@ namespace IngameScript
                         block.ApplyConfig(new Dictionary<String, Object>
                         {
                             { nameof(IMyLightingBlock.Enabled), false }
-                        });
+                        }, storage);
                     }
                 }
             }

@@ -2,6 +2,7 @@
 using SpaceEngineers.Game.ModAPI.Ingame;
 using System;
 using System.Collections.Generic;
+using VRage.Game.ModAPI.Ingame.Utilities;
 using VRageMath;
 
 namespace IngameScript
@@ -15,7 +16,7 @@ namespace IngameScript
             public BattleStationsStyler(IMyProgrammableBlock block)
                 : base(4, BlockState.BATTLESTATIONS, block) { }
 
-            public override void Style(IMyTerminalBlock block)
+            public override void Style(IMyTerminalBlock block, MyIni storage)
             {
                 var door = block as IMyDoor;
                 if (door != default(IMyDoor) && door.HasFunction(BlockFunction.DOOR_SECURITY))
@@ -23,7 +24,7 @@ namespace IngameScript
                     door.ApplyConfig(new Dictionary<String, Object>()
                     {
                         { Serialization.CustomProperties.Closed, true }
-                    });
+                    }, storage);
 
                     return;
                 }
@@ -40,7 +41,7 @@ namespace IngameScript
                             { nameof(IMyTextPanel.FontColor), GetStyle<Color>("text.color") },
                             { nameof(IMyTextPanel.BackgroundColor), GetStyle<Color>("sign.color") },
                             { nameof(IMyTextPanel.FontSize), GetStyle<Single>("text.size") }
-                        });
+                        }, storage);
                     }
 
                     if (lcd.HasFunction(BlockFunction.SIGN_WARNING))
@@ -49,7 +50,7 @@ namespace IngameScript
                         {
                             { Serialization.CustomProperties.Images, GetStyle<String>("sign.images") },
                             { nameof(IMyTextPanel.Enabled), true }
-                        });
+                        }, storage);
                     }
 
                     return;
@@ -66,14 +67,14 @@ namespace IngameScript
                             { nameof(IMySoundBlock.LoopPeriod), 3600 },
                             { nameof(IMySoundBlock.Enabled), true },
                             { nameof(IMySoundBlock.Play), true }
-                        });
+                        }, storage);
                     }
                     else
                     {
                         soundBlock.ApplyConfig(new Dictionary<String, Object>()
                         {
                             { nameof(IMySoundBlock.Play), false }
-                        });
+                        }, storage);
                     }
 
                     return;
@@ -91,14 +92,14 @@ namespace IngameScript
                             { nameof(IMyInteriorLight.BlinkLength), GetStyle<Single>("light.duration") },
                             { nameof(IMyInteriorLight.BlinkOffset), GetStyle<Single>("light.offset") },
                             { nameof(IMyInteriorLight.Enabled), true },
-                        });
+                        }, storage);
                     }
                     else
                     {
                         light.ApplyConfig(new Dictionary<String, Object>()
                         {
                             { nameof(IMyInteriorLight.Enabled), false }
-                        });
+                        }, storage);
                     }
                 }
             }

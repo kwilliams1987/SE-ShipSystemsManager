@@ -4,15 +4,20 @@ using SpaceEngineers.Game.ModAPI.Ingame;
 using System.Linq;
 using System;
 using System.Collections.Generic;
+using VRage.Game.ModAPI.Ingame.Utilities;
 
 namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
+        private MyIni GridStorage { get; set; }
+        private MyConfig SelfStorage { get; set; }
+
         public Program()
         {
             Runtime.UpdateFrequency = UpdateFrequency.Update100;
 
+            GridStorage = new MyIni();
             StatePriority = new List<BaseStyler>
             {
                 new SelfDestructStyler(Me, GridTerminalSystem),
@@ -22,34 +27,50 @@ namespace IngameScript
                 new BattleStationsStyler(Me)
             }.OrderBy(s => s.Priority);
         }
-        
+
         public void Main(String argument, UpdateType updateSource)
         {
-            if (String.IsNullOrWhiteSpace(argument))
             {
-                // Perform a tick.
-                if ((updateSource & UpdateType.Update1) != UpdateType.None)
+                var error = default(MyIniParseResult);
+                if (!GridStorage.TryParse(Storage, out error))
                 {
-                    // Running in high speed mode is not recommended!
-                    if (!Me.GetConfig<Boolean>("FastMode"))
-                    {
-                        Output("Running the program at one cycle per tick is not recommended.");
-                        Output("Add \"FastMode:true\" to the Programmable Block CustomData to enable this mode.");
-
-                        // Throw an exception to prevent further cycles.
-                        throw new Exception();
-                    }
+                    throw new Exception(error.Error);
                 }
+            }
 
-                Tick();
-            }
-            else
+            try
             {
-                // Set or clear argument flags.
-                Flags(argument);
+                SelfStorage = new MyConfig(Me);
+                if (String.IsNullOrWhiteSpace(argument))
+                {
+                    // Perform a tick.
+                    if ((updateSource & UpdateType.Update1) != UpdateType.None)
+                    {
+                        // Running in high speed mode is not recommended!
+                        if (!SelfStorage.GetValue("FastMode").ToBoolean())
+                        {
+                            Output("Running the program at one cycle per tick is not recommended.");
+                            Output("Add \"FastMode:true\" to the Programmable Block CustomData to enable this mode.");
+
+                            // Throw an exception to prevent further cycles.
+                            throw new Exception();
+                        }
+                    }
+
+                    Tick();
+                }
+                else
+                {
+                    // Set or clear argument flags.
+                    Flags(argument);
+                }
             }
-            
-            Output($"{Runtime.CurrentInstructionCount}/{Runtime.MaxInstructionCount} instructions. {Runtime.LastRunTimeMs}ms");
+            finally
+            {
+                Storage = GridStorage.ToString();
+                SelfStorage.Dispose();
+                Output($"{Runtime.CurrentInstructionCount}/{Runtime.MaxInstructionCount} instructions. {Runtime.LastRunTimeMs}ms");
+            }
         }
 
         private void Flags(String argument)
@@ -57,7 +78,7 @@ namespace IngameScript
             var arguments = argument.Split(' ');
             if (arguments.Count() > 0)
             {
-                var state = String.Join(" ", argument.Skip(1));
+                var state = String.Join(" ", arguments.Skip(1));
                 switch (arguments.First())
                 {
                     case "activate":
@@ -73,23 +94,45 @@ namespace IngameScript
                         }
 
                         if (!String.IsNullOrWhiteSpace(state))
-                            Me.SetConfigFlag("custom-states", state);
+                            SelfStorage.AddValue("custom-states", state);
                         return;
 
                     case "deactivate":
                         if (!String.IsNullOrWhiteSpace(state))
-                            Me.ClearConfigFlag("custom-states", state);
+                            SelfStorage.ClearValue("custom-states", state);
                         return;
 
 
                     case "toggle":
-                        if (Me.HasConfigFlag("custom-states", state))
+                        if (SelfStorage.GetValues("custom-states").Contains(state))
                         {
                             Flags("deactivate " + state);
                         }
                         else
                         {
                             Flags("activate " + state);
+                        }
+                        return;
+
+                    case "reset":
+                        if (arguments.ElementAtOrDefault(1) == "confirm")
+                        {
+                            var styler = new DefaultStyler(Me);
+                            foreach (var block in GridTerminalSystem.GetBlocksOfType<IMyTerminalBlock>())
+                            {
+                                using (var config = block.GetConfig())
+                                    config.SetValue("state", "");
+
+                                styler.Style(block, GridStorage);
+                            }
+                            Storage = "";
+
+                            using (var config = Me.GetConfig())
+                                config.SetValue("custom-states", "");
+                        }
+                        else
+                        {
+                            Output("You must confirm this action - using it will break block states for any zone not accurately stored.");
                         }
                         return;
 
@@ -100,12 +143,14 @@ namespace IngameScript
                             case "preserve":
                                 Output("Writing default styler settings to the Programmable Block CustomData attribute (preserving existing).");
 
-                                var configs = Me.GetConfig();
-                                foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
+                                using (var configs = Me.GetConfig())
                                 {
-                                    if (!configs.ContainsKey(styler.Key))
+                                    foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
                                     {
-                                        Me.SetConfig(styler.Key, styler.Value);
+                                        if (!configs.ContainsKey(styler.Key))
+                                        {
+                                            SelfStorage.SetValue(styler.Key, styler.Value);
+                                        }
                                     }
                                 }
                                 break;
@@ -114,21 +159,16 @@ namespace IngameScript
 
                                 foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
                                 {
-                                    Me.SetConfig(styler.Key, styler.Value);
+                                    SelfStorage.SetValue(styler.Key, styler.Value);
                                 }
                                 break;
                             case "reset":
-                                var config = Me.CustomData.Split('\n');
-                                var newConfig = new List<String>();
-                                var styles = BaseStyler.DefaultStyles.Select(s => s.Key);
-                                
-                                foreach (var line in config)
-                                {
-                                    if (!line.Contains(':') || !styles.Contains(line.Split(':')[0]))
-                                        newConfig.Add(line);
-                                }
+                                SelfStorage.Clear();
 
-                                Me.CustomData = String.Join("\n", newConfig);
+                                foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
+                                {
+                                    SelfStorage.SetValue(styler.Key, styler.Value);
+                                }
                                 break;
                         }
                         break;
@@ -158,7 +198,10 @@ namespace IngameScript
 
                             foreach (var block in blocks)
                             {
-                                block.SetConfigFlag("zones", zone);
+                                using (var config = block.GetConfig())
+                                {
+                                    config.AddValue("zones", zone);
+                                }
                             }
 
                             Output($"Added {blocks.Count()} blocks to zone {zone}.");
@@ -190,7 +233,10 @@ namespace IngameScript
 
                             foreach (var block in blocks)
                             {
-                                block.SetConfigFlag("functions", function);
+                                using (var config = block.GetConfig())
+                                {
+                                    config.AddValue("functions", function);
+                                }
                             }
 
                             Output($"Added {function} to {blocks.Count()} blocks.");
@@ -210,28 +256,35 @@ namespace IngameScript
 
             Output($"Found {zones.Count()} zones.");
 
-            foreach (var zone in zones)
+            try
             {
-                Output($"Checking Zone \"{zone}\" for new triggers.");
-
-                if (pressure)
+                foreach (var zone in zones)
                 {
-                    TestAirVents(zone);
+                    Output($"Checking Zone \"{zone}\" for new triggers.");
+
+                    if (pressure)
+                    {
+                        TestAirVents(zone);
+                    }
+
+                    TestSensors(zone);
+                    TestInteriorWeapons(zone);
                 }
 
-                TestSensors(zone);
-                TestInteriorWeapons(zone);
-            }
+                if (batteries)
+                {
+                    TestLowPower();
+                }
 
-            if (batteries)
+                TestSelfDestruct();
+                TestBattleStations();
+
+                ApplyBlockStates();
+            }
+            catch (Exception e)
             {
-                TestLowPower();
+                Output("Exception: " + e.Message + "\n" + e.StackTrace);                    
             }
-
-            TestSelfDestruct();
-            TestBattleStations();
-
-            ApplyBlockStates();
         }
 
         /// <summary>
@@ -279,18 +332,20 @@ namespace IngameScript
 
         private void ApplyBlockStates()
         {
-            foreach (var block in GetBlocks<IMyTerminalBlock>(b => b.GetConfig<Boolean>("state-changed")))
+            foreach (var block in GetBlocks<IMyTerminalBlock>())
             {
-                var states = block.GetConfigs("state");
-                var styler = StatePriority.FirstOrDefault(s => states.Contains(s.State));
-                
-                if (styler == default(BaseStyler))
+                using (var config = block.GetConfig())
                 {
-                    styler = new DefaultStyler(Me);
-                }
+                    var states = config.GetValues("state");
+                    var styler = StatePriority.FirstOrDefault(s => states.Contains(s.State));
 
-                styler.Style(block);
-                block.SetConfig("state-changed", false);
+                    if (styler == default(BaseStyler))
+                    {
+                        styler = new DefaultStyler(Me);
+                    }
+
+                    styler.Style(block, GridStorage);
+                }
             }
         }
 

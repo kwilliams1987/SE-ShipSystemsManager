@@ -98,7 +98,7 @@ namespace IngameScript.MDK
                     CustomData = "functions:doorsign"
                 });
 
-                room.OfType<IMyTextPanel>().First(b => b.Name == "Door Sign (Zone 1)")
+                room.OfType<IMyTextPanel>().First(b => b.CustomName == "Door Sign (Zone 1)")
                     .WritePublicText("ZONE 1");
 
                 zones.Add(room);
@@ -142,7 +142,7 @@ namespace IngameScript.MDK
                     CustomData = "functions:doorsign"
                 });
 
-                room.OfType<IMyTextPanel>().First(b => b.Name == "Door Sign (Zone 2)")
+                room.OfType<IMyTextPanel>().First(b => b.CustomName == "Door Sign (Zone 2)")
                     .WritePublicText("ZONE 2");
 
                 zones.Add(room);
@@ -164,10 +164,10 @@ namespace IngameScript.MDK
             foreach (var light in grid.GetBlocksOfType<IMyInteriorLight>())
             {
                 Console.WriteLine($"Testing Light {light.EntityId}.");
-                Assert.That(light.Color == new Color(255,255,255), $"Light {light.EntityId} does not have the expected color.");
-                Assert.That(light.BlinkIntervalSeconds == 0, $"Light {light.EntityId} does not have the expected blink interval.");
-                Assert.That(light.BlinkLength == 0, $"Light {light.EntityId} does not have the expected blink length.");
-                Assert.That(light.BlinkOffset == 0, $"Light {light.EntityId} does not have the expected blink offset.");
+                Assert.Equals(light.Color, new Color(255,255,255), $"Light {light.EntityId} does not have the expected color.");
+                Assert.Equals(light.BlinkIntervalSeconds, 0, $"Light {light.EntityId} does not have the expected blink interval.");
+                Assert.Equals(light.BlinkLength, 0, $"Light {light.EntityId} does not have the expected blink length.");
+                Assert.Equals(light.BlinkOffset, 0, $"Light {light.EntityId} does not have the expected blink offset.");
             }
                                 
             foreach (var lcd in grid.GetBlocksOfType<IMyTextPanel>())
@@ -176,10 +176,10 @@ namespace IngameScript.MDK
                 switch (lcd.Name)
                 {
                     case "Door Sign (Zone 1)":
-                        Assert.That(lcd.GetPublicText() == "ZONE 1", $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        Assert.Equals(lcd.GetPublicText(), "ZONE 1", $"LCD {lcd.EntityId} doesn't have the expected text.");
                         break;
                     case "Door Sign (Zone 2)":
-                        Assert.That(lcd.GetPublicText() == "ZONE 2", $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        Assert.Equals(lcd.GetPublicText(), "ZONE 2", $"LCD {lcd.EntityId} doesn't have the expected text.");
                         break;
                 }
             }
@@ -188,7 +188,7 @@ namespace IngameScript.MDK
             {
                 if (door.IsInAllZones("zone-1", "zone-2"))
                 {
-                    Assert.That(door.Status == DoorStatus.Open, $"Airlock joined to Zone 1 and a 2 should be open.");
+                    Assert.True(door.Status == DoorStatus.Open, $"Airlock joined to Zone 1 and a 2 should be open.");
                 }
             }
             
@@ -207,15 +207,15 @@ namespace IngameScript.MDK
                 Console.WriteLine($"Testing Light {light.EntityId}.");
                 if (light.HasFunction(Program.BlockFunction.LIGHT_WARNING))
                 {
-                    Assert.That(light.Color == Styler.Get<Color>("decompression.light.color"), $"Light {light.EntityId} does not have the expected color.");
-                    Assert.That(light.BlinkIntervalSeconds == Styler.Get<Single>("decompression.light.interval"), $"Light {light.EntityId} does not have the expected blink interval.");
-                    Assert.That(light.BlinkLength == Styler.Get<Single>("decompression.light.duration"), $"Light {light.EntityId} does not have the expected blink length.");
-                    Assert.That(light.BlinkOffset == Styler.Get<Single>("decompression.light.offset"), $"Light {light.EntityId} does not have the expected blink offset.");
-                    Assert.That(light.Enabled, $"Light {light.EntityId} should be enabled.");
+                    Assert.Equals(light.Color, Styler.Get<Color>("decompression.light.color"), $"Light {light.EntityId} does not have the expected color.");
+                    Assert.Equals(light.BlinkIntervalSeconds, Styler.Get<Single>("decompression.light.interval"), $"Light {light.EntityId} does not have the expected blink interval.");
+                    Assert.Equals(light.BlinkLength, Styler.Get<Single>("decompression.light.duration"), $"Light {light.EntityId} does not have the expected blink length.");
+                    Assert.Equals(light.BlinkOffset, Styler.Get<Single>("decompression.light.offset"), $"Light {light.EntityId} does not have the expected blink offset.");
+                    Assert.True(light.Enabled, $"Light {light.EntityId} should be enabled.");
                 }
                 else
                 {
-                    Assert.That(!light.Enabled, $"Light {light.EntityId} should not be enabled.");
+                    Assert.False(light.Enabled, $"Light {light.EntityId} should not be enabled.");
                 }
             }
 
@@ -225,7 +225,7 @@ namespace IngameScript.MDK
                 switch (lcd.Name)
                 {
                     case "Door Sign (Zone 1)":
-                        Assert.That(lcd.GetPublicText() == Styler.Get<String>("decompression.text"), $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        Assert.Equals(lcd.GetPublicText(), Styler.Get<String>("decompression.text"), $"LCD {lcd.EntityId} doesn't have the expected text.");
                         break;
                 }
             }
@@ -235,8 +235,8 @@ namespace IngameScript.MDK
                 Console.WriteLine($"Testing door {door.EntityId}.");
                 if (door.IsInAllZones("zone-1", "zone-2"))
                 {
-                    Assert.That(door.Status == DoorStatus.Closed || door.Status == DoorStatus.Closed, $"Airlock joined to Zone 1 and a 2 should be closed or closing.");
-                    Assert.That(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be enabled.");
+                    Assert.True(door.Status == DoorStatus.Closed || door.Status == DoorStatus.Closed, $"Airlock joined to Zone 1 and a 2 should be closed or closing.");
+                    Assert.True(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be enabled.");
                 }
             }
 
@@ -249,8 +249,8 @@ namespace IngameScript.MDK
                 Console.WriteLine($"Testing door {door.EntityId}.");
                 if (door.IsInAllZones("zone-1", "zone-2"))
                 {
-                    Assert.That(door.Status == DoorStatus.Closed, $"Airlock joined to Zone 1 and a 2 should be closed.");
-                    Assert.That(door.Enabled == false, $"Airlock joined to Zone 1 and a 2 should be disabled.");
+                    Assert.True(door.Status == DoorStatus.Closed, $"Airlock joined to Zone 1 and a 2 should be closed.");
+                    Assert.False(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be disabled.");
                 }
             }
 
@@ -267,10 +267,10 @@ namespace IngameScript.MDK
             foreach (var light in grid.GetZoneBlocks<MockInteriorLight>("zone-1"))
             {
                 Console.WriteLine($"Testing Light {light.EntityId}.");
-                Assert.That(light.Color == new Color(255, 255, 255), $"Light {light.EntityId} does not have the expected color.");
-                Assert.That(light.BlinkIntervalSeconds == 0, $"Light {light.EntityId} does not have the expected blink interval.");
-                Assert.That(light.BlinkLength == 0, $"Light {light.EntityId} does not have the expected blink length.");
-                Assert.That(light.BlinkOffset == 0, $"Light {light.EntityId} does not have the expected blink offset.");
+                Assert.Equals(light.Color, new Color(255, 255, 255), $"Light {light.EntityId} does not have the expected color.");
+                Assert.Equals(light.BlinkIntervalSeconds, 0, $"Light {light.EntityId} does not have the expected blink interval.");
+                Assert.Equals(light.BlinkLength, 0, $"Light {light.EntityId} does not have the expected blink length.");
+                Assert.Equals(light.BlinkOffset, 0, $"Light {light.EntityId} does not have the expected blink offset.");
             }
 
             var lcds = grid.GetZoneBlocks<IMyTextPanel>("zone-1");
@@ -281,10 +281,34 @@ namespace IngameScript.MDK
                 switch (lcd.Name)
                 {
                     case "Door Sign (Zone 1)":
-                        Assert.That(lcd.GetPublicText() == "ZONE 1", $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        Assert.Equals(lcd.GetPublicText(), "ZONE 1", $"LCD {lcd.EntityId} doesn't have the expected text.");
                         break;
                 }
             }
+
+            Console.WriteLine("Executing Run #5 (Enable Battle Stations)");
+            MDKFactory.Run(program, argument: "activate battle");
+            Console.WriteLine($"Execution time: {program.Runtime.LastRunTimeMs}ms.");
+
+            Assert.Equals(programmableBlock.GetConfig("custom-states"), "battle", "Activating battle state did not have desired effect.");
+
+            Console.WriteLine("Executing Run #6 (Enable Self-Destruct)");
+            MDKFactory.Run(program, argument: "activate destruct");
+            Console.WriteLine($"Execution time: {program.Runtime.LastRunTimeMs}ms.");
+
+            Assert.Equals(programmableBlock.GetConfig("custom-states"), "battle;destruct", "Activating destruct state did not have desired effect.");
+
+            Console.WriteLine("Executing Run #7 (Toggle Battle Stations)");
+            MDKFactory.Run(program, argument: "toggle battle");
+            Console.WriteLine($"Execution time: {program.Runtime.LastRunTimeMs}ms.");
+
+            Assert.Equals(programmableBlock.GetConfig("custom-states"), "destruct", "Toggling battle state did not have desired effect.");
+
+            Console.WriteLine("Executing Run #8 (Toggle Self-Destruct)");
+            MDKFactory.Run(program, argument: "disable destruct");
+            Console.WriteLine($"Execution time: {program.Runtime.LastRunTimeMs}ms.");
+
+            Assert.Equals(programmableBlock.GetConfig("custom-states"), "", "Disabling destruct state did not have desired effect.");
 
             Console.WriteLine();
             Console.WriteLine("-----------------------------------");

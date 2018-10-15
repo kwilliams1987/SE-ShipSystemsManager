@@ -2,6 +2,7 @@
 using SpaceEngineers.Game.ModAPI.Ingame;
 using System;
 using System.Collections.Generic;
+using VRage.Game.ModAPI.Ingame.Utilities;
 using VRageMath;
 
 namespace IngameScript
@@ -14,7 +15,7 @@ namespace IngameScript
             public IntruderStyler(IMyProgrammableBlock block, String blockState)
                 : base(3, blockState, block) { }
 
-            public override void Style(IMyTerminalBlock block)
+            public override void Style(IMyTerminalBlock block, MyIni storage)
             {
                 var door = block as IMyDoor;
                 if (door != default(IMyDoor))
@@ -22,7 +23,7 @@ namespace IngameScript
                     door.ApplyConfig(new Dictionary<String, Object>()
                     {
                         { Serialization.CustomProperties.Closed, true }
-                    });
+                    }, storage);
 
                     return;
                 }
@@ -38,7 +39,7 @@ namespace IngameScript
                             { nameof(IMyTextPanel.FontColor), GetStyle<Color>("text.color") },
                             { nameof(IMyTextPanel.BackgroundColor), GetStyle<Color>("sign.color") },
                             { nameof(IMyTextPanel.FontSize), GetStyle<Single>("text.size") }
-                        });
+                        }, storage);
                     }
 
                     if (lcd.HasFunction(BlockFunction.SIGN_WARNING))
@@ -47,7 +48,7 @@ namespace IngameScript
                         {
                             { Serialization.CustomProperties.Images, GetStyle<Color>("sign.images") },
                             { nameof(IMyTextPanel.Enabled), true }
-                        });
+                        }, storage);
                     }
 
                     return;
@@ -59,19 +60,19 @@ namespace IngameScript
                     if (soundBlock.HasFunction(BlockFunction.SOUNDBLOCK_SIREN))
                     {
                         soundBlock.ApplyConfig(new Dictionary<String, Object>
-                    {
-                        { nameof(IMySoundBlock.SelectedSound), GetStyle<Color>("sound") },
-                        { nameof(IMySoundBlock.LoopPeriod), 3600 },
-                        { nameof(IMySoundBlock.Enabled), true },
-                        { nameof(IMySoundBlock.Play), true }
-                    });
+                        {
+                            { nameof(IMySoundBlock.SelectedSound), GetStyle<Color>("sound") },
+                            { nameof(IMySoundBlock.LoopPeriod), 3600 },
+                            { nameof(IMySoundBlock.Enabled), true },
+                            { nameof(IMySoundBlock.Play), true }
+                        }, storage);
                     }
                     else
                     {
                         soundBlock.ApplyConfig(new Dictionary<String, Object>()
                         {
                             { nameof(IMySoundBlock.Play), false }
-                        });
+                        }, storage);
                     }
 
                     return;

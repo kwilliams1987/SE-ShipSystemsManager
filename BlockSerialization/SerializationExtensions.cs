@@ -3,6 +3,7 @@ using SpaceEngineers.Game.ModAPI.Ingame;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using VRage.Game.ModAPI.Ingame.Utilities;
 
 namespace IngameScript
 {
@@ -107,19 +108,19 @@ namespace IngameScript
             return new Serialization.IMyTerminalBlockSerializer<T>();
         }
 
-        public static void RestoreConfig<T>(this T block)
-             where T : IMyTerminalBlock => GetSerializer(block).RestoreState(block);
+        public static void RestoreConfig<T>(this T block, MyIni storage)
+             where T : IMyTerminalBlock => GetSerializer(block).RestoreState(block, storage);
 
-        public static void ApplyConfig<T>(this T block, Dictionary<String, Object> configValues)
-             where T : IMyTerminalBlock => GetSerializer(block).SetState(block, configValues);
+        public static void ApplyConfig<T>(this T block, Dictionary<String, Object> configValues, MyIni storage)
+             where T : IMyTerminalBlock => GetSerializer(block).SetState(block, configValues, storage);
 
-        public static void ApplyConfig<T>(this IEnumerable<T> blocks, Dictionary<String, Object> configValues)
+        public static void ApplyConfig<T>(this IEnumerable<T> blocks, Dictionary<String, Object> configValues, MyIni storage)
             where T : IMyTerminalBlock
         {
             var serializer = GetSerializer(blocks.FirstOrDefault());
             foreach (var block in blocks)
             {
-                serializer.SetState(block, configValues);
+                serializer.SetState(block, configValues, storage);
             }
         }
     }

@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using VRage.Game.ModAPI.Ingame.Utilities;
+using VRageMath;
 
 namespace IngameScript
 {
@@ -12,9 +14,9 @@ namespace IngameScript
         public interface IMyTerminalBlockSerializer
         {
             Dictionary<String, Object> GetState(IMyTerminalBlock block);
-            void SetState(IMyTerminalBlock block, Dictionary<String, Object> values);
-            void SaveState(IMyTerminalBlock block);
-            void RestoreState(IMyTerminalBlock block);
+            void SetState(IMyTerminalBlock block, Dictionary<String, Object> values, MyIni storage);
+            void SaveState(IMyTerminalBlock block, MyIni storage);
+            void RestoreState(IMyTerminalBlock block, MyIni storage);
         }
 
         public class IMyTerminalBlockSerializer<T>: IMyTerminalBlockSerializer
@@ -31,9 +33,9 @@ namespace IngameScript
                 return values;
             }
 
-            public void SetState(IMyTerminalBlock block, Dictionary<String, Object> values)
+            public void SetState(IMyTerminalBlock block, Dictionary<String, Object> values, MyIni storage)
             {
-                SaveState(block);
+                SaveState(block, storage);
 
                 if (block is T)
                 {
@@ -41,32 +43,34 @@ namespace IngameScript
                 }
             }
 
-            public void SaveState(IMyTerminalBlock block)
+            public void SaveState(IMyTerminalBlock block, MyIni storage)
             {
-                if (block.CustomData.Split('\n').Any(l => l == "saved:true"))
+                var section = "Entity" + block.EntityId;
+                if (storage.ContainsSection(section))
                     return;
 
                 var states = GetState(block);
-                var config = "\nsaved:true\n";
+
                 foreach (var state in states)
                 {
-                    config += state.Key + ":" + state.Value.ToString().Replace("\n", LineBreak) + "\n";
+                    storage.Set(section, state.Key, state.Value);
                 }
-
-                block.CustomData += config + "\n";
             }
 
-            public void RestoreState(IMyTerminalBlock block)
+            public void RestoreState(IMyTerminalBlock block, MyIni storage)
             {
+                var section = "Entity" + block.EntityId;
+                var keys = new List<MyIniKey>();
                 var values = new Dictionary<String, Object>();
 
-                foreach (var line in block.CustomData.Split('\n').Where(l => l.Contains(":")))
+                storage.GetKeys(section, keys);
+                
+                foreach (var key in keys)
                 {
-                    var pair = line.Split(':');
-                    values.Add(pair.ElementAt(0), String.Join(":", pair.Skip(1)).Replace(LineBreak, "\n"));
+                    values.Add(key.Name, storage.Get(key));
                 }
 
-                SetState(block, values);
+                SetState(block, values, storage);
             }
 
             protected virtual void Serialize(T block, Dictionary<String, Object> values)
