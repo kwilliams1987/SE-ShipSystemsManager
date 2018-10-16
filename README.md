@@ -4,9 +4,9 @@ A Space Engineers script to automate block states, such as doors, lights and sou
 
 The script takes a snapshot of the state of all blocks which it has control over before the first time it edits them, allowing it to restore the blocks to default state when all states are cleared.
 
-The script is completely automated, polling every 10 frames.
+The script is completely automated, polling every 100 update frames.
 
-*It is possible, but not recommended, to run the script faster or slower.*
+*It is possible, but not recommended, to run the script faster.*
 
 *Doing so will either cause excess performance impact, or reduce the speed at which the script can react to emergencies.*
 ## Special Thanks
