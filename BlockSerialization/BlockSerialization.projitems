@@ -9,40 +9,6 @@
     <Import_RootNamespace>BlockSerialization</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)CustomProperties.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GravityGeneratorSphere.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SoundBlock.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GravityGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Warhead.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Thrust.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TextPanel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SmallGatlingGun.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SmallMissileLauncher.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ShipWelder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ShipDrill.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ShipConnector.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SensorBlock.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Reactor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Collector.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConveyorSorter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RadioAntenna.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PistonBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GasTank.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GasGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)OreDetector.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MotorStator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)LightingBlock.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)LaserAntenna.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)LargeThrusterBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Gyro.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Door.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SerializationExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Cockpit.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CameraBlock.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Beacon.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BatteryBlock.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Assembler.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FunctionalBlock.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TerminalBlock.cs" />
   </ItemGroup>
 </Project>
