@@ -7,34 +7,31 @@ namespace IngameScript
 {
     static class IMyTerminalBlockSelectorExtensions
     {
-        public static IEnumerable<String> GetFunctions(this IMyTerminalBlock block)
-        {
-            return block.GetConfigs("functions");
-        }
-
-        public static Boolean HasFunction(this IMyTerminalBlock block, String function)
-        {
-            return block.GetFunctions().Contains(function);
-        }
-
+        const String Functions = "functions";
+        const String Zones = "zones";
+        
         public static IEnumerable<String> GetZones(this IMyTerminalBlock block)
         {
-            return block.GetConfigs("zones");
+            using (var config = block.GetConfig())
+                return config.GetValues(Zones).Where(z => z != "");
+        }
+
+        public static Boolean IsA(this IMyTerminalBlock block, String function)
+        {
+            using (var config = block.GetConfig())
+                return config.GetValues(Functions).Contains(function);
         }
 
         public static Boolean IsInZone(this IMyTerminalBlock block, String zone)
-        {
-            return block.GetZones().Contains(zone);
-        }
+            => block.GetZones().Contains(zone);
 
         public static Boolean IsInAnyZone(this IMyTerminalBlock block, params String[] zones)
-        {
-            return block.GetZones().Any(z => zones.Contains(z));
-        }
+            => block.GetZones().Any(z => zones.Contains(z));
 
         public static Boolean IsInAllZones(this IMyTerminalBlock block, params String[] zones)
-        {
-            return block.GetZones().All(z => zones.Contains(z));
-        }
+            => block.GetZones().All(z => zones.Contains(z));
+
+        public static MyConfig GetConfig(this IMyTerminalBlock block) 
+            => new MyConfig(block);
     }
 }

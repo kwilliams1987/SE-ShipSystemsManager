@@ -13,18 +13,18 @@ namespace IngameScript
 
             var power = GridTerminalSystem.GetBlocksOfType<IMyBatteryBlock>(b => b.IsFunctional && !b.OnlyRecharge && b.Enabled).Average(b => b.CurrentStoredPower / b.MaxStoredPower);
 
-            var blocks = new List<IMyTerminalBlock>();
-            blocks.AddRange(GetBlocks<IMyAssembler>());
-            blocks.AddRange(GetBlocks<IMyLightingBlock>());
-            blocks.AddRange(GetBlocks<IMyRefinery>());
+            var blocks = new List<IMyTerminalBlock>()
+                            .Concat(GetBlocks<IMyAssembler>())
+                            .Concat(GetBlocks<IMyLightingBlock>())
+                            .Concat(GetBlocks<IMyRefinery>());
 
             if (power < 0.1f)
             {
-                blocks.SetStates(BlockState.LOWPOWER);
+                SetStates(blocks, BlockState.LowPower);
             }
             else
             {
-                blocks.ClearStates(BlockState.LOWPOWER);
+                ClearStates(blocks, BlockState.LowPower);
             }
         }
     }

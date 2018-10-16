@@ -1,6 +1,7 @@
 ﻿using Sandbox.ModAPI.Ingame;
 using SpaceEngineers.Game.ModAPI.Ingame;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace IngameScript
 {
@@ -8,20 +9,20 @@ namespace IngameScript
     {
         private void TestBattleStations()
         {
-            var blocks = new List<IMyTerminalBlock>();
-            blocks.AddRange(GetBlocks<IMyDoor>(d => d.HasFunction(BlockFunction.DOOR_SECURITY)));
-            blocks.AddRange(GetBlocks<IMyTextPanel>(l => l.HasFunction(BlockFunction.SIGN_BATTLE)));
-            blocks.AddRange(GetBlocks<IMyTextPanel>(l => l.HasFunction(BlockFunction.SIGN_WARNING)));
-            blocks.AddRange(GetBlocks<IMySoundBlock>(s => s.HasFunction(BlockFunction.SOUNDBLOCK_SIREN)));
-            blocks.AddRange(GetBlocks<IMyLightingBlock>());
+            var blocks = new List<IMyTerminalBlock>()
+                            .Concat(GetBlocks<IMyDoor>(d => d.IsA(BlockType.Security)))
+                            .Concat(GetBlocks<IMyTextPanel>(l => l.IsA(BlockType.BattleSign)))
+                            .Concat(GetBlocks<IMyTextPanel>(l => l.IsA(BlockType.Warning)))
+                            .Concat(GetBlocks<IMySoundBlock>(s => s.IsA(BlockType.Siren)))
+                            .Concat(GetBlocks<IMyLightingBlock>());
 
-            if (Me.HasConfigFlag("custom-states", "battle"))
+            if (SelfStorage.GetValues("custom-states").Contains("battle"))
             {
-                blocks.SetStates(BlockState.BATTLESTATIONS);
+                SetStates(blocks, BlockState.BattleStations);
             }
             else
             {
-                blocks.ClearStates(BlockState.BATTLESTATIONS);
+                ClearStates(blocks, BlockState.BattleStations);
             }
         }
     }

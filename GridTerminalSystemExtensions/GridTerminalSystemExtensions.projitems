@@ -10,7 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)IMyGridTerminalSystem.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IMyTerminalBlockConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMyTerminalBlockSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MyConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MyIniExtensions.cs" />
   </ItemGroup>
 </Project>

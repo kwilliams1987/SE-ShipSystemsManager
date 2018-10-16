@@ -4,9 +4,9 @@ using System.Text;
 
 namespace IngameScript
 {
-    partial class Serialization
+    partial class Serializer
     {
-        public static class CustomProperties
+        public static class Custom
         {
             public const String Images = nameof(Images);
             public const String Closed = nameof(Closed);

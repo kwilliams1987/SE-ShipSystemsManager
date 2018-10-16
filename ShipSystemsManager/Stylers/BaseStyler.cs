@@ -1,6 +1,7 @@
 ﻿using Sandbox.ModAPI.Ingame;
 using System;
 using System.Collections.Generic;
+using VRage.Game.ModAPI.Ingame.Utilities;
 using VRageMath;
 
 namespace IngameScript
@@ -12,7 +13,7 @@ namespace IngameScript
             public Int32 Priority { get; protected set; }
             public String State { get; protected set; }
 
-            protected abstract String StylePrefix { get; }
+            protected abstract String Prefix { get; }
             public static IReadOnlyDictionary<String, Object> DefaultStyles { get; } = new Dictionary<String, Object>()
             {
                 { "battle.text", "BATTLE STATIONS" },
@@ -56,29 +57,31 @@ namespace IngameScript
             };
 
             protected IMyProgrammableBlock ProgrammableBlock { get; }
+            protected MyConfig ProgrammableBlockConfig { get; }
 
             protected BaseStyler(Int32 priority, String key, IMyProgrammableBlock block)
             {
                 Priority = priority;
                 State = key;
                 ProgrammableBlock = block;
+                ProgrammableBlockConfig = new MyConfig(block);
             }
 
-            protected T GetStyle<T>(String key)
+            protected T Get<T>(String key)
             {
-                key = StylePrefix + "." + key;
-                var custom = ProgrammableBlock.GetConfig<T>(key);
-                if (ProgrammableBlock.GetConfig().ContainsKey(key))
+                key = Prefix + "." + key;
+
+                if (ProgrammableBlockConfig.ContainsKey(key))
                 {
-                    return ProgrammableBlock.GetConfig<T>(key);
+                    return ProgrammableBlockConfig.GetValue(key).ToType<T>();
                 }
                 else
                 {
-                    return (T) DefaultStyles[key];
+                    return (T)DefaultStyles[key];
                 }
             }
 
-            public abstract void Style(IMyTerminalBlock block);
+            public abstract void Style(IMyTerminalBlock block, MyIni storage);
         }
     }
 }

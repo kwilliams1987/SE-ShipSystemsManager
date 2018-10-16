@@ -12,25 +12,24 @@ namespace IngameScript
         private void TestSensors(String zone)
         {
             var sensors = GetBlocks<IMySensorBlock>(s => s.IsWorking && s.IsInZone(zone) && s.DetectEnemy);
-            var blocks = new List<IMyTerminalBlock>();
-            blocks.AddRange(GetZoneBlocks<IMyDoor>(zone, BlockFunction.DOOR_SECURITY, true));
-            blocks.AddRange(GetZoneBlocks<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR));
-            blocks.AddRange(GetZoneBlocks<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING));
-            blocks.AddRange(GetZoneBlocks<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN));
+            var blocks = new List<IMyTerminalBlock>()
+                                .Concat(GetZoneBlocks<IMyDoor>(zone, BlockType.Security, true))
+                                .Concat(GetZoneBlocks<IMyTextPanel>(zone, BlockType.DoorSign))
+                                .Concat(GetZoneBlocks<IMyTextPanel>(zone, BlockType.Warning))
+                                .Concat(GetZoneBlocks<IMySoundBlock>(zone, BlockType.Siren));
 
             if (sensors.Any(t => t.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
             {
                 Output($"Sensor detected enemy in zone {zone}!");
 
-                blocks.SetStates(BlockState.INTRUDER2);
+                SetStates(blocks, BlockState.Intruder2);
             }
             else
             {
-                blocks.GroupBy(b => b.GetZones())
+                ClearStates(blocks.GroupBy(b => b.GetZones())
                     .Where(g => !GetBlocks<IMySensorBlock>(t => t.IsWorking && t.IsInAnyZone(g.Key.ToArray()) && t.DetectEnemy)
                         .All(t => !t.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
-                    .SelectMany(g => g)
-                    .ClearStates(BlockState.INTRUDER2);
+                    .SelectMany(g => g), BlockState.Intruder2);
             }
         }
     }
