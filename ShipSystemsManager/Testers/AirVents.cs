@@ -10,7 +10,7 @@ namespace IngameScript
     {
         private void TestAirVents(String zone)
         {
-            var vents = GetBlocks<IMyAirVent>(v => v.IsWorking && v.IsInZone(zone) && !v.Depressurize);
+            var vents = GetBlocks<IMyAirVent>(v => v.IsWorking && v.InZone(zone) && !v.Depressurize);
             var blocks = new List<IMyTerminalBlock>()
                             .Concat(GetZoneBlocks<IMyDoor>(zone, BlockType.Airlock, true))
                             .Concat(GetZoneBlocks<IMyTextPanel>(zone, BlockType.DoorSign))
@@ -29,7 +29,7 @@ namespace IngameScript
             }
             else
             {
-                ClearStates(blocks.Where(b => b.GetZones().All(z => !GetBlocks<IMyAirVent>(v => v.IsInZone(z) && !v.CanPressurize).Any())), BlockState.Decompression);
+                ClearStates(blocks.Where(b => b.GetZones().All(z => !GetBlocks<IMyAirVent>(v => v.InZone(z) && !v.CanPressurize).Any())), BlockState.Decompression);
             }
         }
     }

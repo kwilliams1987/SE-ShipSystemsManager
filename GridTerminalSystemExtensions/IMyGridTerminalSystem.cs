@@ -19,7 +19,7 @@ namespace IngameScript
         public static IEnumerable<T> GetZoneBlocks<T>(this IMyGridTerminalSystem grid, String zone, Boolean all = false)
             where T : class, IMyTerminalBlock
         {
-            return grid.GetBlocksOfType<T>(p => (p.IsWorking || all) && p.IsInZone(zone));
+            return grid.GetBlocksOfType<T>(p => (p.IsWorking || all) && p.InZone(zone));
         }
 
         public static IEnumerable<T> GetZoneBlocksByFunction<T>(this IMyGridTerminalSystem grid, String zone, String function, Boolean all = false)
@@ -36,7 +36,7 @@ namespace IngameScript
         public static Boolean AdjacentZonesTest<T>(this IMyGridTerminalSystem grid, Func<T, Boolean> test, params String[] zones)
             where T : class, IMyTerminalBlock
         {
-            return grid.GetBlocksOfType<T>(v => v.IsInAnyZone(zones)).All(test);
+            return grid.GetBlocksOfType<T>(v => v.InAnyZone(zones)).All(test);
         }
 
         public static List<MyDetectedEntityInfo> GetDetectedEntities(this IMySensorBlock sensorBlock, Func<MyDetectedEntityInfo, Boolean> collect = null)

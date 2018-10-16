@@ -22,13 +22,13 @@ namespace IngameScript
                 return config.GetValues(Functions).Contains(function);
         }
 
-        public static Boolean IsInZone(this IMyTerminalBlock block, String zone)
+        public static Boolean InZone(this IMyTerminalBlock block, String zone)
             => block.GetZones().Contains(zone);
 
-        public static Boolean IsInAnyZone(this IMyTerminalBlock block, params String[] zones)
+        public static Boolean InAnyZone(this IMyTerminalBlock block, params String[] zones)
             => block.GetZones().Any(z => zones.Contains(z));
 
-        public static Boolean IsInAllZones(this IMyTerminalBlock block, params String[] zones)
+        public static Boolean InAllZones(this IMyTerminalBlock block, params String[] zones)
             => block.GetZones().All(z => zones.Contains(z));
 
         public static MyConfig GetConfig(this IMyTerminalBlock block) 

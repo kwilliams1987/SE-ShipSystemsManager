@@ -11,7 +11,7 @@ namespace IngameScript
     {
         private void TestSensors(String zone)
         {
-            var sensors = GetBlocks<IMySensorBlock>(s => s.IsWorking && s.IsInZone(zone) && s.DetectEnemy);
+            var sensors = GetBlocks<IMySensorBlock>(s => s.IsWorking && s.InZone(zone) && s.DetectEnemy);
             var blocks = new List<IMyTerminalBlock>()
                                 .Concat(GetZoneBlocks<IMyDoor>(zone, BlockType.Security, true))
                                 .Concat(GetZoneBlocks<IMyTextPanel>(zone, BlockType.DoorSign))
@@ -27,7 +27,7 @@ namespace IngameScript
             else
             {
                 ClearStates(blocks.GroupBy(b => b.GetZones())
-                    .Where(g => !GetBlocks<IMySensorBlock>(t => t.IsWorking && t.IsInAnyZone(g.Key.ToArray()) && t.DetectEnemy)
+                    .Where(g => !GetBlocks<IMySensorBlock>(t => t.IsWorking && t.InAnyZone(g.Key.ToArray()) && t.DetectEnemy)
                         .All(t => !t.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
                     .SelectMany(g => g), BlockState.Intruder2);
             }

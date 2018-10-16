@@ -183,7 +183,7 @@ namespace IngameScript.MDK
 
             foreach (var door in grid.GetBlocksOfType<IMyDoor>())
             {
-                if (door.IsInAllZones("zone-1", "zone-2"))
+                if (door.InAllZones("zone-1", "zone-2"))
                 {
                     Assert.True(door.Status == DoorStatus.Open, $"Airlock joined to Zone 1 and a 2 should be open.");
                 }
@@ -226,7 +226,7 @@ namespace IngameScript.MDK
 
             foreach (var door in grid.GetBlocksOfType<IMyDoor>())
             {
-                if (door.IsInAllZones("zone-1", "zone-2"))
+                if (door.InAllZones("zone-1", "zone-2"))
                 {
                     Assert.True(door.Status == DoorStatus.Closed || door.Status == DoorStatus.Closing, $"Airlock joined to Zone 1 and a 2 should be closed or closing.");
                     Assert.True(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be enabled.");
@@ -238,7 +238,7 @@ namespace IngameScript.MDK
 
             foreach (var door in grid.GetBlocksOfType<IMyDoor>())
             {
-                if (door.IsInAllZones("zone-1", "zone-2"))
+                if (door.InAllZones("zone-1", "zone-2"))
                 {
                     Assert.True(door.Status == DoorStatus.Closed, $"Airlock joined to Zone 1 and a 2 should be closed.");
                     Assert.False(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be disabled.");

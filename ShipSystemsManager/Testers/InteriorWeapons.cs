@@ -11,7 +11,7 @@ namespace IngameScript
     {
         private void TestInteriorWeapons(String zone)
         {
-            var interiorTurrets = GetBlocks<IMyLargeInteriorTurret>(t => t.IsWorking && t.IsInZone(zone));
+            var interiorTurrets = GetBlocks<IMyLargeInteriorTurret>(t => t.IsWorking && t.InZone(zone));
             var blocks = new List<IMyTerminalBlock>()
                                 .Concat(GetZoneBlocks<IMyDoor>(zone, BlockType.Security, true))
                                 .Concat(GetZoneBlocks<IMyTextPanel>(zone, BlockType.DoorSign))
@@ -27,7 +27,7 @@ namespace IngameScript
             else
             {
                 ClearStates(blocks.GroupBy(b => b.GetZones())
-                    .Where(g => !GetBlocks<IMyLargeInteriorTurret>(t => t.IsWorking && t.IsInAnyZone(g.Key.ToArray()))
+                    .Where(g => !GetBlocks<IMyLargeInteriorTurret>(t => t.IsWorking && t.InAnyZone(g.Key.ToArray()))
                         .Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
                     .SelectMany(g => g), BlockState.Intruder1);
             }
