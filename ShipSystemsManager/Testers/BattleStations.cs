@@ -7,22 +7,22 @@ namespace IngameScript
 {
     partial class Program
     {
-        private void TestBattleStations()
+        void TestBattleStations()
         {
             var blocks = new List<IMyTerminalBlock>()
-                            .Concat(GetBlocks<IMyDoor>(d => d.IsA(BlockType.Security)))
-                            .Concat(GetBlocks<IMyTextPanel>(l => l.IsA(BlockType.BattleSign)))
-                            .Concat(GetBlocks<IMyTextPanel>(l => l.IsA(BlockType.Warning)))
-                            .Concat(GetBlocks<IMySoundBlock>(s => s.IsA(BlockType.Siren)))
+                            .Concat(GetBlocks<IMyDoor>(d => d.IsA(Function.Security)))
+                            .Concat(GetBlocks<IMyTextPanel>(l => l.IsA(Function.BattleSign)))
+                            .Concat(GetBlocks<IMyTextPanel>(l => l.IsA(Function.Warning)))
+                            .Concat(GetBlocks<IMySoundBlock>(s => s.IsA(Function.Siren)))
                             .Concat(GetBlocks<IMyLightingBlock>());
 
             if (SelfStorage.GetValues("custom-states").Contains("battle"))
             {
-                SetStates(blocks, BlockState.BattleStations);
+                SetStates(blocks, State.BattleStations);
             }
             else
             {
-                ClearStates(blocks, BlockState.BattleStations);
+                ClearStates(blocks, State.BattleStations);
             }
         }
     }

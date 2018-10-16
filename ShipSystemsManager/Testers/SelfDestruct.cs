@@ -7,23 +7,23 @@ namespace IngameScript
 {
     partial class Program
     {
-        private void TestSelfDestruct()
+        void TestSelfDestruct()
         {
             var blocks = new List<IMyTerminalBlock>()
-                                .Concat(GetBlocks<IMyDoor>(d => d.IsA(BlockType.Security)))
-                                .Concat(GetBlocks<IMyTextPanel>(l => l.IsA(BlockType.BattleSign)))
-                                .Concat(GetBlocks<IMyTextPanel>(l => l.IsA(BlockType.Warning)))
-                                .Concat(GetBlocks<IMySoundBlock>(s => s.IsA(BlockType.Siren)))
+                                .Concat(GetBlocks<IMyDoor>(d => d.IsA(Function.Security)))
+                                .Concat(GetBlocks<IMyTextPanel>(l => l.IsA(Function.BattleSign)))
+                                .Concat(GetBlocks<IMyTextPanel>(l => l.IsA(Function.Warning)))
+                                .Concat(GetBlocks<IMySoundBlock>(s => s.IsA(Function.Siren)))
                                 .Concat(GetBlocks<IMyLightingBlock>())
-                                .Concat(GetBlocks<IMyWarhead>(w => w.IsA(BlockType.SelfDestruct)));
+                                .Concat(GetBlocks<IMyWarhead>(w => w.IsA(Function.SelfDestruct)));
 
             if (SelfStorage.GetValues("custom-states").Contains("destruct"))
             {
-                SetStates(blocks, BlockState.Destruct);
+                SetStates(blocks, State.Destruct);
             }
             else
             {
-                ClearStates(blocks, BlockState.Destruct);
+                ClearStates(blocks, State.Destruct);
             }
         }
     }

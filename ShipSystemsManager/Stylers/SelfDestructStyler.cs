@@ -11,13 +11,13 @@ namespace IngameScript
         class SelfDestructStyler: BattleStationsStyler
         {
             protected override String Prefix => "destruct";
-            private IMyGridTerminalSystem Grid { get; }
+            IMyGridTerminalSystem Grid { get; }
 
             public SelfDestructStyler(IMyProgrammableBlock block, IMyGridTerminalSystem grid)
                 : base(block)
             {
                 Priority = 1;
-                State = BlockState.Destruct;
+                State = Program.State.Destruct;
                 Grid = grid;
             }
 
@@ -26,13 +26,13 @@ namespace IngameScript
                 base.Style(block, storage);
 
                 var warhead = block as IMyWarhead;
-                var countdown = Grid.GetBlocksOfType<IMyWarhead>(w => w.IsCountingDown && w.IsA(BlockType.SelfDestruct))
+                var countdown = Grid.GetBlocksOfType<IMyWarhead>(w => w.IsCountingDown && w.IsA(Function.SelfDestruct))
                     .Min(w => w.DetonationTime);
                 
                 if (countdown == default(Single))
                     countdown = Get<Single>("timer");
 
-                if (warhead != default(IMyWarhead) && warhead.IsA(BlockType.SelfDestruct))
+                if (warhead != default(IMyWarhead) && warhead.IsA(Function.SelfDestruct))
                 {
                     if (!warhead.IsCountingDown)
                     {
@@ -51,7 +51,7 @@ namespace IngameScript
                     var label = String.Format(Get<String>("text"), TimeSpan.FromSeconds(countdown));
                     var fontSize = label.Split('\n').Length;
 
-                    if (lcd.IsA(BlockType.Warning))
+                    if (lcd.IsA(Function.Warning))
                     {
                         lcd.Apply(new Dictionary<String, Object>()
                         {
@@ -60,7 +60,7 @@ namespace IngameScript
                         }, storage);
                     }
 
-                    if (lcd.IsA(BlockType.Warning))
+                    if (lcd.IsA(Function.Warning))
                     {
                         lcd.Apply(new Dictionary<String, Object>()
                         {

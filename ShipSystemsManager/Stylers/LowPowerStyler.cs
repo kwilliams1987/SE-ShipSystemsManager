@@ -13,13 +13,13 @@ namespace IngameScript
             protected override String Prefix => "lowpower";
 
             public LowPowerStyler(IMyProgrammableBlock block)
-                : base(5, BlockState.LowPower, block) { }
+                : base(5, Program.State.LowPower, block) { }
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
                 if (block is IMyAssembler)
                 {
-                    if (!block.IsA(BlockType.AlwaysOn))
+                    if (!block.IsA(Function.AlwaysOn))
                     {
                         block.Apply(new Dictionary<String, Object>
                         {
@@ -30,7 +30,7 @@ namespace IngameScript
 
                 if (block is IMyLightingBlock)
                 {
-                    if (block.IsA(BlockType.AlwaysOn))
+                    if (block.IsA(Function.AlwaysOn))
                     {
                         block.Apply(new Dictionary<String, Object>
                         {
@@ -50,7 +50,7 @@ namespace IngameScript
 
                 if (block is IMyRefinery)
                 {
-                    if (!block.IsA(BlockType.AlwaysOn))
+                    if (!block.IsA(Function.AlwaysOn))
                     {
                         block.Apply(new Dictionary<String, Object>
                         {

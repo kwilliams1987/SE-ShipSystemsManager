@@ -9,10 +9,10 @@ namespace IngameScript
 {
     public class MyConfig : IDisposable
     {
-        private String Section => "Ship Systems Manager";
-        private IMyTerminalBlock Block { get; }
-        private MyIni Config { get; } = new MyIni();
-        private Boolean Changed { get; set; } = false;
+        String Section => "Ship Systems Manager";
+        IMyTerminalBlock Block { get; }
+        MyIni Config { get; } = new MyIni();
+        Boolean Changed { get; set; } = false;
 
         public MyConfig(IMyTerminalBlock block)
         {

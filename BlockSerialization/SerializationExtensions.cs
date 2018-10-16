@@ -36,7 +36,7 @@ namespace IngameScript
             }
         }
 
-        private static ISerializer GetSerializer<T>(T block)
+        static ISerializer GetSerializer<T>(T block)
              where T : IMyTerminalBlock
         {
             if (block is IMyAssembler)
@@ -1123,7 +1123,7 @@ namespace IngameScript
         public class TerminalBlock<T> : ISerializer
             where T : IMyTerminalBlock
         {
-            private const String LineBreak = "#N#";
+            const String LineBreak = "#N#";
 
             public Dictionary<String, Object> GetState(IMyTerminalBlock block)
             {

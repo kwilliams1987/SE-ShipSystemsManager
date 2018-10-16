@@ -6,7 +6,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        private void TestLowPower()
+        void TestLowPower()
         {
             if (GridTerminalSystem.GetBlocksOfType<IMyBatteryBlock>(b => !b.OnlyRecharge).Count() == 0)
                 return;
@@ -20,11 +20,11 @@ namespace IngameScript
 
             if (power < 0.1f)
             {
-                SetStates(blocks, BlockState.LowPower);
+                SetStates(blocks, State.LowPower);
             }
             else
             {
-                ClearStates(blocks, BlockState.LowPower);
+                ClearStates(blocks, State.LowPower);
             }
         }
     }

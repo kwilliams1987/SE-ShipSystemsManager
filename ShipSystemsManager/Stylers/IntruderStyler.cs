@@ -31,7 +31,7 @@ namespace IngameScript
                 var lcd = block as IMyTextPanel;
                 if (lcd != default(IMyTextPanel))
                 {
-                    if (lcd.IsA(BlockType.DoorSign))
+                    if (lcd.IsA(Function.DoorSign))
                     {
                         lcd.Apply(new Dictionary<String, Object>()
                         {
@@ -42,7 +42,7 @@ namespace IngameScript
                         }, storage);
                     }
 
-                    if (lcd.IsA(BlockType.Warning))
+                    if (lcd.IsA(Function.Warning))
                     {
                         lcd.Apply(new Dictionary<String, Object>()
                         {
@@ -57,7 +57,7 @@ namespace IngameScript
                 var soundBlock = block as IMySoundBlock;
                 if (soundBlock != default(IMySoundBlock))
                 {
-                    if (soundBlock.IsA(BlockType.Siren))
+                    if (soundBlock.IsA(Function.Siren))
                     {
                         soundBlock.Apply(new Dictionary<String, Object>
                         {

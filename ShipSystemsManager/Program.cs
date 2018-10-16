@@ -10,8 +10,38 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        private MyIni GridStorage { get; set; }
-        private MyConfig SelfStorage { get; set; }
+        public static class Function
+        {
+            public const String Airlock = "airlock";
+            public const String Security = "security";
+            public const String DoorSign = "doorsign";
+            public const String BattleSign = "battle";
+            public const String Warning = "warnsign";
+            public const String Siren = "siren";
+            public const String SelfDestruct = "selfdestruct";
+            public const String AlwaysOn = "lowpower";
+        }
+
+        public static class State
+        {
+            public const String LowPower = "lowpower";
+            public const String BattleStations = "battle";
+            public const String Decompression = "decompression";
+            public const String Intruder1 = "intruder1"; // Turrets
+            public const String Intruder2 = "intruder2"; // Sensors
+            public const String Destruct = "selfdestruct";
+        }
+
+        #region mdk macros
+        const String VERSION = "$MDK_DATE$, $MDK_TIME$";
+        #endregion
+
+        const String States = "states";
+
+        MyIni GridStorage { get; set; }
+        MyConfig SelfStorage { get; set; }
+        readonly IOrderedEnumerable<BaseStyler> StatePriority;
+
 
         public Program()
         {
@@ -22,8 +52,8 @@ namespace IngameScript
             {
                 new SelfDestructStyler(Me, GridTerminalSystem),
                 new DecompressionStyler(Me),
-                new IntruderStyler(Me, BlockState.Intruder1), // Turrets
-                new IntruderStyler(Me, BlockState.Intruder2), // Sensors
+                new IntruderStyler(Me, State.Intruder1), // Turrets
+                new IntruderStyler(Me, State.Intruder2), // Sensors
                 new BattleStationsStyler(Me)
             }.OrderBy(s => s.Priority);
         }
@@ -73,7 +103,7 @@ namespace IngameScript
             }
         }
 
-        private void Flags(String argument)
+        void Flags(String argument)
         {
             var arguments = argument.Split(' ');
             if (arguments.Count() > 0)
@@ -85,7 +115,7 @@ namespace IngameScript
                         switch (state)
                         {
                             case "destruct":
-                                var warheads = GetBlocks<IMyWarhead>(w => w.IsA(BlockType.SelfDestruct) && w.IsFunctional);
+                                var warheads = GetBlocks<IMyWarhead>(w => w.IsA(Function.SelfDestruct) && w.IsFunctional);
                                 if (!warheads.Any())
                                 {
                                     Output("WARNING: Self Destruct is unavailable.");
@@ -245,7 +275,7 @@ namespace IngameScript
             }
         }
 
-        private void Tick()
+        void Tick()
         {
             Output($"Running tick.");
             // Only check air vents if pressurization is enabled.
@@ -291,7 +321,7 @@ namespace IngameScript
         /// </summary>
         /// <param name="message"></param>
         /// <param name="append"></param>
-        private void Output(String message, Boolean append = true)
+        void Output(String message, Boolean append = true)
         {
             message = $"[{DateTime.Now:HH:mm:ss}] {message}";
             Echo(message);
@@ -329,7 +359,7 @@ namespace IngameScript
             }
         }
 
-        private void ApplyBlockStates()
+        void ApplyBlockStates()
         {
             foreach (var block in GetBlocks<IMyTerminalBlock>().Where(b => GridStorage.Get(BlockKey(b), "state-changed").ToBoolean()))
             {
@@ -346,7 +376,7 @@ namespace IngameScript
             }
         }
 
-        private IEnumerable<T> GetZoneBlocks<T>(String zone, String function = "", Boolean all = true)
+        IEnumerable<T> GetZoneBlocks<T>(String zone, String function = "", Boolean all = true)
             where T: class, IMyTerminalBlock
         {
             if (String.IsNullOrWhiteSpace(function))
@@ -359,7 +389,49 @@ namespace IngameScript
             }
         }
 
-        private IEnumerable<T> GetBlocks<T>(Func<T, Boolean> collect = null)
+        IEnumerable<T> GetBlocks<T>(Func<T, Boolean> collect = null)
             where T : class, IMyTerminalBlock => GridTerminalSystem.GetBlocksOfType(collect);
+
+
+        String BlockKey(IMyTerminalBlock block) => "Entity " + block.EntityId;
+
+        IEnumerable<String> GetStates(IMyTerminalBlock block)
+            => GridStorage.Get(BlockKey(block), States).ToString().Split('\n').Where(s => s != "");
+
+        void SetStates(IMyTerminalBlock block, params String[] states)
+        {
+            var current = GetStates(block).ToList();
+            var concat = current.Concat(states).Distinct();
+
+            if (concat.Count() != current.Count())
+            {
+                GridStorage.Set(BlockKey(block), States, String.Join("\n", concat));
+                GridStorage.Set(BlockKey(block), "state-changed", true);
+            }
+        }
+
+        void ClearStates(IMyTerminalBlock block, params String[] states)
+        {
+            var current = GetStates(block).ToList();
+            var removed = current.RemoveAll(c => states.Contains(c));
+
+            if (removed > 0)
+            {
+                GridStorage.Set(BlockKey(block), States, String.Join("\n", current));
+                GridStorage.Set(BlockKey(block), "state-changed", true);
+            }
+        }
+
+        void SetStates(IEnumerable<IMyTerminalBlock> blocks, params String[] states)
+        {
+            foreach (var block in blocks)
+                SetStates(block, states);
+        }
+
+        void ClearStates(IEnumerable<IMyTerminalBlock> blocks, params String[] states)
+        {
+            foreach (var block in blocks)
+                ClearStates(block, states);
+        }
     }
 }

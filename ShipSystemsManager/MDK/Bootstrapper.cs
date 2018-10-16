@@ -200,7 +200,7 @@ namespace IngameScript.MDK
             
             foreach (var light in grid.GetZoneBlocks<MockInteriorLight>("zone-1"))
             {
-                if (light.IsA(Program.BlockType.Siren))
+                if (light.IsA(Program.Function.Siren))
                 {
                     Assert.Equals(Styler.Get<Color>("decompression.light.color"), light.Color, $"Light {light.EntityId} does not have the expected color.");
                     Assert.Equals(Styler.Get<Single>("decompression.light.interval"), light.BlinkIntervalSeconds, $"Light {light.EntityId} does not have the expected blink interval.");
@@ -307,7 +307,7 @@ namespace IngameScript.MDK
             Console.ReadKey(true);
         }
 
-        private class Zone : IReadOnlyList<IMyTerminalBlock>
+        class Zone : IReadOnlyList<IMyTerminalBlock>
         {
             public String Name { get; }
             public IEnumerable<String> AdjacentZones => Blocks.SelectMany(b => b.GetZones()).Distinct().Where(z => z != Name);

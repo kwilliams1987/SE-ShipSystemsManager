@@ -14,12 +14,12 @@ namespace IngameScript
             protected override String Prefix => "decompression";
 
             public DecompressionStyler(IMyProgrammableBlock block)
-                : base(2, BlockState.Decompression, block) { }
+                : base(2, Program.State.Decompression, block) { }
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
                 var door = block as IMyDoor;
-                if (door != default(IMyDoor) && door.IsA(BlockType.Airlock))
+                if (door != default(IMyDoor) && door.IsA(Function.Airlock))
                 {
                     door.Apply(new Dictionary<String, Object>()
                     {
@@ -30,7 +30,7 @@ namespace IngameScript
                 var lcd = block as IMyTextPanel;
                 if (lcd != default(IMyTextPanel))
                 {
-                    if (lcd.IsA(BlockType.DoorSign))
+                    if (lcd.IsA(Function.DoorSign))
                     {
                         lcd.Apply(new Dictionary<String, Object>()
                         {
@@ -41,7 +41,7 @@ namespace IngameScript
                         }, storage);
                     }
 
-                    if (lcd.IsA(BlockType.Warning))
+                    if (lcd.IsA(Function.Warning))
                     {
                         lcd.Apply(new Dictionary<String, Object>()
                         {
@@ -54,7 +54,7 @@ namespace IngameScript
                 var soundBlock = block as IMySoundBlock;
                 if (soundBlock != default(IMySoundBlock))
                 {
-                    if (soundBlock.IsA(BlockType.Siren))
+                    if (soundBlock.IsA(Function.Siren))
                     {
                         soundBlock.Apply(new Dictionary<String, Object>
                         {
@@ -78,7 +78,7 @@ namespace IngameScript
                 var light = block as IMyLightingBlock;
                 if (light != default(IMyLightingBlock))
                 {
-                    if (light.IsA(BlockType.Siren))
+                    if (light.IsA(Function.Siren))
                     {
                         light.Apply(new Dictionary<String, Object>()
                         {

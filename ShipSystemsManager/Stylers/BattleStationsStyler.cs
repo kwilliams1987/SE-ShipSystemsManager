@@ -14,12 +14,12 @@ namespace IngameScript
             protected override String Prefix => "battle";
 
             public BattleStationsStyler(IMyProgrammableBlock block)
-                : base(4, BlockState.BattleStations, block) { }
+                : base(4, Program.State.BattleStations, block) { }
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
                 var door = block as IMyDoor;
-                if (door != default(IMyDoor) && door.IsA(BlockType.Security))
+                if (door != default(IMyDoor) && door.IsA(Function.Security))
                 {
                     door.Apply(new Dictionary<String, Object>()
                     {
@@ -32,7 +32,7 @@ namespace IngameScript
                 var lcd = block as IMyTextPanel;
                 if (lcd != default(IMyTextPanel))
                 {
-                    if (lcd.IsA(BlockType.BattleSign))
+                    if (lcd.IsA(Function.BattleSign))
                     {
                         lcd.Apply(new Dictionary<String, Object>()
                         {
@@ -44,7 +44,7 @@ namespace IngameScript
                         }, storage);
                     }
 
-                    if (lcd.IsA(BlockType.Warning))
+                    if (lcd.IsA(Function.Warning))
                     {
                         lcd.Apply(new Dictionary<String, Object>()
                         {
@@ -59,7 +59,7 @@ namespace IngameScript
                 var soundBlock = block as IMySoundBlock;
                 if (soundBlock != default(IMySoundBlock))
                 {
-                    if (soundBlock.IsA(BlockType.Siren))
+                    if (soundBlock.IsA(Function.Siren))
                     {
                         soundBlock.Apply(new Dictionary<String, Object>
                         {
@@ -83,7 +83,7 @@ namespace IngameScript
                 var light = block as IMyLightingBlock;
                 if (light != default(IMyLightingBlock))
                 {
-                    if (light.IsA(BlockType.Siren))
+                    if (light.IsA(Function.Siren))
                     {
                         light.Apply(new Dictionary<String, Object>()
                         {
