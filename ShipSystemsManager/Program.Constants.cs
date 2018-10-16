@@ -12,27 +12,26 @@ namespace IngameScript
         private const String VERSION = "$MDK_DATE$, $MDK_TIME$";
         #endregion
 
-        public static class BlockFunction
+        public static class BlockType
         {
-            public static readonly String DOOR_AIRLOCK = "airlock";
-            public static readonly String DOOR_SECURITY = "security";
-            public static readonly String SIGN_DOOR = "doorsign";
-            public static readonly String SIGN_BATTLE = "battle";
-            public static readonly String SIGN_WARNING = "warnsign";
-            public static readonly String SOUNDBLOCK_SIREN = "siren";
-            public static readonly String LIGHT_WARNING = "warnlight";
-            public static readonly String WARHEAD_DESTRUCT = "selfdestruct";
-            public static readonly String EMERGENCYPOWER = "lowpower";
+            public const String Airlock = "airlock";
+            public const String Security = "security";
+            public const String DoorSign = "doorsign";
+            public const String BattleSign = "battle";
+            public const String Warning = "warnsign";
+            public const String Siren = "siren";
+            public const String SelfDestruct = "selfdestruct";
+            public const String AlwaysOn = "lowpower";
         }
 
         public static class BlockState
         {
-            public static readonly String LOWPOWER = "lowpower";
-            public static readonly String BATTLESTATIONS = "battle";
-            public static readonly String DECOMPRESSION = "decompression";
-            public static readonly String INTRUDER1 = "intruder1"; // Turrets
-            public static readonly String INTRUDER2 = "intruder2"; // Sensors
-            public static readonly String SELFDESTRUCT = "selfdestruct";
+            public const String LowPower = "lowpower";
+            public const String BattleStations = "battle";
+            public const String Decompression = "decompression";
+            public const String Intruder1 = "intruder1"; // Turrets
+            public const String Intruder2 = "intruder2"; // Sensors
+            public const String Destruct = "selfdestruct";
         }
     }
 }

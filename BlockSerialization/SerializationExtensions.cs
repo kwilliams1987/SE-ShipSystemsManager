@@ -9,112 +9,112 @@ namespace IngameScript
 {
     public static class SerializationExtensions
     {
-        private static Serialization.IMyTerminalBlockSerializer GetSerializer<T>(T block)
+        private static Serializer.IMyTerminalBlockSerializer GetSerializer<T>(T block)
              where T : IMyTerminalBlock
         {
             if (block is IMyAssembler)
-                return new Serialization.IMyAssemblerSerializer();
+                return new Serializer.Assembler();
 
             if (block is IMyBatteryBlock)
-                return new Serialization.IMyBatteryBlockSerializer();
+                return new Serializer.BatteryBlock();
 
             if (block is IMyCameraBlock)
-                return new Serialization.IMyCameraBlockSerializer();
+                return new Serializer.CameraBlock();
 
             if (block is IMyCockpit)
-                return new Serialization.IMyCockpitSerializer();
+                return new Serializer.Cockpit();
 
             if (block is IMyCollector)
-                return new Serialization.IMyCollectorSerializer();
+                return new Serializer.Collector();
 
             if (block is IMyConveyorSorter)
-                return new Serialization.IMyConveyorSorterSerializer();
+                return new Serializer.ConveyorSorter();
 
             if (block is IMyDoor)
-                return new Serialization.IMyDoorSerializer();
+                return new Serializer.Door();
 
             if (block is IMyGasGenerator)
-                return new Serialization.IMyGasGeneratorSerializer();
+                return new Serializer.GasGenerator();
 
             if (block is IMyGasTank)
-                return new Serialization.IMyGasTankSerializer();
+                return new Serializer.GasTank();
 
             if (block is IMyGyro)
-                return new Serialization.IMyGyroSerializer();
+                return new Serializer.Gyro();
 
             if (block is IMyGravityGenerator)
-                return new Serialization.IMyGravityGeneratorSerializer();
+                return new Serializer.GravityGenerator();
 
             if (block is IMyGravityGeneratorSphere)
-                return new Serialization.IMyGravityGeneratorSphereSerializer();
+                return new Serializer.GravityGeneratorSphere();
 
             if (block is IMyLargeTurretBase)
-                return new Serialization.IMyLargeTurretBaseSerializer();
+                return new Serializer.LargeThrusterBase();
 
             if (block is IMyLaserAntenna)
-                return new Serialization.IMyLaserAntennaSerializer();
+                return new Serializer.LaserAntenna();
 
             if (block is IMyLightingBlock)
-                return new Serialization.IMyLightingBlockSerializer();
+                return new Serializer.LightingBlock();
 
             if (block is IMyMotorStator)
-                return new Serialization.IMyMotorStatorSerializer();
+                return new Serializer.MotorStator();
 
             if (block is IMyOreDetector)
-                return new Serialization.IMyOreDetectorSerializer();
+                return new Serializer.OreDetector();
 
             if (block is IMyPistonBase)
-                return new Serialization.IMyPistonBaseSerializer();
+                return new Serializer.PistonBase();
 
             if (block is IMyRadioAntenna)
-                return new Serialization.IMyRadioAntennaSerializer();
+                return new Serializer.RadioAntenna();
 
             if (block is IMyReactor)
-                return new Serialization.IMyReactorSerializer();
+                return new Serializer.Reactor();
 
             if (block is IMySensorBlock)
-                return new Serialization.IMySensorBlockSerializer();
+                return new Serializer.SensorBlock();
 
             if (block is IMyShipConnector)
-                return new Serialization.IMyShipConnectorSerializer();
+                return new Serializer.ShipConnector();
 
             if (block is IMyShipDrill)
-                return new Serialization.IMyShipDrillSerializer();
+                return new Serializer.ShipDrill();
 
             if (block is IMyShipWelder)
-                return new Serialization.IMyShipWelderSerializer();
+                return new Serializer.ShipWelder();
 
             if (block is IMySmallGatlingGun)
-                return new Serialization.IMySmallGatlingGunSerializer();
+                return new Serializer.SmallGatlingGun();
 
             if (block is IMySmallMissileLauncher)
-                return new Serialization.IMySmallMissileLauncherSerializer();
+                return new Serializer.SmallMissileLauncher();
 
             if (block is IMySoundBlock)
-                return new Serialization.IMySoundBlockSerializer();
+                return new Serializer.SoundBlock();
 
             if (block is IMyTextPanel)
-                return new Serialization.IMyTextPanelSerializer();
+                return new Serializer.TextPanel();
 
             if (block is IMyThrust)
-                return new Serialization.IMyThrustSerializer();
+                return new Serializer.Thrust();
 
             if (block is IMyWarhead)
-                return new Serialization.IMyWarheadSerializer();
+                return new Serializer.Warhead();
 
             if (block is IMyFunctionalBlock)
-                return new Serialization.IMyFunctionalBlockSerializer();
+                return new Serializer.FunctionalBlock();
 
-            return new Serialization.IMyTerminalBlockSerializer<T>();
+            return new Serializer.TerminalBlock<T>();
         }
 
-        public static void RestoreConfig<T>(this T block, MyIni storage)
+        public static void Restore<T>(this T block, MyIni storage)
              where T : IMyTerminalBlock => GetSerializer(block).RestoreState(block, storage);
 
-        public static void ApplyConfig<T>(this T block, Dictionary<String, Object> configValues, MyIni storage)
+        public static void Apply<T>(this T block, Dictionary<String, Object> configValues, MyIni storage)
              where T : IMyTerminalBlock => GetSerializer(block).SetState(block, configValues, storage);
 
-        public static void ApplyConfig<T>(this IEnumerable<T> blocks, Dictionary<String, Object> configValues, MyIni storage)
+        public static void Apply<T>(this IEnumerable<T> blocks, Dictionary<String, Object> configValues, MyIni storage)
             where T : IMyTerminalBlock
         {
             var serializer = GetSerializer(blocks.FirstOrDefault());

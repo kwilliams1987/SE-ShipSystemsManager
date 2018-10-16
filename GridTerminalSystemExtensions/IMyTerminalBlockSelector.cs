@@ -9,21 +9,18 @@ namespace IngameScript
     {
         const String Functions = "functions";
         const String Zones = "zones";
-
-        public static IEnumerable<String> GetFunctions(this IMyTerminalBlock block)
-        {
-            using (var config = block.GetConfig())
-                return config.GetValues(Functions);
-        }
-
+        
         public static IEnumerable<String> GetZones(this IMyTerminalBlock block)
         {
             using (var config = block.GetConfig())
                 return config.GetValues(Zones).Where(z => z != "");
         }
 
-        public static Boolean HasFunction(this IMyTerminalBlock block, String function)
-            => block.GetFunctions().Contains(function);
+        public static Boolean IsA(this IMyTerminalBlock block, String function)
+        {
+            using (var config = block.GetConfig())
+                return config.GetValues(Functions).Contains(function);
+        }
 
         public static Boolean IsInZone(this IMyTerminalBlock block, String zone)
             => block.GetZones().Contains(zone);

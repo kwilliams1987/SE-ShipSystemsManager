@@ -8,12 +8,12 @@ namespace IngameScript
     {
         class DefaultStyler : BaseStyler
         {
-            protected override String StylePrefix => "";
+            protected override String Prefix => "";
 
             public DefaultStyler(IMyProgrammableBlock block)
                 : base(1000, "", block) { }
 
-            public override void Style(IMyTerminalBlock block, MyIni storage) => block.RestoreConfig(storage);
+            public override void Style(IMyTerminalBlock block, MyIni storage) => block.Restore(storage);
         }
     }
 }

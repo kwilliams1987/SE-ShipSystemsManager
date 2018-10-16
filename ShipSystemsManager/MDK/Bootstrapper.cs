@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Timers;
 using IngameScript.Mockups;
@@ -10,7 +9,6 @@ using IngameScript.Mockups.Blocks;
 using Malware.MDKUtilities;
 using Sandbox.ModAPI.Ingame;
 using SpaceEngineers.Game.ModAPI.Ingame;
-using VRage.Game.ModAPI;
 using VRageMath;
 
 namespace IngameScript.MDK
@@ -202,7 +200,7 @@ namespace IngameScript.MDK
             
             foreach (var light in grid.GetZoneBlocks<MockInteriorLight>("zone-1"))
             {
-                if (light.HasFunction(Program.BlockFunction.LIGHT_WARNING))
+                if (light.IsA(Program.BlockType.Siren))
                 {
                     Assert.Equals(Styler.Get<Color>("decompression.light.color"), light.Color, $"Light {light.EntityId} does not have the expected color.");
                     Assert.Equals(Styler.Get<Single>("decompression.light.interval"), light.BlinkIntervalSeconds, $"Light {light.EntityId} does not have the expected blink interval.");
@@ -303,7 +301,7 @@ namespace IngameScript.MDK
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("DEBUG LCD OUTPUT:");
             Console.WriteLine("-----------------------------------");
-            Console.WriteLine(grid.GetBlocksOfType<IMyTextPanel>(t => t.HasFunction("debug lcd")).FirstOrDefault()?.GetPublicText()?.Trim() ?? ">> NO LCD FOUND <<");
+            Console.WriteLine(grid.GetBlocksOfType<IMyTextPanel>(t => t.IsA("debug lcd")).FirstOrDefault()?.GetPublicText()?.Trim() ?? ">> NO LCD FOUND <<");
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey(true);

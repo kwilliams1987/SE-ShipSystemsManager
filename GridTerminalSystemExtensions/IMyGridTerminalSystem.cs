@@ -25,7 +25,7 @@ namespace IngameScript
         public static IEnumerable<T> GetZoneBlocksByFunction<T>(this IMyGridTerminalSystem grid, String zone, String function, Boolean all = false)
             where T : class, IMyTerminalBlock
         {
-            return grid.GetZoneBlocks<T>(zone, all).Where(p => p.HasFunction(function));
+            return grid.GetZoneBlocks<T>(zone, all).Where(p => p.IsA(function));
         }
 
         public static IEnumerable<String> GetZones(this IMyGridTerminalSystem grid)

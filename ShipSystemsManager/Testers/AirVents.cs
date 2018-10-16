@@ -11,25 +11,25 @@ namespace IngameScript
         private void TestAirVents(String zone)
         {
             var vents = GetBlocks<IMyAirVent>(v => v.IsWorking && v.IsInZone(zone) && !v.Depressurize);
-            var blocks = new List<IMyTerminalBlock>();
-            blocks.AddRange(GetZoneBlocks<IMyDoor>(zone, BlockFunction.DOOR_AIRLOCK, true));
-            blocks.AddRange(GetZoneBlocks<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR));
-            blocks.AddRange(GetZoneBlocks<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING));
-            blocks.AddRange(GetZoneBlocks<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN));
-            blocks.AddRange(GridTerminalSystem.GetZoneBlocks<IMyInteriorLight>(zone));
+            var blocks = new List<IMyTerminalBlock>()
+                            .Concat(GetZoneBlocks<IMyDoor>(zone, BlockType.Airlock, true))
+                            .Concat(GetZoneBlocks<IMyTextPanel>(zone, BlockType.DoorSign))
+                            .Concat(GetZoneBlocks<IMyTextPanel>(zone, BlockType.Warning))
+                            .Concat(GetZoneBlocks<IMySoundBlock>(zone, BlockType.Siren))
+                            .Concat(GridTerminalSystem.GetZoneBlocks<IMyInteriorLight>(zone));
 
             if (vents.Any(v => !v.CanPressurize))
             {
                 Output($"Depressurization detected in {vents.Count()} Air Vents in zone {zone}.");
 
-                SetStates(blocks, BlockState.DECOMPRESSION);
+                SetStates(blocks, BlockState.Decompression);
 
                 foreach (var door in blocks.OfType<IMyDoor>().Where(d => d.Enabled)) // These doors are not locked yet.
                     GridStorage.Set(BlockKey(door), "state-changed", true);
             }
             else
             {
-                ClearStates(blocks.Where(b => b.GetZones().All(z => !GetBlocks<IMyAirVent>(v => v.IsInZone(z) && !v.CanPressurize).Any())), BlockState.DECOMPRESSION);
+                ClearStates(blocks.Where(b => b.GetZones().All(z => !GetBlocks<IMyAirVent>(v => v.IsInZone(z) && !v.CanPressurize).Any())), BlockState.Decompression);
             }
         }
     }

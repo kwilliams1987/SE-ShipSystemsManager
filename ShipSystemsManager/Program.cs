@@ -22,8 +22,8 @@ namespace IngameScript
             {
                 new SelfDestructStyler(Me, GridTerminalSystem),
                 new DecompressionStyler(Me),
-                new IntruderStyler(Me, BlockState.INTRUDER1), // Turrets
-                new IntruderStyler(Me, BlockState.INTRUDER2), // Sensors
+                new IntruderStyler(Me, BlockState.Intruder1), // Turrets
+                new IntruderStyler(Me, BlockState.Intruder2), // Sensors
                 new BattleStationsStyler(Me)
             }.OrderBy(s => s.Priority);
         }
@@ -85,7 +85,7 @@ namespace IngameScript
                         switch (state)
                         {
                             case "destruct":
-                                var warheads = GetBlocks<IMyWarhead>(w => w.HasFunction(BlockFunction.WARHEAD_DESTRUCT) && w.IsFunctional);
+                                var warheads = GetBlocks<IMyWarhead>(w => w.IsA(BlockType.SelfDestruct) && w.IsFunctional);
                                 if (!warheads.Any())
                                 {
                                     Output("WARNING: Self Destruct is unavailable.");
@@ -296,7 +296,7 @@ namespace IngameScript
             message = $"[{DateTime.Now:HH:mm:ss}] {message}";
             Echo(message);
 
-            var lcds = GetBlocks<IMyTextPanel>(p => p.HasFunction("debug lcd"));
+            var lcds = GetBlocks<IMyTextPanel>(p => p.IsA("debug lcd"));
             Echo($"[{DateTime.Now:HH:mm:ss}] Found {lcds.Count()} Debug LCD panels.");
             var text = "";
 

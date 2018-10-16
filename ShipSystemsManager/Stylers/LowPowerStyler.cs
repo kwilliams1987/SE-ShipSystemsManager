@@ -10,18 +10,18 @@ namespace IngameScript
     {
         class LowPowerStyler: BaseStyler
         {
-            protected override String StylePrefix => "lowpower";
+            protected override String Prefix => "lowpower";
 
             public LowPowerStyler(IMyProgrammableBlock block)
-                : base(5, BlockState.LOWPOWER, block) { }
+                : base(5, BlockState.LowPower, block) { }
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
                 if (block is IMyAssembler)
                 {
-                    if (!block.HasFunction(BlockFunction.EMERGENCYPOWER))
+                    if (!block.IsA(BlockType.AlwaysOn))
                     {
-                        block.ApplyConfig(new Dictionary<String, Object>
+                        block.Apply(new Dictionary<String, Object>
                         {
                             { nameof(IMyLightingBlock.Enabled), false }
                         }, storage);
@@ -30,18 +30,18 @@ namespace IngameScript
 
                 if (block is IMyLightingBlock)
                 {
-                    if (block.HasFunction(BlockFunction.EMERGENCYPOWER))
+                    if (block.IsA(BlockType.AlwaysOn))
                     {
-                        block.ApplyConfig(new Dictionary<String, Object>
+                        block.Apply(new Dictionary<String, Object>
                         {
                             { nameof(IMyLightingBlock.Enabled), true },
-                            { nameof(IMyLightingBlock.Intensity), GetStyle<Single>("light.intensity") },
-                            { nameof(IMyLightingBlock.Radius), GetStyle<Single>("light.radius") }
+                            { nameof(IMyLightingBlock.Intensity), Get<Single>("light.intensity") },
+                            { nameof(IMyLightingBlock.Radius), Get<Single>("light.radius") }
                         }, storage);
                     }
                     else
                     {
-                        block.ApplyConfig(new Dictionary<String, Object>
+                        block.Apply(new Dictionary<String, Object>
                         {
                             { nameof(IMyLightingBlock.Enabled), false }
                         }, storage);
@@ -50,9 +50,9 @@ namespace IngameScript
 
                 if (block is IMyRefinery)
                 {
-                    if (!block.HasFunction(BlockFunction.EMERGENCYPOWER))
+                    if (!block.IsA(BlockType.AlwaysOn))
                     {
-                        block.ApplyConfig(new Dictionary<String, Object>
+                        block.Apply(new Dictionary<String, Object>
                         {
                             { nameof(IMyLightingBlock.Enabled), false }
                         }, storage);

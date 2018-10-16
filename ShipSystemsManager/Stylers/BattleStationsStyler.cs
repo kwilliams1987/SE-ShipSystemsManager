@@ -11,19 +11,19 @@ namespace IngameScript
     {
         class BattleStationsStyler : BaseStyler
         {
-            protected override String StylePrefix => "battle";
+            protected override String Prefix => "battle";
 
             public BattleStationsStyler(IMyProgrammableBlock block)
-                : base(4, BlockState.BATTLESTATIONS, block) { }
+                : base(4, BlockState.BattleStations, block) { }
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
                 var door = block as IMyDoor;
-                if (door != default(IMyDoor) && door.HasFunction(BlockFunction.DOOR_SECURITY))
+                if (door != default(IMyDoor) && door.IsA(BlockType.Security))
                 {
-                    door.ApplyConfig(new Dictionary<String, Object>()
+                    door.Apply(new Dictionary<String, Object>()
                     {
-                        { Serialization.CustomProperties.Closed, true }
+                        { Serializer.Custom.Closed, true }
                     }, storage);
 
                     return;
@@ -32,23 +32,23 @@ namespace IngameScript
                 var lcd = block as IMyTextPanel;
                 if (lcd != default(IMyTextPanel))
                 {
-                    if (lcd.HasFunction(BlockFunction.SIGN_BATTLE))
+                    if (lcd.IsA(BlockType.BattleSign))
                     {
-                        lcd.ApplyConfig(new Dictionary<String, Object>()
+                        lcd.Apply(new Dictionary<String, Object>()
                         {
-                            { Serialization.CustomProperties.PublicText, GetStyle<String>("text") },
-                            { nameof(IMyTextPanel.Font), GetStyle<String>("text.font") },
-                            { nameof(IMyTextPanel.FontColor), GetStyle<Color>("text.color") },
-                            { nameof(IMyTextPanel.BackgroundColor), GetStyle<Color>("sign.color") },
-                            { nameof(IMyTextPanel.FontSize), GetStyle<Single>("text.size") }
+                            { Serializer.Custom.PublicText, Get<String>("text") },
+                            { nameof(IMyTextPanel.Font), Get<String>("text.font") },
+                            { nameof(IMyTextPanel.FontColor), Get<Color>("text.color") },
+                            { nameof(IMyTextPanel.BackgroundColor), Get<Color>("sign.color") },
+                            { nameof(IMyTextPanel.FontSize), Get<Single>("text.size") }
                         }, storage);
                     }
 
-                    if (lcd.HasFunction(BlockFunction.SIGN_WARNING))
+                    if (lcd.IsA(BlockType.Warning))
                     {
-                        lcd.ApplyConfig(new Dictionary<String, Object>()
+                        lcd.Apply(new Dictionary<String, Object>()
                         {
-                            { Serialization.CustomProperties.Images, GetStyle<String>("sign.images") },
+                            { Serializer.Custom.Images, Get<String>("sign.images") },
                             { nameof(IMyTextPanel.Enabled), true }
                         }, storage);
                     }
@@ -59,11 +59,11 @@ namespace IngameScript
                 var soundBlock = block as IMySoundBlock;
                 if (soundBlock != default(IMySoundBlock))
                 {
-                    if (soundBlock.HasFunction(BlockFunction.SOUNDBLOCK_SIREN))
+                    if (soundBlock.IsA(BlockType.Siren))
                     {
-                        soundBlock.ApplyConfig(new Dictionary<String, Object>
+                        soundBlock.Apply(new Dictionary<String, Object>
                         {
-                            { nameof(IMySoundBlock.SelectedSound), GetStyle<String>("sound") },
+                            { nameof(IMySoundBlock.SelectedSound), Get<String>("sound") },
                             { nameof(IMySoundBlock.LoopPeriod), 3600 },
                             { nameof(IMySoundBlock.Enabled), true },
                             { nameof(IMySoundBlock.Play), true }
@@ -71,7 +71,7 @@ namespace IngameScript
                     }
                     else
                     {
-                        soundBlock.ApplyConfig(new Dictionary<String, Object>()
+                        soundBlock.Apply(new Dictionary<String, Object>()
                         {
                             { nameof(IMySoundBlock.Play), false }
                         }, storage);
@@ -83,20 +83,20 @@ namespace IngameScript
                 var light = block as IMyLightingBlock;
                 if (light != default(IMyLightingBlock))
                 {
-                    if (light.HasFunction(BlockFunction.LIGHT_WARNING))
+                    if (light.IsA(BlockType.Siren))
                     {
-                        light.ApplyConfig(new Dictionary<String, Object>()
+                        light.Apply(new Dictionary<String, Object>()
                         {
-                            { nameof(IMyInteriorLight.Color), GetStyle<Color>("light.color") },
-                            { nameof(IMyInteriorLight.BlinkIntervalSeconds), GetStyle<Single>("light.interval") },
-                            { nameof(IMyInteriorLight.BlinkLength), GetStyle<Single>("light.duration") },
-                            { nameof(IMyInteriorLight.BlinkOffset), GetStyle<Single>("light.offset") },
+                            { nameof(IMyInteriorLight.Color), Get<Color>("light.color") },
+                            { nameof(IMyInteriorLight.BlinkIntervalSeconds), Get<Single>("light.interval") },
+                            { nameof(IMyInteriorLight.BlinkLength), Get<Single>("light.duration") },
+                            { nameof(IMyInteriorLight.BlinkOffset), Get<Single>("light.offset") },
                             { nameof(IMyInteriorLight.Enabled), true },
                         }, storage);
                     }
                     else
                     {
-                        light.ApplyConfig(new Dictionary<String, Object>()
+                        light.Apply(new Dictionary<String, Object>()
                         {
                             { nameof(IMyInteriorLight.Enabled), false }
                         }, storage);

@@ -12,24 +12,24 @@ namespace IngameScript
         private void TestInteriorWeapons(String zone)
         {
             var interiorTurrets = GetBlocks<IMyLargeInteriorTurret>(t => t.IsWorking && t.IsInZone(zone));
-            var blocks = new List<IMyTerminalBlock>();
-            blocks.AddRange(GetZoneBlocks<IMyDoor>(zone, BlockFunction.DOOR_SECURITY, true));
-            blocks.AddRange(GetZoneBlocks<IMyTextPanel>(zone, BlockFunction.SIGN_DOOR));
-            blocks.AddRange(GetZoneBlocks<IMyTextPanel>(zone, BlockFunction.SIGN_WARNING));
-            blocks.AddRange(GetZoneBlocks<IMySoundBlock>(zone, BlockFunction.SOUNDBLOCK_SIREN));
+            var blocks = new List<IMyTerminalBlock>()
+                                .Concat(GetZoneBlocks<IMyDoor>(zone, BlockType.Security, true))
+                                .Concat(GetZoneBlocks<IMyTextPanel>(zone, BlockType.DoorSign))
+                                .Concat(GetZoneBlocks<IMyTextPanel>(zone, BlockType.Warning))
+                                .Concat(GetZoneBlocks<IMySoundBlock>(zone, BlockType.Siren));
 
             if (interiorTurrets.Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
             {
                 Output($"Turret detected enemy in zone {zone}!");
 
-                SetStates(blocks, BlockState.INTRUDER1);
+                SetStates(blocks, BlockState.Intruder1);
             }
             else
             {
                 ClearStates(blocks.GroupBy(b => b.GetZones())
                     .Where(g => !GetBlocks<IMyLargeInteriorTurret>(t => t.IsWorking && t.IsInAnyZone(g.Key.ToArray()))
                         .Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
-                    .SelectMany(g => g), BlockState.INTRUDER1);
+                    .SelectMany(g => g), BlockState.Intruder1);
             }
         }
     }

@@ -9,21 +9,21 @@ namespace IngameScript
     {
         private void TestSelfDestruct()
         {
-            var blocks = new List<IMyTerminalBlock>();
-            blocks.AddRange(GetBlocks<IMyDoor>(d => d.HasFunction(BlockFunction.DOOR_SECURITY)));
-            blocks.AddRange(GetBlocks<IMyTextPanel>(l => l.HasFunction(BlockFunction.SIGN_BATTLE)));
-            blocks.AddRange(GetBlocks<IMyTextPanel>(l => l.HasFunction(BlockFunction.SIGN_WARNING)));
-            blocks.AddRange(GetBlocks<IMySoundBlock>(s => s.HasFunction(BlockFunction.SOUNDBLOCK_SIREN)));
-            blocks.AddRange(GetBlocks<IMyLightingBlock>());
-            blocks.AddRange(GetBlocks<IMyWarhead>(w => w.HasFunction(BlockFunction.WARHEAD_DESTRUCT)));
+            var blocks = new List<IMyTerminalBlock>()
+                                .Concat(GetBlocks<IMyDoor>(d => d.IsA(BlockType.Security)))
+                                .Concat(GetBlocks<IMyTextPanel>(l => l.IsA(BlockType.BattleSign)))
+                                .Concat(GetBlocks<IMyTextPanel>(l => l.IsA(BlockType.Warning)))
+                                .Concat(GetBlocks<IMySoundBlock>(s => s.IsA(BlockType.Siren)))
+                                .Concat(GetBlocks<IMyLightingBlock>())
+                                .Concat(GetBlocks<IMyWarhead>(w => w.IsA(BlockType.SelfDestruct)));
 
             if (SelfStorage.GetValues("custom-states").Contains("destruct"))
             {
-                SetStates(blocks, BlockState.SELFDESTRUCT);
+                SetStates(blocks, BlockState.Destruct);
             }
             else
             {
-                ClearStates(blocks, BlockState.SELFDESTRUCT);
+                ClearStates(blocks, BlockState.Destruct);
             }
         }
     }

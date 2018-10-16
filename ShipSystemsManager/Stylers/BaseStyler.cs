@@ -13,7 +13,7 @@ namespace IngameScript
             public Int32 Priority { get; protected set; }
             public String State { get; protected set; }
 
-            protected abstract String StylePrefix { get; }
+            protected abstract String Prefix { get; }
             public static IReadOnlyDictionary<String, Object> DefaultStyles { get; } = new Dictionary<String, Object>()
             {
                 { "battle.text", "BATTLE STATIONS" },
@@ -67,9 +67,9 @@ namespace IngameScript
                 ProgrammableBlockConfig = new MyConfig(block);
             }
 
-            protected T GetStyle<T>(String key)
+            protected T Get<T>(String key)
             {
-                key = StylePrefix + "." + key;
+                key = Prefix + "." + key;
 
                 if (ProgrammableBlockConfig.ContainsKey(key))
                 {
