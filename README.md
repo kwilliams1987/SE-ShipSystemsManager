@@ -6,9 +6,8 @@ The script takes a snapshot of the state of all blocks which it has control over
 
 The script is completely automated, polling every 100 update frames.
 
-*It is possible, but not recommended, to run the script faster.*
+*It is possible, but not recommended, to run the script faster, doing so will cause excess performance impact on larger grids.*
 
-*Doing so will either cause excess performance impact, or reduce the speed at which the script can react to emergencies.*
 ## Special Thanks
 Big shout out to [Malware](https://github.com/malware-dev) for his [Space Engineers Visual Studio Developers Kit](https://github.com/malware-dev/MDK-SE).
 
