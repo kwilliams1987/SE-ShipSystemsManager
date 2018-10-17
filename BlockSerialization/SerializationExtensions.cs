@@ -39,98 +39,37 @@ namespace IngameScript
         static ISerializer GetSerializer<T>(T block)
              where T : IMyTerminalBlock
         {
-            if (block is IMyAssembler)
-                return new Assembler();
-
-            if (block is IMyBatteryBlock)
-                return new BatteryBlock();
-
-            if (block is IMyCameraBlock)
-                return new CameraBlock();
-
-            if (block is IMyCockpit)
-                return new Cockpit();
-
-            if (block is IMyCollector)
-                return new Collector();
-
-            if (block is IMyConveyorSorter)
-                return new ConveyorSorter();
-
-            if (block is IMyDoor)
-                return new Door();
-
-            if (block is IMyGasGenerator)
-                return new GasGenerator();
-
-            if (block is IMyGasTank)
-                return new GasTank();
-
-            if (block is IMyGyro)
-                return new Gyro();
-
-            if (block is IMyGravityGenerator)
-                return new GravityGenerator();
-
-            if (block is IMyGravityGeneratorSphere)
-                return new GravityGeneratorSphere();
-
-            if (block is IMyLargeTurretBase)
-                return new LargeThrusterBase();
-
-            if (block is IMyLaserAntenna)
-                return new LaserAntenna();
-
-            if (block is IMyLightingBlock)
-                return new LightingBlock();
-
-            if (block is IMyMotorStator)
-                return new MotorStator();
-
-            if (block is IMyOreDetector)
-                return new OreDetector();
-
-            if (block is IMyPistonBase)
-                return new PistonBase();
-
-            if (block is IMyRadioAntenna)
-                return new RadioAntenna();
-
-            if (block is IMyReactor)
-                return new Reactor();
-
-            if (block is IMySensorBlock)
-                return new SensorBlock();
-
-            if (block is IMyShipConnector)
-                return new ShipConnector();
-
-            if (block is IMyShipDrill)
-                return new ShipDrill();
-
-            if (block is IMyShipWelder)
-                return new ShipWelder();
-
-            if (block is IMySmallGatlingGun)
-                return new SmallGatlingGun();
-
-            if (block is IMySmallMissileLauncher)
-                return new SmallMissileLauncher();
-
-            if (block is IMySoundBlock)
-                return new SoundBlock();
-
-            if (block is IMyTextPanel)
-                return new TextPanel();
-
-            if (block is IMyThrust)
-                return new Thrust();
-
-            if (block is IMyWarhead)
-                return new Warhead();
-
-            if (block is IMyFunctionalBlock)
-                return new FunctionalBlock();
+            if (block is IMyAssembler) return new Assembler();
+            if (block is IMyBatteryBlock) return new BatteryBlock();
+            if (block is IMyCameraBlock) return new CameraBlock();
+            if (block is IMyCockpit) return new Cockpit();
+            if (block is IMyCollector) return new Collector();
+            if (block is IMyConveyorSorter) return new ConveyorSorter();
+            if (block is IMyDoor) return new Door();
+            if (block is IMyGasGenerator) return new GasGenerator();
+            if (block is IMyGasTank) return new GasTank();
+            if (block is IMyGyro) return new Gyro();
+            if (block is IMyGravityGenerator) return new GravityGenerator();
+            if (block is IMyGravityGeneratorSphere) return new GravityGeneratorSphere();
+            if (block is IMyLargeTurretBase) return new LargeThrusterBase();
+            if (block is IMyLaserAntenna) return new LaserAntenna();
+            if (block is IMyLightingBlock) return new LightingBlock();
+            if (block is IMyMotorStator) return new MotorStator();
+            if (block is IMyOreDetector) return new OreDetector();
+            if (block is IMyPistonBase) return new PistonBase();
+            if (block is IMyRadioAntenna) return new RadioAntenna();
+            if (block is IMyReactor) return new Reactor();
+            if (block is IMySensorBlock) return new SensorBlock();
+            if (block is IMyShipConnector) return new ShipConnector();
+            if (block is IMyShipDrill) return new ShipDrill();
+            if (block is IMyShipWelder) return new ShipWelder();
+            if (block is IMySmallGatlingGun) return new SmallGatlingGun();
+            if (block is IMySmallMissileLauncher) return new SmallMissileLauncher();
+            if (block is IMySoundBlock) return new SoundBlock();
+            if (block is IMyTextPanel) return new TextPanel();
+            if (block is IMyThrust) return new Thrust();
+            if (block is IMyWarhead) return new Warhead();
+            if (block is IMyFunctionalBlock) return new FunctionalBlock();
 
             return new TerminalBlock<T>();
         }
@@ -156,14 +95,10 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.CooperativeMode):
-                            block.CooperativeMode = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.Mode):
-                            block.Mode = (MyAssemblerMode)Enum.Parse(typeof(MyAssemblerMode), value.Value.ToString()); break;
-                        case nameof(block.Repeating):
-                            block.Repeating = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.UseConveyorSystem):
-                            block.UseConveyorSystem = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.CooperativeMode): block.CooperativeMode = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.Mode): block.Mode = (MyAssemblerMode)Enum.Parse(typeof(MyAssemblerMode), value.Value.ToString()); break;
+                        case nameof(block.Repeating): block.Repeating = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.UseConveyorSystem): block.UseConveyorSystem = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -188,17 +123,14 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.OnlyDischarge):
-                            block.OnlyDischarge = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.OnlyRecharge):
-                            block.OnlyRecharge = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.SemiautoEnabled):
-                            block.SemiautoEnabled = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.OnlyDischarge): block.OnlyDischarge = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.OnlyRecharge): block.OnlyRecharge = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.SemiautoEnabled): block.SemiautoEnabled = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
         }
-        
+
         public class Beacon : FunctionalBlock<IMyBeacon>
         {
             protected override void Serialize(IMyBeacon block, Dictionary<String, Object> values)
@@ -216,8 +148,7 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.Radius):
-                            block.Radius = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Radius): block.Radius = Convert.ToSingle(value.Value); break;
                     }
                 }
             }
@@ -240,8 +171,7 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.EnableRaycast):
-                            block.EnableRaycast = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.EnableRaycast): block.EnableRaycast = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -269,18 +199,12 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.ControlThrusters):
-                            block.ControlThrusters = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.ControlWheels):
-                            block.ControlWheels = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.DampenersOverride):
-                            block.DampenersOverride = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.HandBrake):
-                            block.HandBrake = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.IsMainCockpit):
-                            block.IsMainCockpit = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.ShowHorizonIndicator):
-                            block.ShowHorizonIndicator = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.ControlThrusters): block.ControlThrusters = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.ControlWheels): block.ControlWheels = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DampenersOverride): block.DampenersOverride = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.HandBrake): block.HandBrake = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.IsMainCockpit): block.IsMainCockpit = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.ShowHorizonIndicator): block.ShowHorizonIndicator = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -303,8 +227,7 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.UseConveyorSystem):
-                            block.UseConveyorSystem = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.UseConveyorSystem): block.UseConveyorSystem = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -335,8 +258,7 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.DrainAll):
-                            block.DrainAll = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DrainAll): block.DrainAll = Convert.ToBoolean(value.Value); break;
 
                         case nameof(block.Mode):
                             // NYI : SetBlacklist & SetWhitelist don't exist...
@@ -420,8 +342,7 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.Enabled):
-                            block.Enabled = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.Enabled): block.Enabled = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -445,10 +366,8 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.AutoRefill):
-                            block.AutoRefill = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.UseConveyorSystem):
-                            block.UseConveyorSystem = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.AutoRefill): block.AutoRefill = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.UseConveyorSystem): block.UseConveyorSystem = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -472,10 +391,8 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.AutoRefillBottles):
-                            block.AutoRefillBottles = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.Stockpile):
-                            block.Stockpile = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.AutoRefillBottles): block.AutoRefillBottles = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.Stockpile): block.Stockpile = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -491,7 +408,6 @@ namespace IngameScript
                 values.Add(nameof(block.FieldSize.Y), block.FieldSize.Y);
                 values.Add(nameof(block.FieldSize.Z), block.FieldSize.Z);
                 values.Add(nameof(block.GravityAcceleration), block.GravityAcceleration);
-
             }
 
             protected override void Deserialize(IMyGravityGenerator block, Dictionary<String, Object> values)
@@ -505,17 +421,10 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.FieldSize.X):
-                            fieldX = Convert.ToSingle(value.Value); break;
-
-                        case nameof(block.FieldSize.Y):
-                            fieldY = Convert.ToSingle(value.Value); break;
-
-                        case nameof(block.FieldSize.Z):
-                            fieldZ = Convert.ToSingle(value.Value); break;
-
-                        case nameof(block.GravityAcceleration):
-                            block.GravityAcceleration = Convert.ToSingle(value.Value); break;
+                        case nameof(block.FieldSize.X): fieldX = Convert.ToSingle(value.Value); break;
+                        case nameof(block.FieldSize.Y): fieldY = Convert.ToSingle(value.Value); break;
+                        case nameof(block.FieldSize.Z): fieldZ = Convert.ToSingle(value.Value); break;
+                        case nameof(block.GravityAcceleration): block.GravityAcceleration = Convert.ToSingle(value.Value); break;
                     }
                 }
 
@@ -534,7 +443,6 @@ namespace IngameScript
 
                 values.Add(nameof(block.GravityAcceleration), block.GravityAcceleration);
                 values.Add(nameof(block.Radius), block.Radius);
-
             }
 
             protected override void Deserialize(IMyGravityGeneratorSphere block, Dictionary<String, Object> values)
@@ -543,11 +451,8 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.GravityAcceleration):
-                            block.GravityAcceleration = Convert.ToSingle(value.Value); break;
-
-                        case nameof(block.Radius):
-                            block.Radius = Convert.ToSingle(value.Value); break;
+                        case nameof(block.GravityAcceleration): block.GravityAcceleration = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Radius): block.Radius = Convert.ToSingle(value.Value); break;
                     }
                 }
             }
@@ -574,16 +479,11 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.GyroPower):
-                            block.GyroPower = Convert.ToSingle(value.Value); break;
-                        case nameof(block.GyroOverride):
-                            block.GyroOverride = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.Yaw):
-                            block.Yaw = Convert.ToSingle(value.Value); break;
-                        case nameof(block.Pitch):
-                            block.Pitch = Convert.ToSingle(value.Value); break;
-                        case nameof(block.Roll):
-                            block.Roll = Convert.ToSingle(value.Value); break;
+                        case nameof(block.GyroPower): block.GyroPower = Convert.ToSingle(value.Value); break;
+                        case nameof(block.GyroOverride): block.GyroOverride = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.Yaw): block.Yaw = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Pitch): block.Pitch = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Roll): block.Roll = Convert.ToSingle(value.Value); break;
                     }
                 }
             }
@@ -644,13 +544,10 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.AttachedProgrammableBlock):
-                            // TODO: Check if Entity ID is a Programmable Block on the current grid.
-                            block.AttachedProgrammableBlock = Convert.ToInt64(value.Value); break;
-                        case nameof(block.IsPermanent):
-                            block.IsPermanent = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.Range):
-                            block.Range = Convert.ToSingle(value.Value); break;
+                        // TODO: Check if Entity ID is a Programmable Block on the current grid.
+                        case nameof(block.AttachedProgrammableBlock): block.AttachedProgrammableBlock = Convert.ToInt64(value.Value); break;
+                        case nameof(block.IsPermanent): block.IsPermanent = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.Range): block.Range = Convert.ToSingle(value.Value); break;
                     }
                 }
             }
@@ -679,18 +576,12 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.Radius):
-                            block.Radius = Convert.ToSingle(value.Value); break;
-                        case nameof(block.Intensity):
-                            block.Intensity = Convert.ToSingle(value.Value); break;
-                        case nameof(block.Falloff):
-                            block.Falloff = Convert.ToSingle(value.Value); break;
-                        case nameof(block.BlinkIntervalSeconds):
-                            block.BlinkIntervalSeconds = Convert.ToSingle(value.Value); break;
-                        case nameof(block.BlinkLength):
-                            block.BlinkLength = Convert.ToSingle(value.Value); break;
-                        case nameof(block.BlinkOffset):
-                            block.BlinkOffset = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Radius): block.Radius = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Intensity): block.Intensity = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Falloff): block.Falloff = Convert.ToSingle(value.Value); break;
+                        case nameof(block.BlinkIntervalSeconds): block.BlinkIntervalSeconds = Convert.ToSingle(value.Value); break;
+                        case nameof(block.BlinkLength): block.BlinkLength = Convert.ToSingle(value.Value); break;
+                        case nameof(block.BlinkOffset): block.BlinkOffset = Convert.ToSingle(value.Value); break;
                         case nameof(block.Color):
                             if (value.Value.GetType() == typeof(VRageMath.Color))
                             {
@@ -729,20 +620,13 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.BrakingTorque):
-                            block.BrakingTorque = Convert.ToSingle(value.Value); break;
-                        case nameof(block.Displacement):
-                            block.Displacement = Convert.ToSingle(value.Value); break;
-                        case nameof(block.LowerLimitDeg):
-                            block.LowerLimitDeg = Convert.ToSingle(value.Value); break;
-                        case nameof(block.RotorLock):
-                            block.RotorLock = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.TargetVelocityRPM):
-                            block.TargetVelocityRPM = Convert.ToSingle(value.Value); break;
-                        case nameof(block.Torque):
-                            block.Torque = Convert.ToSingle(value.Value); break;
-                        case nameof(block.UpperLimitDeg):
-                            block.UpperLimitDeg = Convert.ToSingle(value.Value); break;
+                        case nameof(block.BrakingTorque): block.BrakingTorque = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Displacement): block.Displacement = Convert.ToSingle(value.Value); break;
+                        case nameof(block.LowerLimitDeg): block.LowerLimitDeg = Convert.ToSingle(value.Value); break;
+                        case nameof(block.RotorLock): block.RotorLock = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.TargetVelocityRPM): block.TargetVelocityRPM = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Torque): block.Torque = Convert.ToSingle(value.Value); break;
+                        case nameof(block.UpperLimitDeg): block.UpperLimitDeg = Convert.ToSingle(value.Value); break;
                     }
                 }
             }
@@ -765,8 +649,7 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.BroadcastUsingAntennas):
-                            block.BroadcastUsingAntennas = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.BroadcastUsingAntennas): block.BroadcastUsingAntennas = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -791,12 +674,9 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case (nameof(block.MaxLimit)):
-                            block.MaxLimit = Convert.ToSingle(value.Value); break;
-                        case (nameof(block.MinLimit)):
-                            block.MinLimit = Convert.ToSingle(value.Value); break;
-                        case (nameof(block.Velocity)):
-                            block.Velocity = Convert.ToSingle(value.Value); break;
+                        case (nameof(block.MaxLimit)): block.MaxLimit = Convert.ToSingle(value.Value); break;
+                        case (nameof(block.MinLimit)): block.MinLimit = Convert.ToSingle(value.Value); break;
+                        case (nameof(block.Velocity)): block.Velocity = Convert.ToSingle(value.Value); break;
                     }
                 }
             }
@@ -824,19 +704,13 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case (nameof(block.AttachedProgrammableBlock)):
-                            // TODO: Check if Entity ID is a Programmable Block on the current grid.
-                            block.AttachedProgrammableBlock = Convert.ToInt64(value.Value); break;
-                        case (nameof(block.EnableBroadcasting)):
-                            block.EnableBroadcasting = Convert.ToBoolean(value.Value); break;
-                        case (nameof(block.IgnoreAlliedBroadcast)):
-                            block.IgnoreAlliedBroadcast = Convert.ToBoolean(value.Value); break;
-                        case (nameof(block.IgnoreOtherBroadcast)):
-                            block.IgnoreOtherBroadcast = Convert.ToBoolean(value.Value); break;
-                        case (nameof(block.Radius)):
-                            block.Radius = Convert.ToInt64(value.Value); break;
-                        case (nameof(block.ShowShipName)):
-                            block.ShowShipName = Convert.ToBoolean(value.Value); break;
+                        // TODO: Check if Entity ID is a Programmable Block on the current grid.
+                        case (nameof(block.AttachedProgrammableBlock)): block.AttachedProgrammableBlock = Convert.ToInt64(value.Value); break;
+                        case (nameof(block.EnableBroadcasting)): block.EnableBroadcasting = Convert.ToBoolean(value.Value); break;
+                        case (nameof(block.IgnoreAlliedBroadcast)): block.IgnoreAlliedBroadcast = Convert.ToBoolean(value.Value); break;
+                        case (nameof(block.IgnoreOtherBroadcast)): block.IgnoreOtherBroadcast = Convert.ToBoolean(value.Value); break;
+                        case (nameof(block.Radius)): block.Radius = Convert.ToInt64(value.Value); break;
+                        case (nameof(block.ShowShipName)): block.ShowShipName = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -859,8 +733,7 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.UseConveyorSystem):
-                            block.UseConveyorSystem = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.UseConveyorSystem): block.UseConveyorSystem = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -900,42 +773,24 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.DetectFloatingObjects):
-                            block.DetectFloatingObjects = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.DetectEnemy):
-                            block.DetectEnemy = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.DetectNeutral):
-                            block.DetectNeutral = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.DetectFriendly):
-                            block.DetectFriendly = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.DetectOwner):
-                            block.DetectOwner = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.DetectAsteroids):
-                            block.DetectAsteroids = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.DetectSubgrids):
-                            block.DetectSubgrids = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.DetectStations):
-                            block.DetectStations = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.DetectLargeShips):
-                            block.DetectLargeShips = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.DetectSmallShips):
-                            block.DetectSmallShips = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.DetectPlayers):
-                            block.DetectPlayers = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.PlayProximitySound):
-                            block.PlayProximitySound = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.BackExtend):
-                            block.BackExtend = Convert.ToSingle(value.Value); break;
-                        case nameof(block.FrontExtend):
-                            block.FrontExtend = Convert.ToSingle(value.Value); break;
-                        case nameof(block.BottomExtend):
-                            block.BottomExtend = Convert.ToSingle(value.Value); break;
-                        case nameof(block.TopExtend):
-                            block.TopExtend = Convert.ToSingle(value.Value); break;
-                        case nameof(block.RightExtend):
-                            block.RightExtend = Convert.ToSingle(value.Value); break;
-                        case nameof(block.LeftExtend):
-                            block.LeftExtend = Convert.ToSingle(value.Value); break;
+                        case nameof(block.DetectFloatingObjects): block.DetectFloatingObjects = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DetectEnemy): block.DetectEnemy = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DetectNeutral): block.DetectNeutral = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DetectFriendly): block.DetectFriendly = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DetectOwner): block.DetectOwner = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DetectAsteroids): block.DetectAsteroids = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DetectSubgrids): block.DetectSubgrids = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DetectStations): block.DetectStations = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DetectLargeShips): block.DetectLargeShips = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DetectSmallShips): block.DetectSmallShips = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DetectPlayers): block.DetectPlayers = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.PlayProximitySound): block.PlayProximitySound = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.BackExtend): block.BackExtend = Convert.ToSingle(value.Value); break;
+                        case nameof(block.FrontExtend): block.FrontExtend = Convert.ToSingle(value.Value); break;
+                        case nameof(block.BottomExtend): block.BottomExtend = Convert.ToSingle(value.Value); break;
+                        case nameof(block.TopExtend): block.TopExtend = Convert.ToSingle(value.Value); break;
+                        case nameof(block.RightExtend): block.RightExtend = Convert.ToSingle(value.Value); break;
+                        case nameof(block.LeftExtend): block.LeftExtend = Convert.ToSingle(value.Value); break;
                     }
                 }
             }
@@ -960,12 +815,9 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.CollectAll):
-                            block.CollectAll = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.PullStrength):
-                            block.PullStrength = Convert.ToSingle(value.Value); break;
-                        case nameof(block.ThrowOut):
-                            block.ThrowOut = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.CollectAll): block.CollectAll = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.PullStrength): block.PullStrength = Convert.ToSingle(value.Value); break;
+                        case nameof(block.ThrowOut): block.ThrowOut = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -988,8 +840,7 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.UseConveyorSystem):
-                            block.UseConveyorSystem = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.UseConveyorSystem): block.UseConveyorSystem = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -1013,10 +864,8 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.HelpOthers):
-                            block.HelpOthers = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.UseConveyorSystem):
-                            block.UseConveyorSystem = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.HelpOthers): block.HelpOthers = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.UseConveyorSystem): block.UseConveyorSystem = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -1095,18 +944,12 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(IMySoundBlock.Play):
-                            block.Play(); break;
-                        case nameof(IMySoundBlock.Stop):
-                            block.Stop(); break;
-                        case nameof(block.LoopPeriod):
-                            block.LoopPeriod = Convert.ToSingle(value.Value); break;
-                        case nameof(block.Range):
-                            block.Range = Convert.ToSingle(value.Value); break;
-                        case nameof(block.SelectedSound):
-                            block.SelectedSound = Convert.ToString(value.Value); break;
-                        case nameof(block.Volume):
-                            block.Volume = Convert.ToSingle(value.Value); break;
+                        case nameof(IMySoundBlock.Play): block.Play(); break;
+                        case nameof(IMySoundBlock.Stop): block.Stop(); break;
+                        case nameof(block.LoopPeriod): block.LoopPeriod = Convert.ToSingle(value.Value); break;
+                        case nameof(block.Range): block.Range = Convert.ToSingle(value.Value); break;
+                        case nameof(block.SelectedSound): block.SelectedSound = Convert.ToString(value.Value); break;
+                        case nameof(block.Volume): block.Volume = Convert.ToSingle(value.Value); break;
                     }
                 }
             }
@@ -1191,16 +1034,11 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.CustomName):
-                            block.CustomName = value.Value.ToString(); break;
-                        case nameof(block.ShowInInventory):
-                            block.ShowInInventory = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.ShowInTerminal):
-                            block.ShowInTerminal = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.ShowInToolbarConfig):
-                            block.ShowInToolbarConfig = Convert.ToBoolean(value.Value); break;
-                        case nameof(block.ShowOnHUD):
-                            block.ShowOnHUD = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.CustomName): block.CustomName = value.Value.ToString(); break;
+                        case nameof(block.ShowInInventory): block.ShowInInventory = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.ShowInTerminal): block.ShowInTerminal = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.ShowInToolbarConfig): block.ShowInToolbarConfig = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.ShowOnHUD): block.ShowOnHUD = Convert.ToBoolean(value.Value); break;
                     }
                 }
             }
@@ -1244,8 +1082,7 @@ namespace IngameScript
                                 block.BackgroundColor = new VRageMath.Color(Convert.ToUInt32(value.Value));
                             }
                             break;
-                        case nameof(block.ChangeInterval):
-                            block.ChangeInterval = Convert.ToSingle(value.Value); break;
+                        case nameof(block.ChangeInterval): block.ChangeInterval = Convert.ToSingle(value.Value); break;
                         case nameof(block.Font):
                             var font = Convert.ToString(value.Value);
                             var fonts = new List<String>();
@@ -1263,8 +1100,7 @@ namespace IngameScript
                                 block.FontColor = new VRageMath.Color(Convert.ToUInt32(value.Value));
                             }
                             break;
-                        case nameof(block.FontSize):
-                            block.FontSize = Convert.ToSingle(value.Value); break;
+                        case nameof(block.FontSize): block.FontSize = Convert.ToSingle(value.Value); break;
                         case nameof(block.ShowText):
                             var show = Convert.ToBoolean(value.Value);
                             if (show)
@@ -1309,8 +1145,7 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.ThrustOverridePercentage):
-                            block.ThrustOverridePercentage = Convert.ToSingle(value.Value); break;
+                        case nameof(block.ThrustOverridePercentage): block.ThrustOverridePercentage = Convert.ToSingle(value.Value); break;
                     }
                 }
             }
@@ -1337,11 +1172,8 @@ namespace IngameScript
                 {
                     switch (value.Key)
                     {
-                        case nameof(block.DetonationTime):
-                            block.DetonationTime = Convert.ToSingle(value.Value); break;
-
-                        case nameof(block.IsArmed):
-                            block.IsArmed = Convert.ToBoolean(value.Value); break;
+                        case nameof(block.DetonationTime): block.DetonationTime = Convert.ToSingle(value.Value); break;
+                        case nameof(block.IsArmed): block.IsArmed = Convert.ToBoolean(value.Value); break;
 
                         case Custom.Countdown:
                             if (Object.Equals(true, value.Value))

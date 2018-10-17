@@ -39,6 +39,9 @@ namespace IngameScript
                 { "decompression.sound", "Alert 2" },
 
                 { "destruct.text", "SELF DESTRUCT in {0}" },
+                { "destruct.text.color", new Color(255, 0, 0) },
+                { "destruct.text.fail", "SELF DESTRUCT\nUNAVAILABLE" },
+                { "destruct.text.fail.color", new Color(255, 255, 0) },
                 { "destruct.sign.images", "Danger" },
                 { "destruct.timer", 180f },
 

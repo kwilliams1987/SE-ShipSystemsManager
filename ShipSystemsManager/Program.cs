@@ -40,6 +40,7 @@ namespace IngameScript
 
         MyIni GridStorage { get; set; }
         MyConfig SelfStorage { get; set; }
+        Dictionary<Int64, MyConfig> EntityStorage { get; set; } = new Dictionary<Int64, MyConfig>();
         readonly IOrderedEnumerable<BaseStyler> StatePriority;
 
         public Program()
@@ -97,8 +98,12 @@ namespace IngameScript
             }
             finally
             {
+                // Commit config updates.
                 Storage = GridStorage.ToString();
                 SelfStorage.Dispose();
+                foreach (var config in EntityStorage)
+                    config.Value.Dispose();
+
                 Output($"{Runtime.LastRunTimeMs}ms. {Runtime.CurrentInstructionCount}/{Runtime.MaxInstructionCount} instructions.");
             }
         }
@@ -115,7 +120,7 @@ namespace IngameScript
                         switch (state)
                         {
                             case "destruct":
-                                var warheads = GetBlocks<IMyWarhead>(w => w.IsA(Function.SelfDestruct) && w.IsFunctional);
+                                var warheads = GetBlocks<IMyWarhead>(w => GetConfig(w).IsA(Function.SelfDestruct) && w.IsFunctional);
                                 if (!warheads.Any())
                                 {
                                     Output("WARNING: Self Destruct is unavailable.");
@@ -148,16 +153,14 @@ namespace IngameScript
                         if (arguments.ElementAtOrDefault(1) == "confirm")
                         {
                             var styler = new DefaultStyler(Me);
-                            foreach (var block in GridTerminalSystem.GetBlocksOfType<IMyTerminalBlock>())
+                            foreach (var block in GetBlocksOfType<IMyTerminalBlock>())
                             {
                                 ClearStates(block);
                                 styler.Style(block, GridStorage);
                             }
 
                             Storage = "";
-
-                            using (var config = Me.GetConfig())
-                                config.ClearValue("custom-states");
+                            GetConfig(Me).ClearValue("custom-states");
                         }
                         else
                         {
@@ -172,14 +175,11 @@ namespace IngameScript
                             case "preserve":
                                 Output("Writing default styler settings to the Programmable Block CustomData attribute (preserving existing).");
 
-                                using (var configs = Me.GetConfig())
+                                foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
                                 {
-                                    foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
+                                    if (!SelfStorage.ContainsKey(styler.Key))
                                     {
-                                        if (!configs.ContainsKey(styler.Key))
-                                        {
-                                            SelfStorage.SetValue(styler.Key, styler.Value);
-                                        }
+                                        SelfStorage.SetValue(styler.Key, styler.Value);
                                     }
                                 }
                                 break;
@@ -227,10 +227,7 @@ namespace IngameScript
 
                             foreach (var block in blocks)
                             {
-                                using (var config = block.GetConfig())
-                                {
-                                    config.AddValue("zones", zone);
-                                }
+                                GetConfig(block).AddValue("zones", zone);
                             }
 
                             Output($"Added {blocks.Count()} blocks to zone {zone}.");
@@ -262,10 +259,7 @@ namespace IngameScript
 
                             foreach (var block in blocks)
                             {
-                                using (var config = block.GetConfig())
-                                {
-                                    config.AddValue("functions", function);
-                                }
+                                GetConfig(block).AddValue("functions", function);
                             }
 
                             Output($"Added {function} to {blocks.Count()} blocks.");
@@ -281,7 +275,7 @@ namespace IngameScript
             // Only check air vents if pressurization is enabled.
             var pressure = GetBlocks<IMyAirVent>().FirstOrDefault(v => v.PressurizationEnabled) != default(IMyAirVent);
             var batteries = GetBlocks<IMyBatteryBlock>().Any();
-            var zones = GridTerminalSystem.GetZones();
+            var zones = GetZones();
 
             Output($"Found {zones.Count()} zones.");
 
@@ -326,7 +320,7 @@ namespace IngameScript
             message = $"[{DateTime.Now:HH:mm:ss}] {message}";
             Echo(message);
 
-            var lcds = GetBlocks<IMyTextPanel>(p => p.IsA("debug lcd"));
+            var lcds = GetBlocks<IMyTextPanel>(p => GetConfig(p).IsA("debug lcd"));
             Echo($"[{DateTime.Now:HH:mm:ss}] Found {lcds.Count()} Debug LCD panels.");
             var text = "";
 
@@ -376,21 +370,8 @@ namespace IngameScript
             }
         }
 
-        IEnumerable<T> GetZoneBlocks<T>(String zone, String function = "", Boolean all = true)
-            where T: class, IMyTerminalBlock
-        {
-            if (String.IsNullOrWhiteSpace(function))
-            {
-                return GridTerminalSystem.GetZoneBlocks<T>(zone, all);
-            }
-            else
-            {
-                return GridTerminalSystem.GetZoneBlocksByFunction<T>(zone, function, all);
-            }
-        }
-
         IEnumerable<T> GetBlocks<T>(Func<T, Boolean> collect = null)
-            where T : class, IMyTerminalBlock => GridTerminalSystem.GetBlocksOfType(collect);
+            where T : class, IMyTerminalBlock => GetBlocksOfType(collect);
 
 
         String BlockKey(IMyTerminalBlock block) => "Entity " + block.EntityId;
@@ -433,5 +414,33 @@ namespace IngameScript
             foreach (var block in blocks)
                 ClearStates(block, states);
         }
+
+        MyConfig GetConfig(IMyTerminalBlock block)
+        {
+            if (!EntityStorage.ContainsKey(block.EntityId))
+                EntityStorage.Add(block.EntityId, new MyConfig(block));
+
+            return EntityStorage[block.EntityId];
+        }
+
+
+        public IEnumerable<T> GetBlocksOfType<T>(Func<T, Boolean> collect = null)
+            where T : class, IMyTerminalBlock
+        {
+            var result = new List<T>();
+            GridTerminalSystem.GetBlocksOfType(result, collect);
+            return result;
+        }
+
+        public IEnumerable<T> GetZoneBlocks<T>(String zone, Boolean all = false)
+            where T : class, IMyTerminalBlock => GetBlocksOfType<T>(b => (b.IsWorking || all) && GetConfig(b).InZone(zone));
+
+        public IEnumerable<T> GetZoneBlocksByFunction<T>(String zone, String function, Boolean all = false)
+            where T : class, IMyTerminalBlock => GetZoneBlocks<T>(zone, all).Where(b => GetConfig(b).IsA(function));
+
+        public IEnumerable<String> GetZones() => GetBlocksOfType<IMyTerminalBlock>().SelectMany(b => GetConfig(b).GetZones()).Distinct();
+
+        public Boolean AdjacentZonesTest<T>(Func<T, Boolean> test, params String[] zones)
+            where T : class, IMyTerminalBlock => GetBlocksOfType<T>(v => GetConfig(v).InAnyZone(zones)).All(test);
     }
 }

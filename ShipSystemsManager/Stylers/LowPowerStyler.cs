@@ -16,9 +16,11 @@ namespace IngameScript
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
+                var config = new MyConfig(block);
+
                 if (block is IMyAssembler)
                 {
-                    if (!block.IsA(Function.AlwaysOn))
+                    if (!config.IsA(Function.AlwaysOn))
                     {
                         block.Apply(new Dictionary<String, Object>
                         {
@@ -29,7 +31,7 @@ namespace IngameScript
 
                 if (block is IMyLightingBlock)
                 {
-                    if (block.IsA(Function.AlwaysOn))
+                    if (config.IsA(Function.AlwaysOn))
                     {
                         block.Apply(new Dictionary<String, Object>
                         {
@@ -49,7 +51,7 @@ namespace IngameScript
 
                 if (block is IMyRefinery)
                 {
-                    if (!block.IsA(Function.AlwaysOn))
+                    if (!config.IsA(Function.AlwaysOn))
                     {
                         block.Apply(new Dictionary<String, Object>
                         {

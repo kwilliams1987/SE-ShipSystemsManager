@@ -17,8 +17,9 @@ namespace IngameScript
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
+                var config = new MyConfig(block);
                 var door = block as IMyDoor;
-                if (door != default(IMyDoor) && door.IsA(Function.Security))
+                if (door != default(IMyDoor) && config.IsA(Function.Security))
                 {
                     door.Apply(new Dictionary<String, Object>()
                     {
@@ -31,7 +32,7 @@ namespace IngameScript
                 var lcd = block as IMyTextPanel;
                 if (lcd != default(IMyTextPanel))
                 {
-                    if (lcd.IsA(Function.BattleSign))
+                    if (config.IsA(Function.BattleSign))
                     {
                         lcd.Apply(new Dictionary<String, Object>()
                         {
@@ -41,10 +42,10 @@ namespace IngameScript
                             { nameof(IMyTextPanel.BackgroundColor), Get<Color>("sign.color") }
                         }, storage);
 
-                        lcd.AutoFit();
+                        lcd.AutoFitText();
                     }
 
-                    if (lcd.IsA(Function.Warning))
+                    if (config.IsA(Function.Warning))
                     {
                         lcd.Apply(new Dictionary<String, Object>()
                         {
@@ -59,7 +60,7 @@ namespace IngameScript
                 var soundBlock = block as IMySoundBlock;
                 if (soundBlock != default(IMySoundBlock))
                 {
-                    if (soundBlock.IsA(Function.Siren))
+                    if (config.IsA(Function.Siren))
                     {
                         soundBlock.Apply(new Dictionary<String, Object>
                         {
@@ -83,7 +84,7 @@ namespace IngameScript
                 var light = block as IMyLightingBlock;
                 if (light != default(IMyLightingBlock))
                 {
-                    if (light.IsA(Function.Siren))
+                    if (config.IsA(Function.Siren))
                     {
                         light.Apply(new Dictionary<String, Object>()
                         {

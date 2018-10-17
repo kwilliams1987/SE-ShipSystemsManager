@@ -11,14 +11,16 @@ namespace IngameScript
     {
         void TestInteriorWeapons(String zone)
         {
-            var interiorTurrets = GetBlocks<IMyLargeInteriorTurret>(t => t.IsWorking && t.InZone(zone));
-            var blocks = new List<IMyTerminalBlock>()
-                                .Concat(GetZoneBlocks<IMyDoor>(zone, Function.Security, true))
-                                .Concat(GetZoneBlocks<IMyTextPanel>(zone, Function.DoorSign))
-                                .Concat(GetZoneBlocks<IMyTextPanel>(zone, Function.Warning))
-                                .Concat(GetZoneBlocks<IMySoundBlock>(zone, Function.Siren));
+            var interiorTurrets = GetBlocks<IMyLargeInteriorTurret>(t => t.IsWorking);
+            var zoneTurrets = interiorTurrets.Where(t => GetConfig(t).InZone(zone));
 
-            if (interiorTurrets.Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
+            var blocks = new List<IMyTerminalBlock>()
+                                .Concat(GetZoneBlocksByFunction<IMyDoor>(zone, Function.Security, true))
+                                .Concat(GetZoneBlocksByFunction<IMyTextPanel>(zone, Function.DoorSign))
+                                .Concat(GetZoneBlocksByFunction<IMyTextPanel>(zone, Function.Warning))
+                                .Concat(GetZoneBlocksByFunction<IMySoundBlock>(zone, Function.Siren));
+
+            if (zoneTurrets.Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
             {
                 Output($"Turret detected enemy in zone {zone}!");
 
@@ -26,8 +28,8 @@ namespace IngameScript
             }
             else
             {
-                ClearStates(blocks.GroupBy(b => b.GetZones())
-                    .Where(g => !GetBlocks<IMyLargeInteriorTurret>(t => t.IsWorking && t.InAnyZone(g.Key.ToArray()))
+                ClearStates(blocks.GroupBy(b => GetConfig(b).GetZones())
+                    .Where(g => !interiorTurrets.Where(t => GetConfig(t).InAnyZone(g.Key.ToArray()))
                         .Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
                     .SelectMany(g => g), State.Intruder1);
             }

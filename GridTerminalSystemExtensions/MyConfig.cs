@@ -72,5 +72,15 @@ namespace IngameScript
                 SetValues(key, values);
             }
         }
+
+        public IEnumerable<String> GetZones() => GetValues("zones").Where(z => z != "");
+
+        public Boolean IsA(String function) => GetValues("functions").Contains(function);
+
+        public Boolean InZone(String zone) => GetZones().Contains(zone);
+
+        public Boolean InAnyZone(params String[] zones) => GetZones().Any(z => zones.Contains(z));
+
+        public Boolean InAllZones(params String[] zones) => GetZones().All(z => zones.Contains(z));
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using VRage.Game.ModAPI.Ingame.Utilities;
+using VRageMath;
 
 namespace IngameScript
 {
@@ -12,33 +13,36 @@ namespace IngameScript
         {
             protected override String Prefix => "destruct";
             IMyGridTerminalSystem Grid { get; }
+            List<IMyWarhead> Warheads { get; } = new List<IMyWarhead>();
+            Single Countdown { get; }
 
             public SelfDestructStyler(IMyProgrammableBlock block, IMyGridTerminalSystem grid): base(block)
             {
                 Priority = 1;
                 State = Program.State.Destruct;
                 Grid = grid;
+
+                Grid.GetBlocksOfType(Warheads, w => new MyConfig(w).IsA(Function.SelfDestruct));
+                Countdown = Warheads.Where(w => w.IsCountingDown).Select(w => w.DetonationTime).DefaultIfEmpty(0).Min();
+
+                if (Countdown == default(Single))
+                    Countdown = Get<Single>("timer");
             }
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
                 base.Style(block, storage);
+                var config = new MyConfig(block);
 
                 var warhead = block as IMyWarhead;
-                var countdown = Grid.GetBlocksOfType<IMyWarhead>(w => w.IsCountingDown && w.IsA(Function.SelfDestruct))
-                    .Min(w => w.DetonationTime);
-                
-                if (countdown == default(Single))
-                    countdown = Get<Single>("timer");
-
-                if (warhead != default(IMyWarhead) && warhead.IsA(Function.SelfDestruct))
+                if (warhead != default(IMyWarhead) && config.IsA(Function.SelfDestruct))
                 {
                     if (!warhead.IsCountingDown)
                     {
                         warhead.Apply(new Dictionary<String, Object>()
                         {
                             { nameof(IMyWarhead.IsArmed), true },
-                            { nameof(IMyWarhead.DetonationTime), countdown },
+                            { nameof(IMyWarhead.DetonationTime), Countdown },
                             { Serializer.Custom.Countdown, true }
                         }, storage);
                     }
@@ -47,25 +51,48 @@ namespace IngameScript
                 var lcd = block as IMyTextPanel;
                 if (lcd != default(IMyTextPanel))
                 {
-                    var label = String.Format(Get<String>("text"), TimeSpan.FromSeconds(countdown));
-                    var fontSize = label.Split('\n').Length;
+                    var label = String.Format(Get<String>("text"), TimeSpan.FromSeconds(Countdown));
+                    var color = Get<Color>("text.color");
 
-                    if (lcd.IsA(Function.Warning))
+                    if (!Warheads.Any())
+                    {
+                        label = Get<String>("text.fail");
+                        color = Get<Color>("text.fail.color");
+                    }
+                    
+                    if (config.IsA(Function.DoorSign))
                     {
                         lcd.Apply(new Dictionary<String, Object>()
-                        {
-                            { Serializer.Custom.PublicText, label },
-                            { nameof(IMyTextPanel.FontSize), fontSize }
-                        }, storage);
+                            {
+                                { nameof(IMyTextPanel.BackgroundColor), new Color(0, 0, 0) },
+                                { nameof(IMyTextPanel.FontColor), color },
+                                { Serializer.Custom.PublicText, label }
+                            }, storage);
+
+                        lcd.AutoFitText();
                     }
 
-                    if (lcd.IsA(Function.Warning))
+                    if (config.IsA(Function.Warning) || config.IsA(Function.BattleSign))
                     {
-                        lcd.Apply(new Dictionary<String, Object>()
+                        if (lcd.IsSmall())
                         {
-                            { Serializer.Custom.Images, Get<String>("sign.images") },
-                            { nameof(IMyTextPanel.Enabled), true }
-                        }, storage);
+                            lcd.Apply(new Dictionary<String, Object>()
+                            {
+                                { nameof(IMyTextPanel.BackgroundColor), new Color(0, 0, 0) },
+                                { nameof(IMyTextPanel.FontColor), color },
+                                { Serializer.Custom.PublicText, label }
+                            }, storage);
+
+                            lcd.AutoFitText();
+                        }
+                        else
+                        {
+                            lcd.Apply(new Dictionary<String, Object>()
+                            {
+                                { Serializer.Custom.Images, Get<String>("sign.images") },
+                                { nameof(IMyTextPanel.Enabled), true }
+                            }, storage);
+                        }
                     }
                 }
             }

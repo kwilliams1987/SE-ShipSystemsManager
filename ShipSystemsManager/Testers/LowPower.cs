@@ -8,10 +8,13 @@ namespace IngameScript
     {
         void TestLowPower()
         {
-            if (GridTerminalSystem.GetBlocksOfType<IMyBatteryBlock>(b => !b.OnlyRecharge).Count() == 0)
+            var batteries = new List<IMyBatteryBlock>();
+            GridTerminalSystem.GetBlocksOfType(batteries);
+
+            if (batteries.Count(b => !b.OnlyRecharge) == 0)
                 return;
 
-            var power = GridTerminalSystem.GetBlocksOfType<IMyBatteryBlock>(b => b.IsFunctional && !b.OnlyRecharge && b.Enabled).Average(b => b.CurrentStoredPower / b.MaxStoredPower);
+            var power = batteries.Where(b => b.IsFunctional && !b.OnlyRecharge && b.Enabled).Average(b => b.CurrentStoredPower / b.MaxStoredPower);
 
             var blocks = new List<IMyTerminalBlock>()
                             .Concat(GetBlocks<IMyAssembler>())

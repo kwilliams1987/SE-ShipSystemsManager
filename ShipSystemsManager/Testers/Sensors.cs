@@ -11,12 +11,13 @@ namespace IngameScript
     {
         void TestSensors(String zone)
         {
-            var sensors = GetBlocks<IMySensorBlock>(s => s.IsWorking && s.InZone(zone) && s.DetectEnemy);
+            var sensors = GetBlocks<IMySensorBlock>(s => s.IsWorking && s.DetectEnemy);
+            var zoneSensors = sensors.Where(s => GetConfig(s).InZone(zone));
             var blocks = new List<IMyTerminalBlock>()
-                                .Concat(GetZoneBlocks<IMyDoor>(zone, Function.Security, true))
-                                .Concat(GetZoneBlocks<IMyTextPanel>(zone, Function.DoorSign))
-                                .Concat(GetZoneBlocks<IMyTextPanel>(zone, Function.Warning))
-                                .Concat(GetZoneBlocks<IMySoundBlock>(zone, Function.Siren));
+                                .Concat(GetZoneBlocksByFunction<IMyDoor>(zone, Function.Security, true))
+                                .Concat(GetZoneBlocksByFunction<IMyTextPanel>(zone, Function.DoorSign))
+                                .Concat(GetZoneBlocksByFunction<IMyTextPanel>(zone, Function.Warning))
+                                .Concat(GetZoneBlocksByFunction<IMySoundBlock>(zone, Function.Siren));
 
             if (sensors.Any(t => t.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
             {
@@ -26,8 +27,8 @@ namespace IngameScript
             }
             else
             {
-                ClearStates(blocks.GroupBy(b => b.GetZones())
-                    .Where(g => !GetBlocks<IMySensorBlock>(t => t.IsWorking && t.InAnyZone(g.Key.ToArray()) && t.DetectEnemy)
+                ClearStates(blocks.GroupBy(b => GetConfig(b).GetZones())
+                    .Where(g => sensors.Where(s => GetConfig(s).InAnyZone(g.Key.ToArray()))
                         .All(t => !t.GetDetectedEntities(e => e.Relationship == MyRelationsBetweenPlayerAndBlock.Enemies).Any()))
                     .SelectMany(g => g), State.Intruder2);
             }

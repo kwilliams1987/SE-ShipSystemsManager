@@ -10,12 +10,12 @@ namespace IngameScript
     {
         void TestAirVents(String zone)
         {
-            var vents = GetBlocks<IMyAirVent>(v => v.IsWorking && v.InZone(zone) && !v.Depressurize);
+            var vents = GetBlocks<IMyAirVent>(v => v.IsWorking && GetConfig(v).InZone(zone) && !v.Depressurize);
             var blocks = new List<IMyTerminalBlock>()
-                            .Concat(GetZoneBlocks<IMyDoor>(zone, Function.Airlock, true))
-                            .Concat(GetZoneBlocks<IMyTextPanel>(zone, Function.DoorSign))
-                            .Concat(GetZoneBlocks<IMyTextPanel>(zone, Function.Warning))
-                            .Concat(GetZoneBlocks<IMySoundBlock>(zone, Function.Siren))
+                            .Concat(GetZoneBlocksByFunction<IMyDoor>(zone, Function.Airlock, true))
+                            .Concat(GetZoneBlocksByFunction<IMyTextPanel>(zone, Function.DoorSign))
+                            .Concat(GetZoneBlocksByFunction<IMyTextPanel>(zone, Function.Warning))
+                            .Concat(GetZoneBlocksByFunction<IMySoundBlock>(zone, Function.Siren))
                             .Concat(GetZoneBlocks<IMyInteriorLight>(zone));
 
             if (vents.Any(v => !v.CanPressurize))
@@ -29,7 +29,7 @@ namespace IngameScript
             }
             else
             {
-                ClearStates(blocks.Where(b => b.GetZones().All(z => !GetBlocks<IMyAirVent>(v => v.InZone(z) && !v.CanPressurize).Any())), State.Decompression);
+                ClearStates(blocks.Where(b => GetConfig(b).GetZones().All(z => !GetBlocks<IMyAirVent>(v => GetConfig(v).InZone(z) && !v.CanPressurize).Any())), State.Decompression);
             }
         }
     }

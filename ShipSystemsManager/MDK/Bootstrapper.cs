@@ -160,15 +160,20 @@ namespace IngameScript.MDK
             Console.WriteLine("Executing Run #1 (Normal)");
             MDKFactory.Run(program, updateType: tickrate);
 
-            foreach (var light in grid.GetBlocksOfType<IMyInteriorLight>())
+            var lights = new List<IMyInteriorLight>();
+            grid.GetBlocksOfType(lights);
+
+            foreach (var light in lights)
             {
                 Assert.Equals(new Color(255,255,255), light.Color, $"Light {light.EntityId} does not have the expected color.");
                 Assert.Equals(0, light.BlinkIntervalSeconds, $"Light {light.EntityId} does not have the expected blink interval.");
                 Assert.Equals(0, light.BlinkLength, $"Light {light.EntityId} does not have the expected blink length.");
                 Assert.Equals(0, light.BlinkOffset, $"Light {light.EntityId} does not have the expected blink offset.");
             }
-                                
-            foreach (var lcd in grid.GetBlocksOfType<IMyTextPanel>())
+
+            var lcds = new List<IMyTextPanel>();
+            grid.GetBlocksOfType(lcds);
+            foreach (var lcd in lcds)
             {
                 switch (lcd.CustomName)
                 {
@@ -181,15 +186,16 @@ namespace IngameScript.MDK
                 }
             }
 
-            foreach (var door in grid.GetBlocksOfType<IMyDoor>())
+            var doors = new List<IMyDoor>();
+            grid.GetBlocksOfType(doors, d => d.CustomData.Contains("zone-1") && d.CustomData.Contains("zone-2"));
+            foreach (var door in doors)
             {
-                if (door.InAllZones("zone-1", "zone-2"))
-                {
-                    Assert.True(DoorStatus.Open == door.Status, $"Airlock joined to Zone 1 and a 2 should be open.");
-                }
+                Assert.True(DoorStatus.Open == door.Status, $"Airlock joined to Zone 1 and a 2 should be open.");
             }
-            
-            foreach (var vent in grid.GetZoneBlocks<MockAirVent>("zone-1"))
+
+            var vents = new List<MockAirVent>();
+            grid.GetBlocksOfType(vents, v => v.CustomData.Contains("zone-1"));
+            foreach (var vent in vents)
             {
                 vent.IsDepressurizing = true;
                 vent.CanPressurize = false;
@@ -197,10 +203,12 @@ namespace IngameScript.MDK
 
             Console.WriteLine("Executing Run #2 (Decompression - Zone 1)");
             MDKFactory.Run(program, updateType: tickrate);
-            
-            foreach (var light in grid.GetZoneBlocks<MockInteriorLight>("zone-1"))
+
+            var lights1 = new List<IMyLightingBlock>();
+            grid.GetBlocksOfType(lights1, l=>l.CustomData.Contains("zone-1"));
+            foreach (var light in lights1)
             {
-                if (light.IsA(Program.Function.Siren))
+                if (light.CustomData.Contains(Program.Function.Siren))
                 {
                     Assert.Equals(Styler.Get<Color>("decompression.light.color"), light.Color, $"Light {light.EntityId} does not have the expected color.");
                     Assert.Equals(Styler.Get<Single>("decompression.light.interval"), light.BlinkIntervalSeconds, $"Light {light.EntityId} does not have the expected blink interval.");
@@ -214,7 +222,9 @@ namespace IngameScript.MDK
                 }
             }
 
-            foreach (var lcd in grid.GetZoneBlocks<IMyTextPanel>("zone-1"))
+            var lcds1 = new List<IMyTextPanel>();
+            grid.GetBlocksOfType(lcds1, l => l.CustomData.Contains("zone-1"));
+            foreach (var lcd in lcds1)
             {
                 switch (lcd.CustomName)
                 {
@@ -226,28 +236,24 @@ namespace IngameScript.MDK
                 }
             }
 
-            foreach (var door in grid.GetBlocksOfType<IMyDoor>())
+            var doors1 = new List<IMyDoor>();
+            grid.GetBlocksOfType(doors1, d => d.CustomData.Contains("zone-1") && d.CustomData.Contains("zone-2"));
+            foreach (var door in doors1)
             {
-                if (door.InAllZones("zone-1", "zone-2"))
-                {
-                    Assert.True(DoorStatus.Closed == door.Status || DoorStatus.Closing == door.Status, $"Airlock joined to Zone 1 and a 2 should be closed or closing.");
-                    Assert.True(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be enabled.");
-                }
+                Assert.True(DoorStatus.Closed == door.Status || DoorStatus.Closing == door.Status, $"Airlock joined to Zone 1 and a 2 should be closed or closing.");
+                Assert.True(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be enabled.");
             }
 
             Console.WriteLine("Executing Run #4 (Decompression - Zone 1)");
             MDKFactory.Run(program, updateType: tickrate);
-
-            foreach (var door in grid.GetBlocksOfType<IMyDoor>())
+            
+            foreach (var door in doors1)
             {
-                if (door.InAllZones("zone-1", "zone-2"))
-                {
-                    Assert.True(DoorStatus.Closed == door.Status, $"Airlock joined to Zone 1 and a 2 should be closed.");
-                    Assert.False(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be disabled.");
-                }
+                Assert.True(DoorStatus.Closed == door.Status, $"Airlock joined to Zone 1 and a 2 should be closed.");
+                Assert.False(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be disabled.");
             }
 
-            foreach (var vent in grid.GetZoneBlocks<MockAirVent>("zone-1"))
+            foreach (var vent in vents)
             {
                 vent.IsDepressurizing = false;
                 vent.CanPressurize = true;
@@ -255,7 +261,7 @@ namespace IngameScript.MDK
             
             MDKFactory.Run(program, updateType: tickrate);
 
-            foreach (var light in grid.GetZoneBlocks<MockInteriorLight>("zone-1"))
+            foreach (var light in lights1)
             {
                 Assert.True(light.Enabled, $"Light {light.EntityId} should be enabled.");
                 Assert.Equals(new Color(255, 255, 255), light.Color, $"Light {light.EntityId} does not have the expected color.");
@@ -264,9 +270,7 @@ namespace IngameScript.MDK
                 Assert.Equals(0, light.BlinkOffset, $"Light {light.EntityId} does not have the expected blink offset.");
             }
 
-            var lcds = grid.GetZoneBlocks<IMyTextPanel>("zone-1");
-
-            foreach (var lcd in lcds)
+            foreach (var lcd in lcds1)
             {
                 switch (lcd.CustomName)
                 {
@@ -282,28 +286,32 @@ namespace IngameScript.MDK
             Console.WriteLine("Executing Run #5 (Enable Battle Stations)");
             MDKFactory.Run(program, argument: "activate battle");
 
-            Assert.Equals("battle", programmableBlock.GetConfig().GetValue("custom-states").ToString().Trim(), "Activating battle state did not have desired effect.");
+            Assert.Equals("battle", new MyConfig(programmableBlock).GetValue("custom-states").ToString().Trim(), "Activating battle state did not have desired effect.");
 
             Console.WriteLine("Executing Run #6 (Enable Self-Destruct)");
             MDKFactory.Run(program, argument: "activate destruct");
 
-            Assert.Equals("battle\ndestruct", programmableBlock.GetConfig().GetValue("custom-states").ToString().Trim(), "Activating destruct state did not have desired effect.");
+            Assert.Equals("battle\ndestruct", new MyConfig(programmableBlock).GetValue("custom-states").ToString().Trim(), "Activating destruct state did not have desired effect.");
 
             Console.WriteLine("Executing Run #7 (Toggle Battle Stations)");
             MDKFactory.Run(program, argument: "toggle battle");
 
-            Assert.Equals("destruct", programmableBlock.GetConfig().GetValue("custom-states").ToString().Trim(), "Toggling battle state did not have desired effect.");
+            Console.WriteLine("Executing Run #8 (Self Destruct)");
+            MDKFactory.Run(program, updateType: tickrate);
+            Assert.Equals("destruct", new MyConfig(programmableBlock).GetValue("custom-states").ToString().Trim(), "Toggling battle state did not have desired effect.");
 
-            Console.WriteLine("Executing Run #8 (Toggle Self-Destruct)");
+            Console.WriteLine("Executing Run #9 (Toggle Self-Destruct)");
             MDKFactory.Run(program, argument: "deactivate destruct");
 
-            Assert.Equals("", programmableBlock.GetConfig().GetValue("custom-states").ToString(), "Disabling destruct state did not have desired effect.");
+            Assert.Equals("", new MyConfig(programmableBlock).GetValue("custom-states").ToString(), "Disabling destruct state did not have desired effect.");
 
             Console.WriteLine();
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("DEBUG LCD OUTPUT:");
             Console.WriteLine("-----------------------------------");
-            Console.WriteLine(grid.GetBlocksOfType<IMyTextPanel>(t => t.IsA("debug lcd")).FirstOrDefault()?.GetPublicText()?.Trim() ?? ">> NO LCD FOUND <<");
+            var blocks = new List<IMyTextPanel>();
+            grid.GetBlocksOfType(blocks, t => (new MyConfig(t)).IsA("debug lcd"));
+            Console.WriteLine(blocks.FirstOrDefault()?.GetPublicText()?.Trim() ?? ">> NO LCD FOUND <<");
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey(true);
@@ -312,7 +320,7 @@ namespace IngameScript.MDK
         class Zone : IReadOnlyList<IMyTerminalBlock>
         {
             public String Name { get; }
-            public IEnumerable<String> AdjacentZones => Blocks.SelectMany(b => b.GetZones()).Distinct().Where(z => z != Name);
+            public IEnumerable<String> AdjacentZones => Blocks.SelectMany(b => new MyConfig(b).GetZones()).Distinct().Where(z => z != Name);
             public List<IMyTerminalBlock> Blocks { get; } = new List<IMyTerminalBlock>();
 
             public Int32 Count => ((IReadOnlyList<IMyTerminalBlock>)Blocks).Count;
@@ -328,7 +336,7 @@ namespace IngameScript.MDK
             public void AddBlock(IMyTerminalBlock block)
             {
                 Blocks.Add(block);
-                using (var config = block.GetConfig())
+                using (var config = new MyConfig(block))
                 {
                     config.AddValue("zones", Name);
                 }
@@ -337,7 +345,7 @@ namespace IngameScript.MDK
             public void RemoveBlock(IMyTerminalBlock block)
             {
                 Blocks.Remove(block);
-                using (var config = block.GetConfig())
+                using (var config = new MyConfig(block))
                 {
                     config.ClearValue("zones", Name);
                 }
@@ -348,7 +356,7 @@ namespace IngameScript.MDK
                 Blocks.AddRange(blocks);
                 foreach (var block in blocks)
                 {
-                    using (var config = block.GetConfig())
+                    using (var config = new MyConfig(block))
                     {
                         config.AddValue("zones", Name);
                     }
