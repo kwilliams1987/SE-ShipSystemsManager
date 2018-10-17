@@ -20,7 +20,7 @@ namespace IngameScript
 
             if (vents.Any(v => !v.CanPressurize))
             {
-                Output($"Depressurization detected in {vents.Count()} Air Vents in zone {zone}.");
+                Echo($"Depressurization detected in {vents.Count()} Air Vents in zone {zone}.");
 
                 SetStates(blocks, State.Decompression);
 

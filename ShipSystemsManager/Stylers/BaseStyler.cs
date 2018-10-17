@@ -16,7 +16,7 @@ namespace IngameScript
             protected abstract String Prefix { get; }
             public static IReadOnlyDictionary<String, Object> DefaultStyles { get; } = new Dictionary<String, Object>()
             {
-                { "battle.text", "BATTLE STATIONS" },
+                { "battle.text", "BATTLE\nSTATIONS" },
                 { "battle.text.font", "Debug" },
                 { "battle.text.color", new Color(255, 0, 0) },
                 { "battle.light.color", new Color(255, 0, 0) },
@@ -27,7 +27,7 @@ namespace IngameScript
                 { "battle.sign.images", "Cross" },
                 { "battle.sound", "Alert 1" },
 
-                { "decompression.text", "DECOMPRESSION DANGER" },
+                { "decompression.text", "DECOMPRESSION\nDANGER" },
                 { "decompression.text.font", "Debug" },
                 { "decompression.text.color", new Color(0, 0, 255) },
                 { "decompression.light.color", new Color(0, 0, 255) },
@@ -38,7 +38,7 @@ namespace IngameScript
                 { "decompression.sign.images", "Danger" },
                 { "decompression.sound", "Alert 2" },
 
-                { "destruct.text", "SELF DESTRUCT in {0}" },
+                { "destruct.text", "SELF DESTRUCT\n{0}" },
                 { "destruct.text.color", new Color(255, 0, 0) },
                 { "destruct.text.fail", "SELF DESTRUCT\nUNAVAILABLE" },
                 { "destruct.text.fail.color", new Color(255, 255, 0) },
@@ -75,9 +75,13 @@ namespace IngameScript
                 {
                     return ProgrammableBlockConfig.GetValue(key).ToType<T>();
                 }
-                else
+                else if (DefaultStyles.ContainsKey(key))
                 {
                     return (T)DefaultStyles[key];
+                }
+                else
+                {
+                    throw new Exception($"The requested style {key} is not present.");
                 }
             }
 

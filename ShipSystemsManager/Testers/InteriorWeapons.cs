@@ -22,7 +22,7 @@ namespace IngameScript
 
             if (zoneTurrets.Any(t => t.HasTarget && t.GetTargetedEntity().Relationship == MyRelationsBetweenPlayerAndBlock.Enemies))
             {
-                Output($"Turret detected enemy in zone {zone}!");
+                Echo($"Turret detected enemy in zone {zone}!");
 
                 SetStates(blocks, State.Intruder1);
             }

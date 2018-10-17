@@ -11,7 +11,8 @@ namespace IngameScript
     {
         class SelfDestructStyler: BattleStationsStyler
         {
-            protected override String Prefix => "destruct";
+            private String prefix = "destruct";
+            protected override String Prefix => prefix;
             IMyGridTerminalSystem Grid { get; }
             List<IMyWarhead> Warheads { get; } = new List<IMyWarhead>();
             Single Countdown { get; }
@@ -31,7 +32,9 @@ namespace IngameScript
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
+                prefix = "battle";
                 base.Style(block, storage);
+                prefix = "destruct";
                 var config = new MyConfig(block);
 
                 var warhead = block as IMyWarhead;

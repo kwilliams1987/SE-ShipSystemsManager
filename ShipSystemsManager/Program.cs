@@ -10,6 +10,8 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
+        public class BreakpointException : Exception { }
+
         public static class Function
         {
             public const String Airlock = "airlock";
@@ -42,10 +44,13 @@ namespace IngameScript
         MyConfig SelfStorage { get; set; }
         Dictionary<Int64, MyConfig> EntityStorage { get; set; } = new Dictionary<Int64, MyConfig>();
         readonly IOrderedEnumerable<BaseStyler> StatePriority;
+        Action<String> Log { get; }
 
         public Program()
         {
             Runtime.UpdateFrequency = UpdateFrequency.Update100;
+            Log = Echo;
+            Echo = Output;
 
             GridStorage = new MyIni();
             StatePriority = new List<BaseStyler>
@@ -60,6 +65,12 @@ namespace IngameScript
 
         public void Main(String argument, UpdateType updateSource)
         {
+            try
+            {
+                throw new BreakpointException();
+            }
+            catch { }
+
             {
                 var error = default(MyIniParseResult);
                 if (!GridStorage.TryParse(Storage, out error))
@@ -71,7 +82,7 @@ namespace IngameScript
             try
             {
                 SelfStorage = new MyConfig(Me);
-                Output($"{Runtime.TimeSinceLastRun} since last execution.");
+                Echo($"{Runtime.TimeSinceLastRun} since last execution.");
                 if (String.IsNullOrWhiteSpace(argument))
                 {
                     if ((updateSource & (UpdateType.Update1 | UpdateType.Update10)) != UpdateType.None)
@@ -79,8 +90,8 @@ namespace IngameScript
                         // Running in high speed mode is not recommended!
                         if (!SelfStorage.GetValue("FastMode").ToBoolean())
                         {
-                            Output("Running the program at one cycle per tick is not recommended.");
-                            Output("Add \"FastMode=true\" to the Programmable Block CustomData to enable this mode.");
+                            Echo("Running the program at one cycle per tick is not recommended.");
+                            Echo("Add \"FastMode=true\" to the Programmable Block CustomData to enable this mode.");
 
                             // Throw an exception to prevent further cycles.
                             throw new Exception();
@@ -104,7 +115,7 @@ namespace IngameScript
                 foreach (var config in EntityStorage)
                     config.Value.Dispose();
 
-                Output($"{Runtime.LastRunTimeMs}ms. {Runtime.CurrentInstructionCount}/{Runtime.MaxInstructionCount} instructions.");
+                Echo($"{Runtime.LastRunTimeMs}ms. {Runtime.CurrentInstructionCount}/{Runtime.MaxInstructionCount} instructions.");
             }
         }
 
@@ -123,7 +134,7 @@ namespace IngameScript
                                 var warheads = GetBlocks<IMyWarhead>(w => GetConfig(w).IsA(Function.SelfDestruct) && w.IsFunctional);
                                 if (!warheads.Any())
                                 {
-                                    Output("WARNING: Self Destruct is unavailable.");
+                                    Echo("WARNING: Self Destruct is unavailable.");
                                 }
                                 break;
                         }
@@ -164,7 +175,7 @@ namespace IngameScript
                         }
                         else
                         {
-                            Output("You must confirm this action - using it will break block states for any zone not accurately stored.");
+                            Echo("You must confirm this action - using it will break block states for any zone not accurately stored.");
                         }
                         return;
 
@@ -173,7 +184,7 @@ namespace IngameScript
                         {
                             case "":
                             case "preserve":
-                                Output("Writing default styler settings to the Programmable Block CustomData attribute (preserving existing).");
+                                Echo("Writing default styler settings to the Programmable Block CustomData attribute (preserving existing).");
 
                                 foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
                                 {
@@ -184,7 +195,7 @@ namespace IngameScript
                                 }
                                 break;
                             case "overwrite":
-                                Output("Writing default styler settings to the Programmable Block CustomData attribute (overwriting existing).");
+                                Echo("Writing default styler settings to the Programmable Block CustomData attribute (overwriting existing).");
 
                                 foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
                                 {
@@ -207,7 +218,7 @@ namespace IngameScript
                             var args = String.Join(" ", arguments.Skip(1)).Split(';');
                             if (args.Count() != 2)
                             {
-                                Output("grouptozone failed: Incorrect argument count.");
+                                Echo("grouptozone failed: Incorrect argument count.");
                                 break;
                             }
 
@@ -218,7 +229,7 @@ namespace IngameScript
 
                             if (blockGroup == default(IMyBlockGroup))
                             {
-                                Output($"grouptozone failed: Group \"{group}\" was not found.");
+                                Echo($"grouptozone failed: Group \"{group}\" was not found.");
                                 return;
                             }
 
@@ -230,7 +241,7 @@ namespace IngameScript
                                 GetConfig(block).AddValue("zones", zone);
                             }
 
-                            Output($"Added {blocks.Count()} blocks to zone {zone}.");
+                            Echo($"Added {blocks.Count()} blocks to zone {zone}.");
                         }
                         break;
                         
@@ -239,7 +250,7 @@ namespace IngameScript
                             var args = String.Join(" ", arguments.Skip(1)).Split(';');
                             if (args.Count() != 2)
                             {
-                                Output("grouptofunction failed: Incorrect argument count.");
+                                Echo("grouptofunction failed: Incorrect argument count.");
                                 break;
                             }
 
@@ -250,7 +261,7 @@ namespace IngameScript
 
                             if (blockGroup == default(IMyBlockGroup))
                             {
-                                Output($"grouptofunction failed: Group \"{group}\" was not found.");
+                                Echo($"grouptofunction failed: Group \"{group}\" was not found.");
                                 return;
                             }
 
@@ -262,7 +273,7 @@ namespace IngameScript
                                 GetConfig(block).AddValue("functions", function);
                             }
 
-                            Output($"Added {function} to {blocks.Count()} blocks.");
+                            Echo($"Added {function} to {blocks.Count()} blocks.");
                         }
                         break;
                 }
@@ -271,19 +282,19 @@ namespace IngameScript
 
         void Tick()
         {
-            Output($"Running tick.");
+            Echo($"Running tick.");
             // Only check air vents if pressurization is enabled.
             var pressure = GetBlocks<IMyAirVent>().FirstOrDefault(v => v.PressurizationEnabled) != default(IMyAirVent);
             var batteries = GetBlocks<IMyBatteryBlock>().Any();
             var zones = GetZones();
 
-            Output($"Found {zones.Count()} zones.");
+            Echo($"Found {zones.Count()} zones.");
 
             try
             {
                 foreach (var zone in zones)
                 {
-                    Output($"Checking Zone \"{zone}\" for new triggers.");
+                    Echo($"Checking Zone \"{zone}\" for new triggers.");
 
                     if (pressure)
                     {
@@ -306,50 +317,48 @@ namespace IngameScript
             }
             catch (Exception e)
             {
-                Output("Exception: " + e.Message + "\n" + e.StackTrace);                    
+                Echo("Exception: " + e.Message + "\n" + e.StackTrace);                    
             }
         }
+
+        List<IMyTextPanel> DebugPanels;
 
         /// <summary>
         /// Output the provided message to the Programmable Block debug UI and any other LCDs with the "debug lcd" function enabled.
         /// </summary>
         /// <param name="message"></param>
-        /// <param name="append"></param>
-        void Output(String message, Boolean append = true)
+        void Output(String message)
         {
             message = $"[{DateTime.Now:HH:mm:ss}] {message}";
-            Echo(message);
+            Log(message);
 
-            var lcds = GetBlocks<IMyTextPanel>(p => GetConfig(p).IsA("debug lcd"));
-            Echo($"[{DateTime.Now:HH:mm:ss}] Found {lcds.Count()} Debug LCD panels.");
+            if (DebugPanels == null)
+            {
+                DebugPanels = new List<IMyTextPanel>();
+                GridTerminalSystem.GetBlocksOfType(DebugPanels, p => GetConfig(p).IsA("debug lcd"));
+                Echo($"[{DateTime.Now:HH:mm:ss}] Found {DebugPanels.Count()} Debug LCD panels.");
+            }
             var text = "";
 
-            foreach (var lcd in lcds)
+            foreach (var lcd in DebugPanels)
             {
                 lcd.WritePublicTitle("ShipSystemsManager Diagnostics");
                 lcd.FontSize = 0.5f;
                 lcd.Font = "DEBUG";
 
-                if (append)
+                if (text == "")
                 {
-                    if (text == "")
+                    // Do scrolling logic only once.
+                    var lines = lcd.GetPublicText().Split('\n').ToList();
+                    if (lines.Count() > 32)
                     {
-                        // Do scrolling logic only once.
-                        var lines = lcd.GetPublicText().Split('\n').ToList();
-                        if (lines.Count() > 32)
-                        {
-                            lines.RemoveAt(0);
-                        }
-                        lines.Add(message);
-                        text = String.Join("\n", lines);
+                        lines.RemoveAt(0);
                     }
+                    lines.Add(message);
+                    text = String.Join("\n", lines);
+                }
 
-                    lcd.WritePublicText(text);
-                }
-                else
-                {
-                    lcd.WritePublicText(message);
-                }
+                lcd.WritePublicText(text);
             }
         }
 
