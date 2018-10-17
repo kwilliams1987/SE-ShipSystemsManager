@@ -57,7 +57,7 @@ namespace IngameScript.MDK
             {
                 EntityId = nextEntityId++,
                 CustomName = "Zone 1/2 Airlock",
-                CustomData = "[Ship Systems Manager]\nfunctions=airlock\nzones=\n|zone-1\n|zone-2"
+                CustomData = "[Ship Systems Manager]\nzones=\n|zone-1\n|zone-2\nfunctions=airlock"
             };
 
             airlock.OpenDoor();
@@ -81,7 +81,7 @@ namespace IngameScript.MDK
                     EntityId = nextEntityId++,
                     CustomName = "Alert Light (Zone 1)",
                     ShowInTerminal = false,
-                    CustomData = "[Ship Systems Manager]\nfunctions=warnlight"
+                    CustomData = "[Ship Systems Manager]\nzones=zone-1\nfunctions=warnlight"
                 });
 
                 room.AddBlock(new MockInteriorLight()
@@ -95,7 +95,7 @@ namespace IngameScript.MDK
                 {
                     EntityId = nextEntityId++,
                     CustomName = "Door Sign (Zone 1)",
-                    CustomData = "[Ship Systems Manager]\nfunctions=doorsign"
+                    CustomData = "[Ship Systems Manager]\nzones=zone-1\nfunctions=doorsign"
                 });
 
                 room.OfType<IMyTextPanel>().First(b => b.CustomName == "Door Sign (Zone 1)")
@@ -125,7 +125,7 @@ namespace IngameScript.MDK
                     EntityId = nextEntityId++,
                     CustomName = "Alert Light (Zone 2)",
                     ShowInTerminal = false,
-                    CustomData = "[Ship Systems Manager]\nfunctions=warnlight"
+                    CustomData = "[Ship Systems Manager]\nzones=zone-2\nfunctions=warnlight"
                 });
 
                 room.AddBlock(new MockInteriorLight()
@@ -139,7 +139,7 @@ namespace IngameScript.MDK
                 {
                     EntityId = nextEntityId++,
                     CustomName = "Door Sign (Zone 2)",
-                    CustomData = "[Ship Systems Manager]\nfunctions=doorsign"
+                    CustomData = "[Ship Systems Manager]\nzones=zone-2\nfunctions=doorsign"
                 });
 
                 room.OfType<IMyTextPanel>().First(b => b.CustomName == "Door Sign (Zone 2)")
@@ -159,24 +159,24 @@ namespace IngameScript.MDK
 
             Console.WriteLine("Executing Run #1 (Normal)");
             MDKFactory.Run(program, updateType: tickrate);
-            
+
             foreach (var light in grid.GetBlocksOfType<IMyInteriorLight>())
             {
-                Assert.Equals(light.Color, new Color(255,255,255), $"Light {light.EntityId} does not have the expected color.");
-                Assert.Equals(light.BlinkIntervalSeconds, 0, $"Light {light.EntityId} does not have the expected blink interval.");
-                Assert.Equals(light.BlinkLength, 0, $"Light {light.EntityId} does not have the expected blink length.");
-                Assert.Equals(light.BlinkOffset, 0, $"Light {light.EntityId} does not have the expected blink offset.");
+                Assert.Equals(new Color(255,255,255), light.Color, $"Light {light.EntityId} does not have the expected color.");
+                Assert.Equals(0, light.BlinkIntervalSeconds, $"Light {light.EntityId} does not have the expected blink interval.");
+                Assert.Equals(0, light.BlinkLength, $"Light {light.EntityId} does not have the expected blink length.");
+                Assert.Equals(0, light.BlinkOffset, $"Light {light.EntityId} does not have the expected blink offset.");
             }
                                 
             foreach (var lcd in grid.GetBlocksOfType<IMyTextPanel>())
             {
-                switch (lcd.Name)
+                switch (lcd.CustomName)
                 {
                     case "Door Sign (Zone 1)":
-                        Assert.Equals(lcd.GetPublicText(), "ZONE 1", $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        Assert.Equals("ZONE 1", lcd.GetPublicText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
                         break;
                     case "Door Sign (Zone 2)":
-                        Assert.Equals(lcd.GetPublicText(), "ZONE 2", $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        Assert.Equals("ZONE 2", lcd.GetPublicText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
                         break;
                 }
             }
@@ -185,7 +185,7 @@ namespace IngameScript.MDK
             {
                 if (door.InAllZones("zone-1", "zone-2"))
                 {
-                    Assert.True(door.Status == DoorStatus.Open, $"Airlock joined to Zone 1 and a 2 should be open.");
+                    Assert.True(DoorStatus.Open == door.Status, $"Airlock joined to Zone 1 and a 2 should be open.");
                 }
             }
             
@@ -216,10 +216,12 @@ namespace IngameScript.MDK
 
             foreach (var lcd in grid.GetZoneBlocks<IMyTextPanel>("zone-1"))
             {
-                switch (lcd.Name)
+                switch (lcd.CustomName)
                 {
                     case "Door Sign (Zone 1)":
-                        Assert.Equals(lcd.GetPublicText(), Styler.Get<String>("decompression.text"), $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        Assert.Equals(Styler.Get<String>("decompression.text"), lcd.GetPublicText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        Assert.True(1.327 < lcd.FontSize, $"LCD {lcd.EntityId} did not properly rescale.");
+                        Assert.True(1.328 > lcd.FontSize, $"LCD {lcd.EntityId} did not properly rescale.");
                         break;
                 }
             }
@@ -228,7 +230,7 @@ namespace IngameScript.MDK
             {
                 if (door.InAllZones("zone-1", "zone-2"))
                 {
-                    Assert.True(door.Status == DoorStatus.Closed || door.Status == DoorStatus.Closing, $"Airlock joined to Zone 1 and a 2 should be closed or closing.");
+                    Assert.True(DoorStatus.Closed == door.Status || DoorStatus.Closing == door.Status, $"Airlock joined to Zone 1 and a 2 should be closed or closing.");
                     Assert.True(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be enabled.");
                 }
             }
@@ -240,7 +242,7 @@ namespace IngameScript.MDK
             {
                 if (door.InAllZones("zone-1", "zone-2"))
                 {
-                    Assert.True(door.Status == DoorStatus.Closed, $"Airlock joined to Zone 1 and a 2 should be closed.");
+                    Assert.True(DoorStatus.Closed == door.Status, $"Airlock joined to Zone 1 and a 2 should be closed.");
                     Assert.False(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be disabled.");
                 }
             }
@@ -256,10 +258,10 @@ namespace IngameScript.MDK
             foreach (var light in grid.GetZoneBlocks<MockInteriorLight>("zone-1"))
             {
                 Assert.True(light.Enabled, $"Light {light.EntityId} should be enabled.");
-                Assert.Equals(light.Color, new Color(255, 255, 255), $"Light {light.EntityId} does not have the expected color.");
-                Assert.Equals(light.BlinkIntervalSeconds, 0, $"Light {light.EntityId} does not have the expected blink interval.");
-                Assert.Equals(light.BlinkLength, 0, $"Light {light.EntityId} does not have the expected blink length.");
-                Assert.Equals(light.BlinkOffset, 0, $"Light {light.EntityId} does not have the expected blink offset.");
+                Assert.Equals(new Color(255, 255, 255), light.Color, $"Light {light.EntityId} does not have the expected color.");
+                Assert.Equals(0, light.BlinkIntervalSeconds, $"Light {light.EntityId} does not have the expected blink interval.");
+                Assert.Equals(0, light.BlinkLength, $"Light {light.EntityId} does not have the expected blink length.");
+                Assert.Equals(0, light.BlinkOffset, $"Light {light.EntityId} does not have the expected blink offset.");
             }
 
             var lcds = grid.GetZoneBlocks<IMyTextPanel>("zone-1");
@@ -269,16 +271,16 @@ namespace IngameScript.MDK
                 switch (lcd.CustomName)
                 {
                     case "Door Sign (Zone 1)":
-                        Assert.Equals(lcd.GetPublicText(), "ZONE 1", $"LCD {lcd.EntityId} doesn't have the expected text.");
-                        Assert.Equals(lcd.FontColor, new Color(255, 255, 255), $"LCD {lcd.EntityId} doesn't have the expected text color.");
-                        Assert.Equals(lcd.BackgroundColor, new Color(0, 0, 0), $"LCD {lcd.EntityId} doesn't have the expected background color.");
+                        Assert.Equals("ZONE 1", lcd.GetPublicText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        Assert.Equals(new Color(255, 255, 255), lcd.FontColor, $"LCD {lcd.EntityId} doesn't have the expected text color.");
+                        Assert.Equals(new Color(0, 0, 0), lcd.BackgroundColor, $"LCD {lcd.EntityId} doesn't have the expected background color.");
+                        Assert.Equals(1, lcd.FontSize, $"LCD {lcd.EntityId} Font Size was not correctly restored.");
                         break;
                 }
             }
 
             Console.WriteLine("Executing Run #5 (Enable Battle Stations)");
             MDKFactory.Run(program, argument: "activate battle");
-            Console.WriteLine($"Execution time: {program.Runtime.LastRunTimeMs}ms.");
 
             Assert.Equals("battle", programmableBlock.GetConfig().GetValue("custom-states").ToString().Trim(), "Activating battle state did not have desired effect.");
 

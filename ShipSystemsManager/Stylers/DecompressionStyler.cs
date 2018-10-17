@@ -13,8 +13,7 @@ namespace IngameScript
         {
             protected override String Prefix => "decompression";
 
-            public DecompressionStyler(IMyProgrammableBlock block)
-                : base(2, Program.State.Decompression, block) { }
+            public DecompressionStyler(IMyProgrammableBlock block) : base(2, Program.State.Decompression, block) { }
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
@@ -36,9 +35,10 @@ namespace IngameScript
                         {
                             { Serializer.Custom.PublicText, Get<String>("text") },
                             { nameof(IMyTextPanel.FontColor), Get<Color>("text.color") },
-                            { nameof(IMyTextPanel.BackgroundColor), Get<Color>("sign.color") },
-                            { nameof(IMyTextPanel.FontSize), Get<Single>("text.size") }
+                            { nameof(IMyTextPanel.BackgroundColor), Get<Color>("sign.color") }
                         }, storage);
+
+                        lcd.AutoFit();
                     }
 
                     if (lcd.IsA(Function.Warning))

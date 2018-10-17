@@ -12,8 +12,7 @@ namespace IngameScript
         {
             protected override String Prefix => "lowpower";
 
-            public LowPowerStyler(IMyProgrammableBlock block)
-                : base(5, Program.State.LowPower, block) { }
+            public LowPowerStyler(IMyProgrammableBlock block) : base(5, Program.State.LowPower, block) { }
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {

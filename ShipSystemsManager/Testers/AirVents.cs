@@ -16,7 +16,7 @@ namespace IngameScript
                             .Concat(GetZoneBlocks<IMyTextPanel>(zone, Function.DoorSign))
                             .Concat(GetZoneBlocks<IMyTextPanel>(zone, Function.Warning))
                             .Concat(GetZoneBlocks<IMySoundBlock>(zone, Function.Siren))
-                            .Concat(GridTerminalSystem.GetZoneBlocks<IMyInteriorLight>(zone));
+                            .Concat(GetZoneBlocks<IMyInteriorLight>(zone));
 
             if (vents.Any(v => !v.CanPressurize))
             {

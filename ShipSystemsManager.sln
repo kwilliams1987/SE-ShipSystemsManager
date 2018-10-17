@@ -11,6 +11,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BlockSerialization", "Block
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MDK-Mockups", "..\MDK-Mockups\MDK-Mockups.shproj", "{33863C91-80F6-4ABC-A735-3934A61D494C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSM Utility Script", "SSM Utility Script\SSM Utility Script.csproj", "{7D6D57AE-BF0E-48B8-9275-8EF549E96AD7}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		BlockSerialization\BlockSerialization.projitems*{2907d914-251e-4c86-9557-ea5ca325c0d8}*SharedItemsImports = 13
@@ -26,6 +28,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7577EDAA-27FF-4D32-814B-A1077F8DCDA4}.Debug|x64.ActiveCfg = Debug|x64
 		{7577EDAA-27FF-4D32-814B-A1077F8DCDA4}.Debug|x64.Build.0 = Debug|x64
+		{7D6D57AE-BF0E-48B8-9275-8EF549E96AD7}.Debug|x64.ActiveCfg = Debug|x64
+		{7D6D57AE-BF0E-48B8-9275-8EF549E96AD7}.Debug|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

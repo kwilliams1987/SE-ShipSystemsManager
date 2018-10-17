@@ -42,7 +42,6 @@ namespace IngameScript
         MyConfig SelfStorage { get; set; }
         readonly IOrderedEnumerable<BaseStyler> StatePriority;
 
-
         public Program()
         {
             Runtime.UpdateFrequency = UpdateFrequency.Update100;
@@ -71,22 +70,23 @@ namespace IngameScript
             try
             {
                 SelfStorage = new MyConfig(Me);
+                Output($"{Runtime.TimeSinceLastRun} since last execution.");
                 if (String.IsNullOrWhiteSpace(argument))
                 {
-                    // Perform a tick.
-                    if ((updateSource & UpdateType.Update1) != UpdateType.None)
+                    if ((updateSource & (UpdateType.Update1 | UpdateType.Update10)) != UpdateType.None)
                     {
                         // Running in high speed mode is not recommended!
                         if (!SelfStorage.GetValue("FastMode").ToBoolean())
                         {
                             Output("Running the program at one cycle per tick is not recommended.");
-                            Output("Add \"FastMode:true\" to the Programmable Block CustomData to enable this mode.");
+                            Output("Add \"FastMode=true\" to the Programmable Block CustomData to enable this mode.");
 
                             // Throw an exception to prevent further cycles.
                             throw new Exception();
                         }
                     }
 
+                    // Perform a tick.
                     Tick();
                 }
                 else
@@ -99,7 +99,7 @@ namespace IngameScript
             {
                 Storage = GridStorage.ToString();
                 SelfStorage.Dispose();
-                Output($"{Runtime.CurrentInstructionCount}/{Runtime.MaxInstructionCount} instructions. {Runtime.LastRunTimeMs}ms");
+                Output($"{Runtime.LastRunTimeMs}ms. {Runtime.CurrentInstructionCount}/{Runtime.MaxInstructionCount} instructions.");
             }
         }
 

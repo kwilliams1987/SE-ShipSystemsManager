@@ -13,8 +13,7 @@ namespace IngameScript
             protected override String Prefix => "destruct";
             IMyGridTerminalSystem Grid { get; }
 
-            public SelfDestructStyler(IMyProgrammableBlock block, IMyGridTerminalSystem grid)
-                : base(block)
+            public SelfDestructStyler(IMyProgrammableBlock block, IMyGridTerminalSystem grid): base(block)
             {
                 Priority = 1;
                 State = Program.State.Destruct;

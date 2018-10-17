@@ -17,7 +17,6 @@ namespace IngameScript
             public static IReadOnlyDictionary<String, Object> DefaultStyles { get; } = new Dictionary<String, Object>()
             {
                 { "battle.text", "BATTLE STATIONS" },
-                { "battle.text.size", 2.9f },
                 { "battle.text.font", "Debug" },
                 { "battle.text.color", new Color(255, 0, 0) },
                 { "battle.light.color", new Color(255, 0, 0) },
@@ -29,7 +28,6 @@ namespace IngameScript
                 { "battle.sound", "Alert 1" },
 
                 { "decompression.text", "DECOMPRESSION DANGER" },
-                { "decompression.text.size", 2.9f },
                 { "decompression.text.font", "Debug" },
                 { "decompression.text.color", new Color(0, 0, 255) },
                 { "decompression.light.color", new Color(0, 0, 255) },
@@ -46,7 +44,6 @@ namespace IngameScript
 
                 { "intruder.text", "INTRUDER ALERT" },
                 { "intruder.text.color", new Color(255, 0, 0) },
-                { "intruder.text.size", 2.9f },
                 { "intruder.sign.color", new Color(0, 0, 0) },
                 { "intruder.sign.images", "Danger" },
                 { "intruder.light.color", new Color(255, 0, 0) },

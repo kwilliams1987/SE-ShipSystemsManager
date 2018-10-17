@@ -12,8 +12,7 @@ namespace IngameScript
         class IntruderStyler : BaseStyler
         {
             protected override String Prefix => "intruder";
-            public IntruderStyler(IMyProgrammableBlock block, String blockState)
-                : base(3, blockState, block) { }
+            public IntruderStyler(IMyProgrammableBlock block, String blockState) : base(3, blockState, block) { }
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
@@ -37,9 +36,10 @@ namespace IngameScript
                         {
                             { Serializer.Custom.PublicText, Get<String>("text") },
                             { nameof(IMyTextPanel.FontColor), Get<Color>("text.color") },
-                            { nameof(IMyTextPanel.BackgroundColor), Get<Color>("sign.color") },
-                            { nameof(IMyTextPanel.FontSize), Get<Single>("text.size") }
+                            { nameof(IMyTextPanel.BackgroundColor), Get<Color>("sign.color") }
                         }, storage);
+
+                        lcd.AutoFit();
                     }
 
                     if (lcd.IsA(Function.Warning))

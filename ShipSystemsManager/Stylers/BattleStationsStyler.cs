@@ -13,8 +13,7 @@ namespace IngameScript
         {
             protected override String Prefix => "battle";
 
-            public BattleStationsStyler(IMyProgrammableBlock block)
-                : base(4, Program.State.BattleStations, block) { }
+            public BattleStationsStyler(IMyProgrammableBlock block) : base(4, Program.State.BattleStations, block) { }
 
             public override void Style(IMyTerminalBlock block, MyIni storage)
             {
@@ -39,9 +38,10 @@ namespace IngameScript
                             { Serializer.Custom.PublicText, Get<String>("text") },
                             { nameof(IMyTextPanel.Font), Get<String>("text.font") },
                             { nameof(IMyTextPanel.FontColor), Get<Color>("text.color") },
-                            { nameof(IMyTextPanel.BackgroundColor), Get<Color>("sign.color") },
-                            { nameof(IMyTextPanel.FontSize), Get<Single>("text.size") }
+                            { nameof(IMyTextPanel.BackgroundColor), Get<Color>("sign.color") }
                         }, storage);
+
+                        lcd.AutoFit();
                     }
 
                     if (lcd.IsA(Function.Warning))
