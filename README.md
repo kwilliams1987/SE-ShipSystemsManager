@@ -14,7 +14,11 @@ Big shout out to [Malware](https://github.com/malware-dev) for his [Space Engine
 Without this I'd have never had the patience to go though with such an ambitious project!
 
 # Work in Progress
-Note that this script is still very, very work in progress and probably doesn't work at all yet.
+Note that this script is a work in progress and might be buggy.
+
+# Testing
+
+You can test out some of the features of the mod using this [workshop item](https://steamcommunity.com/sharedfiles/filedetails/?id=1541443254).
 
 # Wiki
 
