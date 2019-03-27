@@ -26,6 +26,7 @@ namespace IngameScript
                 { "battle.sign.color", new Color(0, 0, 0) },
                 { "battle.sign.images", "Cross" },
                 { "battle.sound", "Alert 1" },
+                { "battle.rotor.rpm", 20 },
 
                 { "decompression.text", "DECOMPRESSION\nDANGER" },
                 { "decompression.text.font", "Debug" },
@@ -37,6 +38,7 @@ namespace IngameScript
                 { "decompression.sign.color", new Color(0, 0, 0) },
                 { "decompression.sign.images", "Danger" },
                 { "decompression.sound", "Alert 2" },
+                { "decompression.rotor.rpm", 20 },
 
                 { "destruct.text", "SELF DESTRUCT\n{0}" },
                 { "destruct.text.color", new Color(255, 0, 0) },
@@ -51,6 +53,7 @@ namespace IngameScript
                 { "intruder.sign.images", "Danger" },
                 { "intruder.light.color", new Color(255, 0, 0) },
                 { "intruder.sound", "Alert 1" },
+                { "intruder.rotor.rpm", 20 },
 
                 { "lowpower.light.intensity", 0.3f },
                 { "lowpower.light.radius", 0.3f }

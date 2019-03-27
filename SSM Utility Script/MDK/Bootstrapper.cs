@@ -2,7 +2,7 @@
 
 namespace IngameScript.MDK
 {
-    public class TestBootstrapper
+    public static class TestBootstrapper
     {
         // All the files in this folder, as well as all files containing the file ".debug.", will be excluded
         // from the build process. You can use this to create utilites for testing your scripts directly in 

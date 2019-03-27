@@ -1,4 +1,5 @@
 ﻿// <mdk sortorder="2" />
+#pragma warning disable S112
 using Sandbox.ModAPI.Ingame;
 using SpaceEngineers.Game.ModAPI.Ingame;
 using System.Linq;
@@ -10,7 +11,9 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
+#pragma warning disable S3925
         public class BreakpointException : Exception { }
+#pragma warning disable S3925
 
         public static class Function
         {
@@ -69,7 +72,10 @@ namespace IngameScript
             {
                 throw new BreakpointException();
             }
-            catch { }
+            catch
+            {
+                // Runtime debug breakpoint.
+            }
 
             {
                 var error = default(MyIniParseResult);
@@ -85,17 +91,15 @@ namespace IngameScript
                 Echo($"{Runtime.TimeSinceLastRun} since last execution.");
                 if (String.IsNullOrWhiteSpace(argument))
                 {
-                    if ((updateSource & (UpdateType.Update1 | UpdateType.Update10)) != UpdateType.None)
-                    {
-                        // Running in high speed mode is not recommended!
-                        if (!SelfStorage.GetValue("FastMode").ToBoolean())
-                        {
-                            Echo("Running the program at one cycle per tick is not recommended.");
-                            Echo("Add \"FastMode=true\" to the Programmable Block CustomData to enable this mode.");
+                    // Running in high speed mode is not recommended!
+                    if ((updateSource & (UpdateType.Update1 | UpdateType.Update10)) != UpdateType.None && 
+                        !SelfStorage.GetValue("FastMode").ToBoolean())
+                    { 
+                        Echo("Running the program at one cycle per tick is not recommended.");
+                        Echo("Add \"FastMode=true\" to the Programmable Block CustomData to enable this mode.");
 
-                            // Throw an exception to prevent further cycles.
-                            throw new Exception();
-                        }
+                        // Throw an exception to prevent further cycles.
+                        throw new Exception();
                     }
 
                     // Perform a tick.
@@ -122,7 +126,7 @@ namespace IngameScript
         void Flags(String argument)
         {
             var arguments = argument.Split(' ');
-            if (arguments.Count() > 0)
+            if (arguments.Any())
             {
                 var state = String.Join(" ", arguments.Skip(1));
                 switch (arguments.First())
@@ -241,7 +245,7 @@ namespace IngameScript
                                 GetConfig(block).AddValue("zones", zone);
                             }
 
-                            Echo($"Added {blocks.Count()} blocks to zone {zone}.");
+                            Echo($"Added {blocks.Count} blocks to zone {zone}.");
                         }
                         break;
                         
@@ -273,7 +277,7 @@ namespace IngameScript
                                 GetConfig(block).AddValue("functions", function);
                             }
 
-                            Echo($"Added {function} to {blocks.Count()} blocks.");
+                            Echo($"Added {function} to {blocks.Count} blocks.");
                         }
                         break;
                 }
@@ -336,7 +340,7 @@ namespace IngameScript
             {
                 DebugPanels = new List<IMyTextPanel>();
                 GridTerminalSystem.GetBlocksOfType(DebugPanels, p => GetConfig(p).IsA("debug lcd"));
-                Echo($"[{DateTime.Now:HH:mm:ss}] Found {DebugPanels.Count()} Debug LCD panels.");
+                Echo($"[{DateTime.Now:HH:mm:ss}] Found {DebugPanels.Count} Debug LCD panels.");
             }
             var text = "";
 
@@ -350,7 +354,7 @@ namespace IngameScript
                 {
                     // Do scrolling logic only once.
                     var lines = lcd.GetPublicText().Split('\n').ToList();
-                    if (lines.Count() > 32)
+                    if (lines.Count > 32)
                     {
                         lines.RemoveAt(0);
                     }
@@ -393,7 +397,7 @@ namespace IngameScript
             var current = GetStates(block).ToList();
             var concat = current.Concat(states).Distinct();
 
-            if (concat.Count() != current.Count())
+            if (concat.Count() != current.Count)
             {
                 GridStorage.Set(BlockKey(block), States, String.Join("\n", concat));
                 GridStorage.Set(BlockKey(block), "state-changed", true);

@@ -36,7 +36,6 @@ namespace IngameScript.MDK
             // your script uses from the game, since they're not available outside of the game.
 
             var nextEntityId = 1L;
-            var timer = new Timer();
             var grid = new MockGridTerminalSystem();
             var tickrate = UpdateType.Update100;
 
@@ -100,6 +99,26 @@ namespace IngameScript.MDK
 
                 room.OfType<IMyTextPanel>().First(b => b.CustomName == "Door Sign (Zone 1)")
                     .WritePublicText("ZONE 1");
+
+                var motorSubgrid = new MockCubeGrid();
+                var motorhead = new MockMotorRotor()
+                {
+                    EntityId = nextEntityId++,
+                    CubeGrid = motorSubgrid
+                };
+
+                grid.Add(new MockInteriorLight()
+                {
+                    CubeGrid = motorSubgrid
+                });
+
+                room.AddBlock(new MockMotorStator()
+                {
+                    EntityId = nextEntityId++,
+                    CustomName = "Klaxon (Zone 1)",
+                    CustomData = "[Ship Systems Manager]\nzones=zone-1\nfunctions=siren",
+                    MockPendingAttachment = motorhead 
+                });
 
                 zones.Add(room);
 
