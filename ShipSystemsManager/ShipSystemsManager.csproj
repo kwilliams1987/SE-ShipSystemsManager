@@ -89,37 +89,40 @@
       <HintPath>c:\program files (x86)\steam\SteamApps\common\SpaceEngineers\Bin64\VRage.Scripting.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MDKUtilities">
-      <HintPath>c:\users\kristian\appdata\local\microsoft\visualstudio\15.0_79f59941\extensions\ewabudvm.1wk\MDKUtilities.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Analyzer Include="c:\users\kristian\appdata\local\microsoft\visualstudio\15.0_79f59941\extensions\ewabudvm.1wk\Analyzers\MDKAnalyzer.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Stylers\BaseStyler.cs" />
-    <Compile Include="Stylers\BattleStationsStyler.cs" />
-    <Compile Include="Stylers\DecompressionStyler.cs" />
-    <Compile Include="Stylers\DefaultStyler.cs" />
-    <Compile Include="Stylers\IntruderStyler.cs" />
-    <Compile Include="Stylers\LowPowerStyler.cs" />
-    <Compile Include="Stylers\SelfDestructStyler.cs" />
-    <Compile Include="Testers\BattleStations.cs" />
-    <Compile Include="Testers\InteriorWeapons.cs" />
-    <Compile Include="Testers\LowPower.cs" />
-    <Compile Include="Testers\SelfDestruct.cs" />
-    <Compile Include="Testers\Sensors.cs" />
-    <Compile Include="Testers\AirVents.cs" />
+    <Compile Include="BlockExtensions.cs" />
     <Compile Include="MDK\Bootstrapper.cs" />
     <AdditionalFiles Include="MDK\MDK.options">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </AdditionalFiles>
     <Compile Include="Program.cs" />
+    <Compile Include="Program.Model.cs">
+      <DependentUpon>Program.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.StateMachine.cs">
+      <DependentUpon>Program.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.Stylers.cs">
+      <DependentUpon>Program.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.Testers.cs">
+      <DependentUpon>Program.cs</DependentUpon>
+    </Compile>
     <Compile Include="Readme.cs" />
     <AdditionalFiles Include="thumb.png" />
     <AdditionalFiles Include="MDK\whitelist.cache" />
   </ItemGroup>
-  <Import Project="..\GridTerminalSystemExtensions\GridTerminalSystemExtensions.projitems" Label="Shared" />
-  <Import Project="..\BlockSerialization\BlockSerialization.projitems" Label="Shared" />
+  <ItemGroup>
+    <Analyzer Include="c:\users\kristian\appdata\local\microsoft\visualstudio\15.0_03f27943\extensions\nceszffx.3fo\Analyzers\MDKAnalyzer.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MDK-SE\Source\MDKUtilities\MDKUtilities.csproj">
+      <Project>{5c6b59b5-82cb-4886-94a7-ad610f75b1a6}</Project>
+      <Name>MDKUtilities</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="..\..\MDK-Mockups\MDK-Mockups.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">

@@ -3,10 +3,8 @@
 ################################################################################
 
 /ShipSystemsManager/bin
-/.vs/ShipSystemsManager/v15/Server/sqlite3
 /ShipSystemsManager/obj
-/ShipSystemsManager/MDK.options
-/.vs/ShipSystemsManager/v15
-/.vs/ShipSystemsManager/v14/.suo
-/SSM Utility Script/bin
-/SSM Utility Script/obj
+/ShipSystemsManager/MDK.option
+**/bin
+**/obj
+/.vs

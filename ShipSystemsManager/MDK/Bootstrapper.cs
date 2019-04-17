@@ -9,17 +9,14 @@ using IngameScript.Mockups.Blocks;
 using Malware.MDKUtilities;
 using Sandbox.ModAPI.Ingame;
 using SpaceEngineers.Game.ModAPI.Ingame;
+using VRage.Game.ModAPI.Ingame.Utilities;
 using VRageMath;
+using static IngameScript.Program;
 
 namespace IngameScript.MDK
 {
     public class TestBootstrapper
     {
-        static class Styler
-        {
-            public static T Get<T>(String key) => (T)Program.BaseStyler.DefaultStyles[key];
-        }
-        
         // All the files in this folder, as well as all files containing the file ".debug.", will be excluded
         // from the build process. You can use this to create utilites for testing your scripts directly in 
         // Visual Studio.
@@ -30,6 +27,16 @@ namespace IngameScript.MDK
             MDKUtilityFramework.Load();
         }
 
+        public static void RunCycle(Program program)
+        {
+            MDKFactory.Run(program, updateType: UpdateType.Once);
+
+            while (program.CurrentTick > 0)
+                MDKFactory.Run(program, updateType: UpdateType.Once);
+
+            Assert.Equals(program.CurrentTick, 0, "State machine was unexpected terminated.");
+        }
+
         public static void Main()
         {
             // In order for your program to actually run, you will need to provide a mockup of all the facilities 
@@ -37,7 +44,7 @@ namespace IngameScript.MDK
 
             var nextEntityId = 1L;
             var grid = new MockGridTerminalSystem();
-            var tickrate = UpdateType.Update100;
+            var tickrate = UpdateType.Once;
 
             var programmableBlock = new MockProgrammableBlock()
             {
@@ -98,7 +105,7 @@ namespace IngameScript.MDK
                 });
 
                 room.OfType<IMyTextPanel>().First(b => b.CustomName == "Door Sign (Zone 1)")
-                    .WritePublicText("ZONE 1");
+                    .WriteText("ZONE 1");
 
                 var motorSubgrid = new MockCubeGrid();
                 var motorhead = new MockMotorRotor()
@@ -162,7 +169,7 @@ namespace IngameScript.MDK
                 });
 
                 room.OfType<IMyTextPanel>().First(b => b.CustomName == "Door Sign (Zone 2)")
-                    .WritePublicText("ZONE 2");
+                    .WriteText("ZONE 2");
 
                 zones.Add(room);
 
@@ -176,8 +183,8 @@ namespace IngameScript.MDK
                 ProgrammableBlock = programmableBlock
             });
 
-            Console.WriteLine("Executing Run #1 (Normal)");
-            MDKFactory.Run(program, updateType: tickrate);
+            Console.WriteLine("Executing Run Cycle #1 (Normal)");
+            RunCycle(program);
 
             var lights = new List<IMyInteriorLight>();
             grid.GetBlocksOfType(lights);
@@ -197,10 +204,10 @@ namespace IngameScript.MDK
                 switch (lcd.CustomName)
                 {
                     case "Door Sign (Zone 1)":
-                        Assert.Equals("ZONE 1", lcd.GetPublicText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        Assert.Equals("ZONE 1", lcd.GetText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
                         break;
                     case "Door Sign (Zone 2)":
-                        Assert.Equals("ZONE 2", lcd.GetPublicText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        Assert.Equals("ZONE 2", lcd.GetText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
                         break;
                 }
             }
@@ -220,19 +227,19 @@ namespace IngameScript.MDK
                 vent.CanPressurize = false;
             }
 
-            Console.WriteLine("Executing Run #2 (Decompression - Zone 1)");
-            MDKFactory.Run(program, updateType: tickrate);
+            Console.WriteLine("Executing Run Cycle #2 (Decompression - Zone 1)");
+            RunCycle(program);
 
             var lights1 = new List<IMyLightingBlock>();
             grid.GetBlocksOfType(lights1, l=>l.CustomData.Contains("zone-1"));
             foreach (var light in lights1)
             {
-                if (light.CustomData.Contains(Program.Function.Siren))
+                if (light.CustomData.Contains(Program.BlockFunction.Alert.ToString()))
                 {
-                    Assert.Equals(Styler.Get<Color>("decompression.light.color"), light.Color, $"Light {light.EntityId} does not have the expected color.");
-                    Assert.Equals(Styler.Get<Single>("decompression.light.interval"), light.BlinkIntervalSeconds, $"Light {light.EntityId} does not have the expected blink interval.");
-                    Assert.Equals(Styler.Get<Single>("decompression.light.duration"), light.BlinkLength, $"Light {light.EntityId} does not have the expected blink length.");
-                    Assert.Equals(Styler.Get<Single>("decompression.light.offset"), light.BlinkOffset, $"Light {light.EntityId} does not have the expected blink offset.");
+                    //Assert.Equals(Styler.Get<Color>("decompression.light.color"), light.Color, $"Light {light.EntityId} does not have the expected color.");
+                    //Assert.Equals(Styler.Get<Single>("decompression.light.interval"), light.BlinkIntervalSeconds, $"Light {light.EntityId} does not have the expected blink interval.");
+                    //Assert.Equals(Styler.Get<Single>("decompression.light.duration"), light.BlinkLength, $"Light {light.EntityId} does not have the expected blink length.");
+                    //Assert.Equals(Styler.Get<Single>("decompression.light.offset"), light.BlinkOffset, $"Light {light.EntityId} does not have the expected blink offset.");
                     Assert.True(light.Enabled, $"Light {light.EntityId} should be enabled.");
                 }
                 else
@@ -248,7 +255,7 @@ namespace IngameScript.MDK
                 switch (lcd.CustomName)
                 {
                     case "Door Sign (Zone 1)":
-                        Assert.Equals(Styler.Get<String>("decompression.text"), lcd.GetPublicText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        //Assert.Equals(Styler.Get<String>("decompression.text"), lcd.GetText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
                         Assert.True(1.327 < lcd.FontSize, $"LCD {lcd.EntityId} did not properly rescale.");
                         Assert.True(1.328 > lcd.FontSize, $"LCD {lcd.EntityId} did not properly rescale.");
                         break;
@@ -294,7 +301,7 @@ namespace IngameScript.MDK
                 switch (lcd.CustomName)
                 {
                     case "Door Sign (Zone 1)":
-                        Assert.Equals("ZONE 1", lcd.GetPublicText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
+                        Assert.Equals("ZONE 1", lcd.GetText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
                         Assert.Equals(new Color(255, 255, 255), lcd.FontColor, $"LCD {lcd.EntityId} doesn't have the expected text color.");
                         Assert.Equals(new Color(0, 0, 0), lcd.BackgroundColor, $"LCD {lcd.EntityId} doesn't have the expected background color.");
                         Assert.Equals(1, lcd.FontSize, $"LCD {lcd.EntityId} Font Size was not correctly restored.");
@@ -302,35 +309,43 @@ namespace IngameScript.MDK
                 }
             }
 
+            var config = new MyIni();
+
             Console.WriteLine("Executing Run #5 (Enable Battle Stations)");
             MDKFactory.Run(program, argument: "activate battle");
 
-            Assert.Equals("battle", new MyConfig(programmableBlock).GetValue("custom-states").ToString().Trim(), "Activating battle state did not have desired effect.");
+            Assert.True(config.TryParse(programmableBlock.Storage), "The Programmable Block storage was not parsable.");
+
+            var state = 0;
+            config.Get(Program.IniSection, nameof(program.GridState)).TryGetInt32(out state);
+            var stateEnum = (EntityState)state;
+
+            //Assert.Equals("battle", new MyConfig(programmableBlock.Storage).GetValue("custom-states").ToString().Trim(), "Activating battle state did not have desired effect.");
 
             Console.WriteLine("Executing Run #6 (Enable Self-Destruct)");
             MDKFactory.Run(program, argument: "activate destruct");
 
-            Assert.Equals("battle\ndestruct", new MyConfig(programmableBlock).GetValue("custom-states").ToString().Trim(), "Activating destruct state did not have desired effect.");
+            //Assert.Equals("battle\ndestruct", new MyConfig(programmableBlock).GetValue("custom-states").ToString().Trim(), "Activating destruct state did not have desired effect.");
 
             Console.WriteLine("Executing Run #7 (Toggle Battle Stations)");
             MDKFactory.Run(program, argument: "toggle battle");
 
             Console.WriteLine("Executing Run #8 (Self Destruct)");
             MDKFactory.Run(program, updateType: tickrate);
-            Assert.Equals("destruct", new MyConfig(programmableBlock).GetValue("custom-states").ToString().Trim(), "Toggling battle state did not have desired effect.");
+            //Assert.Equals("destruct", new MyConfig(programmableBlock).GetValue("custom-states").ToString().Trim(), "Toggling battle state did not have desired effect.");
 
             Console.WriteLine("Executing Run #9 (Toggle Self-Destruct)");
             MDKFactory.Run(program, argument: "deactivate destruct");
 
-            Assert.Equals("", new MyConfig(programmableBlock).GetValue("custom-states").ToString(), "Disabling destruct state did not have desired effect.");
+            //Assert.Equals("", new MyConfig(programmableBlock).GetValue("custom-states").ToString(), "Disabling destruct state did not have desired effect.");
 
             Console.WriteLine();
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("DEBUG LCD OUTPUT:");
             Console.WriteLine("-----------------------------------");
             var blocks = new List<IMyTextPanel>();
-            grid.GetBlocksOfType(blocks, t => (new MyConfig(t)).IsA("debug lcd"));
-            Console.WriteLine(blocks.FirstOrDefault()?.GetPublicText()?.Trim() ?? ">> NO LCD FOUND <<");
+            //grid.GetBlocksOfType(blocks, t => (new MyConfig(t)).IsA("debug lcd"));
+            Console.WriteLine(blocks.FirstOrDefault()?.GetText()?.Trim() ?? ">> NO LCD FOUND <<");
             Console.WriteLine("-----------------------------------");
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey(true);
@@ -339,7 +354,7 @@ namespace IngameScript.MDK
         class Zone : IReadOnlyList<IMyTerminalBlock>
         {
             public String Name { get; }
-            public IEnumerable<String> AdjacentZones => Blocks.SelectMany(b => new MyConfig(b).GetZones()).Distinct().Where(z => z != Name);
+            //public IEnumerable<String> AdjacentZones => Blocks.SelectMany(b => new MyConfig(b).GetZones()).Distinct().Where(z => z != Name);
             public List<IMyTerminalBlock> Blocks { get; } = new List<IMyTerminalBlock>();
 
             public Int32 Count => ((IReadOnlyList<IMyTerminalBlock>)Blocks).Count;
@@ -355,19 +370,19 @@ namespace IngameScript.MDK
             public void AddBlock(IMyTerminalBlock block)
             {
                 Blocks.Add(block);
-                using (var config = new MyConfig(block))
-                {
-                    config.AddValue("zones", Name);
-                }
+                //using (var config = new MyConfig(block))
+                //{
+                //    config.AddValue("zones", Name);
+                //}
             }
 
             public void RemoveBlock(IMyTerminalBlock block)
             {
                 Blocks.Remove(block);
-                using (var config = new MyConfig(block))
-                {
-                    config.ClearValue("zones", Name);
-                }
+                //using (var config = new MyConfig(block))
+                //{
+                //    config.ClearValue("zones", Name);
+                //}
             }
 
             public void AddBlocks(IEnumerable<IMyTerminalBlock> blocks)
@@ -375,10 +390,10 @@ namespace IngameScript.MDK
                 Blocks.AddRange(blocks);
                 foreach (var block in blocks)
                 {
-                    using (var config = new MyConfig(block))
-                    {
-                        config.AddValue("zones", Name);
-                    }
+                    //using (var config = new MyConfig(block))
+                    //{
+                    //    config.AddValue("zones", Name);
+                    //}
                 }
             }
 

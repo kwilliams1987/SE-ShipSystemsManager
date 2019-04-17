@@ -5,31 +5,35 @@ VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipSystemsManager", "ShipSystemsManager\ShipSystemsManager.csproj", "{7577EDAA-27FF-4D32-814B-A1077F8DCDA4}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "GridTerminalSystemExtensions", "GridTerminalSystemExtensions\GridTerminalSystemExtensions.shproj", "{E5C4993A-A316-4C0D-9199-DD5D0380EFB9}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BlockSerialization", "BlockSerialization\BlockSerialization.shproj", "{2907D914-251E-4C86-9557-EA5CA325C0D8}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MDK-Mockups", "..\MDK-Mockups\MDK-Mockups.shproj", "{33863C91-80F6-4ABC-A735-3934A61D494C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSM Utility Script", "SSM Utility Script\SSM Utility Script.csproj", "{7D6D57AE-BF0E-48B8-9275-8EF549E96AD7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MDKUtilities", "..\MDK-SE\Source\MDKUtilities\MDKUtilities.csproj", "{5C6B59B5-82CB-4886-94A7-AD610F75B1A6}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		BlockSerialization\BlockSerialization.projitems*{2907d914-251e-4c86-9557-ea5ca325c0d8}*SharedItemsImports = 13
 		..\MDK-Mockups\MDK-Mockups.projitems*{33863c91-80f6-4abc-a735-3934a61d494c}*SharedItemsImports = 13
+		..\MDK-SE\Source\SteamAndSE\SteamAndSE.projitems*{5c6b59b5-82cb-4886-94a7-ad610f75b1a6}*SharedItemsImports = 4
 		..\MDK-Mockups\MDK-Mockups.projitems*{7577edaa-27ff-4d32-814b-a1077f8dcda4}*SharedItemsImports = 4
-		BlockSerialization\BlockSerialization.projitems*{7577edaa-27ff-4d32-814b-a1077f8dcda4}*SharedItemsImports = 4
-		GridTerminalSystemExtensions\GridTerminalSystemExtensions.projitems*{7577edaa-27ff-4d32-814b-a1077f8dcda4}*SharedItemsImports = 4
-		GridTerminalSystemExtensions\GridTerminalSystemExtensions.projitems*{e5c4993a-a316-4c0d-9199-dd5d0380efb9}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7577EDAA-27FF-4D32-814B-A1077F8DCDA4}.Debug|x64.ActiveCfg = Debug|x64
 		{7577EDAA-27FF-4D32-814B-A1077F8DCDA4}.Debug|x64.Build.0 = Debug|x64
+		{7577EDAA-27FF-4D32-814B-A1077F8DCDA4}.Release|x64.ActiveCfg = Debug|x64
+		{7577EDAA-27FF-4D32-814B-A1077F8DCDA4}.Release|x64.Build.0 = Debug|x64
 		{7D6D57AE-BF0E-48B8-9275-8EF549E96AD7}.Debug|x64.ActiveCfg = Debug|x64
 		{7D6D57AE-BF0E-48B8-9275-8EF549E96AD7}.Debug|x64.Build.0 = Debug|x64
+		{7D6D57AE-BF0E-48B8-9275-8EF549E96AD7}.Release|x64.ActiveCfg = Debug|x64
+		{7D6D57AE-BF0E-48B8-9275-8EF549E96AD7}.Release|x64.Build.0 = Debug|x64
+		{5C6B59B5-82CB-4886-94A7-AD610F75B1A6}.Debug|x64.ActiveCfg = Debug|x64
+		{5C6B59B5-82CB-4886-94A7-AD610F75B1A6}.Debug|x64.Build.0 = Debug|x64
+		{5C6B59B5-82CB-4886-94A7-AD610F75B1A6}.Release|x64.ActiveCfg = Release|x64
+		{5C6B59B5-82CB-4886-94A7-AD610F75B1A6}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

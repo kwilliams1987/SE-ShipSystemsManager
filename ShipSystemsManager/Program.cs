@@ -1,459 +1,139 @@
 ﻿// <mdk sortorder="2" />
 #pragma warning disable S112
 using Sandbox.ModAPI.Ingame;
-using SpaceEngineers.Game.ModAPI.Ingame;
 using System.Linq;
 using System;
 using System.Collections.Generic;
-using VRage.Game.ModAPI.Ingame.Utilities;
 
 namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
+        public const String IniSection = "SSM Configuration";
+        public const String IniStyleSection = "SSM Original Style";
+
 #pragma warning disable S3925
         public class BreakpointException : Exception { }
 #pragma warning disable S3925
 
-        public static class Function
-        {
-            public const String Airlock = "airlock";
-            public const String Security = "security";
-            public const String DoorSign = "doorsign";
-            public const String BattleSign = "battle";
-            public const String Warning = "warnsign";
-            public const String Siren = "siren";
-            public const String SelfDestruct = "selfdestruct";
-            public const String AlwaysOn = "lowpower";
-        }
+        public Int32 CurrentTick => StateMachine?.Current ?? -1;
 
-        public static class State
-        {
-            public const String LowPower = "lowpower";
-            public const String BattleStations = "battle";
-            public const String Decompression = "decompression";
-            public const String Intruder1 = "intruder1"; // Turrets
-            public const String Intruder2 = "intruder2"; // Sensors
-            public const String Destruct = "selfdestruct";
-        }
+        public EntityState GridState { get; private set; } = EntityState.Default;
+        public Double PowerThreshold { get; private set; } = 0.1;
+        public Single Countdown { get; private set; } = 300;
 
-        #region mdk macros
-        const String VERSION = "$MDK_DATE$, $MDK_TIME$";
-        #endregion
-
-        const String States = "states";
-
-        MyIni GridStorage { get; set; }
-        MyConfig SelfStorage { get; set; }
-        Dictionary<Int64, MyConfig> EntityStorage { get; set; } = new Dictionary<Int64, MyConfig>();
-        readonly IOrderedEnumerable<BaseStyler> StatePriority;
-        Action<String> Log { get; }
+        private IEnumerator<Int32> StateMachine { get; set; }
 
         public Program()
         {
-            Runtime.UpdateFrequency = UpdateFrequency.Update100;
-            Log = Echo;
-            Echo = Output;
+            var output = Echo;
+            Echo = message => output($"[{DateTime.Now:HH:mm:ss}] {message}");
 
-            GridStorage = new MyIni();
-            StatePriority = new List<BaseStyler>
-            {
-                new SelfDestructStyler(Me, GridTerminalSystem),
-                new DecompressionStyler(Me),
-                new IntruderStyler(Me, State.Intruder1), // Turrets
-                new IntruderStyler(Me, State.Intruder2), // Sensors
-                new BattleStationsStyler(Me)
-            }.OrderBy(s => s.Priority);
+            StateMachine = StateMachineExecutor();
+            Runtime.UpdateFrequency |= UpdateFrequency.Once;
         }
 
-        public void Main(String argument, UpdateType updateSource)
+        public void Main(String argument, UpdateType updateType)
         {
-            try
+            if (String.IsNullOrWhiteSpace(argument) && updateType.HasFlag(UpdateType.Once))
+                StateMachineTick();
+
+            if (!String.IsNullOrWhiteSpace(argument))
+                ParseCommand(argument);
+        }
+
+        private void StateMachineTick()
+        {
+            if (StateMachine == null)
+                return;
+
+            if (StateMachine.MoveNext())
             {
-                throw new BreakpointException();
+                Echo($"Executed cycle {CurrentTick}.");
+                Runtime.UpdateFrequency |= UpdateFrequency.Once;
             }
-            catch
+            else
             {
-                // Runtime debug breakpoint.
-            }
-
-            {
-                var error = default(MyIniParseResult);
-                if (!GridStorage.TryParse(Storage, out error))
-                {
-                    throw new Exception(error.Error);
-                }
-            }
-
-            try
-            {
-                SelfStorage = new MyConfig(Me);
-                Echo($"{Runtime.TimeSinceLastRun} since last execution.");
-                if (String.IsNullOrWhiteSpace(argument))
-                {
-                    // Running in high speed mode is not recommended!
-                    if ((updateSource & (UpdateType.Update1 | UpdateType.Update10)) != UpdateType.None && 
-                        !SelfStorage.GetValue("FastMode").ToBoolean())
-                    { 
-                        Echo("Running the program at one cycle per tick is not recommended.");
-                        Echo("Add \"FastMode=true\" to the Programmable Block CustomData to enable this mode.");
-
-                        // Throw an exception to prevent further cycles.
-                        throw new Exception();
-                    }
-
-                    // Perform a tick.
-                    Tick();
-                }
-                else
-                {
-                    // Set or clear argument flags.
-                    Flags(argument);
-                }
-            }
-            finally
-            {
-                // Commit config updates.
-                Storage = GridStorage.ToString();
-                SelfStorage.Dispose();
-                foreach (var config in EntityStorage)
-                    config.Value.Dispose();
-
-                Echo($"{Runtime.LastRunTimeMs}ms. {Runtime.CurrentInstructionCount}/{Runtime.MaxInstructionCount} instructions.");
+                Echo($"State machine has entered a stop state.");
+                StateMachine.Dispose();
+                StateMachine = null;
             }
         }
 
-        void Flags(String argument)
+        private void ParseCommand(String argument)
         {
-            var arguments = argument.Split(' ');
-            if (arguments.Any())
+            var words = argument.Split(' ');
+            var command = words.ElementAtOrDefault(0).ToLower();
+
+            switch (command)
             {
-                var state = String.Join(" ", arguments.Skip(1));
-                switch (arguments.First())
-                {
-                    case "activate":
-                        switch (state)
-                        {
-                            case "destruct":
-                                var warheads = GetBlocks<IMyWarhead>(w => GetConfig(w).IsA(Function.SelfDestruct) && w.IsFunctional);
-                                if (!warheads.Any())
-                                {
-                                    Echo("WARNING: Self Destruct is unavailable.");
-                                }
-                                break;
-                        }
-
-                        if (!String.IsNullOrWhiteSpace(state))
-                            SelfStorage.AddValue("custom-states", state);
-                        return;
-
-                    case "deactivate":
-                        if (!String.IsNullOrWhiteSpace(state))
-                            SelfStorage.ClearValue("custom-states", state);
-                        return;
-
-
-                    case "toggle":
-                        if (SelfStorage.GetValues("custom-states").Contains(state))
-                        {
-                            Flags("deactivate " + state);
-                        }
-                        else
-                        {
-                            Flags("activate " + state);
-                        }
-                        return;
-
-                    case "reset":
-                        if (arguments.ElementAtOrDefault(1) == "confirm")
-                        {
-                            var styler = new DefaultStyler(Me);
-                            foreach (var block in GetBlocksOfType<IMyTerminalBlock>())
-                            {
-                                ClearStates(block);
-                                styler.Style(block, GridStorage);
-                            }
-
-                            Storage = "";
-                            GetConfig(Me).ClearValue("custom-states");
-                        }
-                        else
-                        {
-                            Echo("You must confirm this action - using it will break block states for any zone not accurately stored.");
-                        }
-                        return;
-
-                    case "customize":
-                        switch (arguments.ElementAtOrDefault(1))
-                        {
-                            case "":
-                            case "preserve":
-                                Echo("Writing default styler settings to the Programmable Block CustomData attribute (preserving existing).");
-
-                                foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
-                                {
-                                    if (!SelfStorage.ContainsKey(styler.Key))
-                                    {
-                                        SelfStorage.SetValue(styler.Key, styler.Value);
-                                    }
-                                }
-                                break;
-                            case "overwrite":
-                                Echo("Writing default styler settings to the Programmable Block CustomData attribute (overwriting existing).");
-
-                                foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
-                                {
-                                    SelfStorage.SetValue(styler.Key, styler.Value);
-                                }
-                                break;
-                            case "reset":
-                                SelfStorage.Clear();
-
-                                foreach (var styler in BaseStyler.DefaultStyles.OrderBy(s => s.Key))
-                                {
-                                    SelfStorage.SetValue(styler.Key, styler.Value);
-                                }
-                                break;
-                        }
-                        break;
-
-                    case "grouptozone":
-                        {
-                            var args = String.Join(" ", arguments.Skip(1)).Split(';');
-                            if (args.Count() != 2)
-                            {
-                                Echo("grouptozone failed: Incorrect argument count.");
-                                break;
-                            }
-
-                            var group = args.ElementAt(0);
-                            var zone = args.ElementAt(1);
-
-                            var blockGroup = GridTerminalSystem.GetBlockGroupWithName(group);
-
-                            if (blockGroup == default(IMyBlockGroup))
-                            {
-                                Echo($"grouptozone failed: Group \"{group}\" was not found.");
-                                return;
-                            }
-
-                            var blocks = new List<IMyTerminalBlock>();
-                            blockGroup.GetBlocks(blocks);
-
-                            foreach (var block in blocks)
-                            {
-                                GetConfig(block).AddValue("zones", zone);
-                            }
-
-                            Echo($"Added {blocks.Count} blocks to zone {zone}.");
-                        }
-                        break;
-                        
-                    case "grouptofunction":
-                        {
-                            var args = String.Join(" ", arguments.Skip(1)).Split(';');
-                            if (args.Count() != 2)
-                            {
-                                Echo("grouptofunction failed: Incorrect argument count.");
-                                break;
-                            }
-
-                            var group = args.ElementAt(0);
-                            var function = args.ElementAt(1);
-
-                            var blockGroup = GridTerminalSystem.GetBlockGroupWithName(group);
-
-                            if (blockGroup == default(IMyBlockGroup))
-                            {
-                                Echo($"grouptofunction failed: Group \"{group}\" was not found.");
-                                return;
-                            }
-
-                            var blocks = new List<IMyTerminalBlock>();
-                            blockGroup.GetBlocks(blocks);
-
-                            foreach (var block in blocks)
-                            {
-                                GetConfig(block).AddValue("functions", function);
-                            }
-
-                            Echo($"Added {function} to {blocks.Count} blocks.");
-                        }
-                        break;
-                }
-            }
-        }
-
-        void Tick()
-        {
-            Echo($"Running tick.");
-            // Only check air vents if pressurization is enabled.
-            var pressure = GetBlocks<IMyAirVent>().FirstOrDefault(v => v.PressurizationEnabled) != default(IMyAirVent);
-            var batteries = GetBlocks<IMyBatteryBlock>().Any();
-            var zones = GetZones();
-
-            Echo($"Found {zones.Count()} zones.");
-
-            try
-            {
-                foreach (var zone in zones)
-                {
-                    Echo($"Checking Zone \"{zone}\" for new triggers.");
-
-                    if (pressure)
+                case "activate":
+                    switch (words.ElementAtOrDefault(1).ToLower())
                     {
-                        TestAirVents(zone);
+                        case "battle":
+                            GridState |= EntityState.Battle;
+                            break;
+                        case "destruct":
+                            GridState |= EntityState.Destruct;
+                            break;
                     }
-
-                    TestSensors(zone);
-                    TestInteriorWeapons(zone);
-                }
-
-                if (batteries)
-                {
-                    TestLowPower();
-                }
-
-                TestSelfDestruct();
-                TestBattleStations();
-
-                ApplyBlockStates();
-            }
-            catch (Exception e)
-            {
-                Echo("Exception: " + e.Message + "\n" + e.StackTrace);                    
-            }
-        }
-
-        List<IMyTextPanel> DebugPanels;
-
-        /// <summary>
-        /// Output the provided message to the Programmable Block debug UI and any other LCDs with the "debug lcd" function enabled.
-        /// </summary>
-        /// <param name="message"></param>
-        void Output(String message)
-        {
-            message = $"[{DateTime.Now:HH:mm:ss}] {message}";
-            Log(message);
-
-            if (DebugPanels == null)
-            {
-                DebugPanels = new List<IMyTextPanel>();
-                GridTerminalSystem.GetBlocksOfType(DebugPanels, p => GetConfig(p).IsA("debug lcd"));
-                Echo($"[{DateTime.Now:HH:mm:ss}] Found {DebugPanels.Count} Debug LCD panels.");
-            }
-            var text = "";
-
-            foreach (var lcd in DebugPanels)
-            {
-                lcd.WritePublicTitle("ShipSystemsManager Diagnostics");
-                lcd.FontSize = 0.5f;
-                lcd.Font = "DEBUG";
-
-                if (text == "")
-                {
-                    // Do scrolling logic only once.
-                    var lines = lcd.GetPublicText().Split('\n').ToList();
-                    if (lines.Count > 32)
+                    break;
+                case "deactivate":
+                    switch (words.ElementAtOrDefault(1).ToLower())
                     {
-                        lines.RemoveAt(0);
+                        case "battle":
+                            GridState &= ~EntityState.Battle;
+                            break;
+                        case "destruct":
+                            GridState &= ~EntityState.Destruct;
+                            break;
                     }
-                    lines.Add(message);
-                    text = String.Join("\n", lines);
-                }
+                    break;
+                case "toggle":
+                    switch (words.ElementAtOrDefault(1).ToLower())
+                    {
+                        case "battle":
+                            if (GridState.HasFlag(EntityState.Battle))
+                            {
+                                GridState &= ~EntityState.Battle;
+                            }
+                            else
+                            {
+                                GridState |= EntityState.Battle;
+                            }
+                            break;
+                        case "destruct":
+                            if (GridState.HasFlag(EntityState.Destruct))
+                            {
+                                GridState &= ~EntityState.Destruct;
+                            }
+                            else
+                            {
+                                GridState |= EntityState.Destruct;
+                            }
+                            break;
+                    }
+                    break;
+                case "set":
+                    switch (words.ElementAtOrDefault(1).ToLower())
+                    {
+                        case "lowpower":
+                            var value = words.ElementAtOrDefault(2);
+                            var parsed = PowerThreshold;
 
-                lcd.WritePublicText(text);
+                            if (Double.TryParse(value, out parsed) && parsed > 0 && parsed < 1)
+                            {
+                                PowerThreshold = parsed;
+                                Echo($"Low power threshold has been set to {parsed}.");
+                            }
+                            else
+                            {
+                                Echo($"Low power threshold must be a decimal value between 0 and 1.");
+                            }
+                            break;
+                    }
+                    break;
             }
         }
-
-        void ApplyBlockStates()
-        {
-            foreach (var block in GetBlocks<IMyTerminalBlock>().Where(b => GridStorage.Get(BlockKey(b), "state-changed").ToBoolean()))
-            {
-                var states = GetStates(block);
-                var styler = StatePriority.FirstOrDefault(s => states.Contains(s.State));
-
-                if (styler == default(BaseStyler))
-                {
-                    styler = new DefaultStyler(Me);
-                }
-
-                styler.Style(block, GridStorage);
-                GridStorage.Set(BlockKey(block), "state-changed", false);
-            }
-        }
-
-        IEnumerable<T> GetBlocks<T>(Func<T, Boolean> collect = null)
-            where T : class, IMyTerminalBlock => GetBlocksOfType(collect);
-
-
-        String BlockKey(IMyTerminalBlock block) => "Entity " + block.EntityId;
-
-        IEnumerable<String> GetStates(IMyTerminalBlock block)
-            => GridStorage.Get(BlockKey(block), States).ToString().Split('\n').Where(s => s != "");
-
-        void SetStates(IMyTerminalBlock block, params String[] states)
-        {
-            var current = GetStates(block).ToList();
-            var concat = current.Concat(states).Distinct();
-
-            if (concat.Count() != current.Count)
-            {
-                GridStorage.Set(BlockKey(block), States, String.Join("\n", concat));
-                GridStorage.Set(BlockKey(block), "state-changed", true);
-            }
-        }
-
-        void ClearStates(IMyTerminalBlock block, params String[] states)
-        {
-            var current = GetStates(block).ToList();
-            var removed = current.RemoveAll(c => states.Contains(c));
-
-            if (removed > 0)
-            {
-                GridStorage.Set(BlockKey(block), States, String.Join("\n", current));
-                GridStorage.Set(BlockKey(block), "state-changed", true);
-            }
-        }
-
-        void SetStates(IEnumerable<IMyTerminalBlock> blocks, params String[] states)
-        {
-            foreach (var block in blocks)
-                SetStates(block, states);
-        }
-
-        void ClearStates(IEnumerable<IMyTerminalBlock> blocks, params String[] states)
-        {
-            foreach (var block in blocks)
-                ClearStates(block, states);
-        }
-
-        MyConfig GetConfig(IMyTerminalBlock block)
-        {
-            if (!EntityStorage.ContainsKey(block.EntityId))
-                EntityStorage.Add(block.EntityId, new MyConfig(block));
-
-            return EntityStorage[block.EntityId];
-        }
-
-
-        public IEnumerable<T> GetBlocksOfType<T>(Func<T, Boolean> collect = null)
-            where T : class, IMyTerminalBlock
-        {
-            var result = new List<T>();
-            GridTerminalSystem.GetBlocksOfType(result, collect);
-            return result;
-        }
-
-        public IEnumerable<T> GetZoneBlocks<T>(String zone, Boolean all = false)
-            where T : class, IMyTerminalBlock => GetBlocksOfType<T>(b => (b.IsWorking || all) && GetConfig(b).InZone(zone));
-
-        public IEnumerable<T> GetZoneBlocksByFunction<T>(String zone, String function, Boolean all = false)
-            where T : class, IMyTerminalBlock => GetZoneBlocks<T>(zone, all).Where(b => GetConfig(b).IsA(function));
-
-        public IEnumerable<String> GetZones() => GetBlocksOfType<IMyTerminalBlock>().SelectMany(b => GetConfig(b).GetZones()).Distinct();
-
-        public Boolean AdjacentZonesTest<T>(Func<T, Boolean> test, params String[] zones)
-            where T : class, IMyTerminalBlock => GetBlocksOfType<T>(v => GetConfig(v).InAnyZone(zones)).All(test);
     }
 }
