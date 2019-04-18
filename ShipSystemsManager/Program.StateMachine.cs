@@ -15,16 +15,16 @@ namespace IngameScript
         private IEnumerator<Int32> StateMachineExecutor()
         {
             Echo("Starting cycle.");
+
+            var textSurface = Me.GetSurface(0);
+            textSurface.ContentType = ContentType.TEXT_AND_IMAGE;
+            textSurface.Font = "Monospace";
+            textSurface.ClearImagesFromSelection();
+
             yield return 0;
 
             Echo("Restoring global statuses.");
             Configuration = new MyIni();
-
-            var textSurface = Me.GetSurface(0);
-            textSurface.ContentType = ContentType.TEXT_AND_IMAGE;
-            textSurface.FontSize = 0.5f;
-            textSurface.Font = "Monospace";
-            textSurface.TextPadding = 5;
 
             if (Configuration.TryParse(Storage))
             {
@@ -192,6 +192,9 @@ namespace IngameScript
 
                 yield return 7;
             }
+
+            textSurface.AddImageToSelection("Offline");            
+            yield break;
         }
 
         private IEnumerable<Block<IMyTerminalBlock>> GetGridBlocks()

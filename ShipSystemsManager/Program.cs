@@ -26,7 +26,7 @@ namespace IngameScript
         {
             Echo = message => { };
             StateMachine = StateMachineExecutor();
-            Runtime.UpdateFrequency |= UpdateFrequency.Once;
+            QueueOnce();
         }
 
         public void Main(String argument, UpdateType updateType)
@@ -46,15 +46,16 @@ namespace IngameScript
             if (StateMachine.MoveNext())
             {
                 Echo($"Executed cycle {CurrentTick}.");
-                Runtime.UpdateFrequency |= UpdateFrequency.Once;
+                QueueOnce();
             }
             else
             {
                 Echo($"State machine has entered a stop state.");
-                StateMachine.Dispose();
-                StateMachine = null;
+                StateMachine.Reset();
             }
         }
+
+        private void QueueOnce() => Runtime.UpdateFrequency |= UpdateFrequency.Once;
 
         private void ParseCommand(String argument)
         {
@@ -68,7 +69,7 @@ namespace IngameScript
                     {
                         case "":
                             Execute = true;
-                            Runtime.UpdateFrequency |= UpdateFrequency.Once;
+                            QueueOnce();
                             break;
                         case "battle":
                             GridState |= EntityState.Battle;
@@ -83,7 +84,6 @@ namespace IngameScript
                     {
                         case "":
                             Execute = false;
-                            Runtime.UpdateFrequency |= ~UpdateFrequency.Once;
                             break;
                         case "battle":
                             GridState &= ~EntityState.Battle;
@@ -100,12 +100,11 @@ namespace IngameScript
                             if (Execute)
                             {
                                 Execute = false;
-                                Runtime.UpdateFrequency |= ~UpdateFrequency.Once;
                             }
                             else
                             {
                                 Execute = true;
-                                Runtime.UpdateFrequency |= UpdateFrequency.Once;
+                                QueueOnce();
                             }
                             break;
                         case "battle":
