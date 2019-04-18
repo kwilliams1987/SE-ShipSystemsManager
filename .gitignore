@@ -4,7 +4,7 @@
 
 /ShipSystemsManager/bin
 /ShipSystemsManager/obj
-/ShipSystemsManager/MDK.option
 **/bin
 **/obj
 /.vs
+MDK.*.props
