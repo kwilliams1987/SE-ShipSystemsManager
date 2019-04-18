@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlockExtensions.cs" />
+    <Compile Include="GlobalSuppressions.debug.cs" />
     <Compile Include="MDK\Bootstrapper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Program.Model.cs">
