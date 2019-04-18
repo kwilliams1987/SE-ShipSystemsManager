@@ -17,8 +17,30 @@ namespace IngameScript
             public static readonly Color Black = new Color(0, 0, 0);
         }
 
-        private class Block<T>
-            where T: IMyTerminalBlock
+        private interface IBlockConfiguration
+        {
+            Boolean HasConfig { get; }
+            Boolean HasStyle { get; }
+
+            void Save();
+
+            void SetStyle(String key, Single value);
+            void SetStyle(String key, Boolean value);
+            void SetStyle(String key, String value);
+            void SetStyle(String key, UInt32 value);
+            void SetStyle(String key, Color value);
+
+            Single GetSingleStyle(String key, Single defaultValue = 0);
+            Boolean GetBooleanStyle(String key, Boolean defaultValue = false);
+            String GetStringStyle(String key, String defaultValue = "");
+            UInt32 GetUInt32Style(String key, UInt32 defaultValue = 0);
+            Color GetColorStyle(String key, Color? defaultValue = null);
+            TEnumType GetEnumStyle<TEnumType>(String key, TEnumType? defaultValue = null)
+                where TEnumType : struct;
+        }
+
+        private class Block<T> : IBlockConfiguration
+            where T : IMyTerminalBlock
         {
             public T Target { get; }
             public IEnumerable<String> Zones { get; }
@@ -59,20 +81,20 @@ namespace IngameScript
 
             public void Save() => Target.CustomData = Configuration.ToString();
 
-            internal void SetStyle(String key, Single value) => Configuration.Set(IniStyleSection, key, value);
-            internal void SetStyle(String key, Boolean value) => Configuration.Set(IniStyleSection, key, value);
-            internal void SetStyle(String key, String value) => Configuration.Set(IniStyleSection, key, value);
-            internal void SetStyle(String key, UInt32 value) => Configuration.Set(IniStyleSection, key, value);
-            internal void SetStyle(String key, Color value) => Configuration.Set(IniStyleSection, key, value.PackedValue);
+            public void SetStyle(String key, Single value) => Configuration.Set(IniStyleSection, key, value);
+            public void SetStyle(String key, Boolean value) => Configuration.Set(IniStyleSection, key, value);
+            public void SetStyle(String key, String value) => Configuration.Set(IniStyleSection, key, value);
+            public void SetStyle(String key, UInt32 value) => Configuration.Set(IniStyleSection, key, value);
+            public void SetStyle(String key, Color value) => Configuration.Set(IniStyleSection, key, value.PackedValue);
 
-            internal Single GetSingleStyle(String key, Single defaultValue = 0) => Configuration.Get(IniStyleSection, key).ToSingle(defaultValue);
-            internal Boolean GetBooleanStyle(String key, Boolean defaultValue = false) => Configuration.Get(IniStyleSection, key).ToBoolean(defaultValue);
-            internal String GetStringStyle(String key, String defaultValue = "") => Configuration.Get(IniStyleSection, key).ToString(defaultValue);
-            internal UInt32 GetUInt32Style(String key, UInt32 defaultValue = 0) => Configuration.Get(IniStyleSection, key).ToUInt32(defaultValue);
-            internal Color GetColorStyle(String key, Color? defaultValue = null)
+            public Single GetSingleStyle(String key, Single defaultValue = 0) => Configuration.Get(IniStyleSection, key).ToSingle(defaultValue);
+            public Boolean GetBooleanStyle(String key, Boolean defaultValue = false) => Configuration.Get(IniStyleSection, key).ToBoolean(defaultValue);
+            public String GetStringStyle(String key, String defaultValue = "") => Configuration.Get(IniStyleSection, key).ToString(defaultValue);
+            public UInt32 GetUInt32Style(String key, UInt32 defaultValue = 0) => Configuration.Get(IniStyleSection, key).ToUInt32(defaultValue);
+            public Color GetColorStyle(String key, Color? defaultValue = null)
                 => new Color(Configuration.Get(IniStyleSection, key).ToUInt32(defaultValue.GetValueOrDefault(Colors.Black).PackedValue));
-            internal TEnumType GetEnumStyle<TEnumType>(String key, TEnumType? defaultValue = null)
-                where TEnumType: struct
+            public TEnumType GetEnumStyle<TEnumType>(String key, TEnumType? defaultValue = null)
+                where TEnumType : struct
             {
                 if (!defaultValue.HasValue)
                     defaultValue = default(TEnumType);
@@ -80,9 +102,9 @@ namespace IngameScript
                 var value = Configuration.Get(IniStyleSection, key).ToString();
 
                 if (String.IsNullOrWhiteSpace(value))
-                    return (TEnumType) defaultValue;
+                    return (TEnumType)defaultValue;
 
-                return (TEnumType) Enum.Parse(typeof(TEnumType), value);
+                return (TEnumType)Enum.Parse(typeof(TEnumType), value);
             }
         }
 

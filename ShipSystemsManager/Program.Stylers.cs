@@ -52,6 +52,34 @@ namespace IngameScript
                 return true;
             }
 
+            if (block.Target is IMyTextSurfaceProvider)
+            {
+                var provider = block.Target as IMyTextSurfaceProvider;
+                var i = 0;
+
+                while (i < provider.SurfaceCount)
+                {
+                    var function = block.GetEnumStyle<BlockFunction>($"Surface {i} Function", BlockFunction.None);
+                    if (function.HasFlag(BlockFunction.Alert))
+                    {
+                        SaveAndApply(block, provider.GetSurface(i), i, surface =>
+                        {
+                            surface.Font = "Debug";
+                            surface.FontColor = Colors.Blue;
+                            surface.BackgroundColor = Colors.Black;
+                            surface.Alignment = TextAlignment.CENTER;
+
+                            if (surface.IsWideScreen())
+                                surface.WriteAndScaleText("DECOMPRESSION");
+                            else
+                                surface.WriteAndScaleText("DECOMPRESSION\nDO NOT ENTER");
+                        });
+                    }
+                }
+
+                return true;
+            }
+
             if (typeof(T) == typeof(IMyLightingBlock) && block.Functions.HasFlag(BlockFunction.Alert))
             {
                 SaveAndApply(block as Block<IMyLightingBlock>, lightingBlock =>
@@ -125,6 +153,45 @@ namespace IngameScript
                     return true;
                 }
 
+                if (block.Target is IMyTextSurfaceProvider)
+                {
+                    var timer = TimeSpan.FromSeconds(countdown);
+                    var text = "SELF DESTRUCT{0}";
+
+                    if (timer.TotalMinutes < 1)
+                        text += $"{timer:ss.fffffff}";
+                    else
+                        text += $"{timer:mm:ss}";
+
+                    var provider = block.Target as IMyTextSurfaceProvider;
+                    var i = 0;
+
+                    while (i < provider.SurfaceCount)
+                    {
+                        var function = block.GetEnumStyle<BlockFunction>($"Surface {i} Function", BlockFunction.None);
+                        if (function.HasFlag(BlockFunction.Alert))
+                        {
+                            SaveAndApply(block, provider.GetSurface(i), i, surface =>
+                            {
+                                if (surface.IsWideScreen())
+                                    text = text.Replace("{0}", ": ");
+                                else
+                                    text = text.Replace("{0}", "\n\n");
+
+                                surface.Font = "Debug";
+                                surface.FontColor = Colors.Red;
+                                surface.BackgroundColor = Colors.Black;
+                                surface.Alignment = TextAlignment.CENTER;
+                                surface.TextPadding = 10f;
+
+                                surface.WriteAndScaleText(text);
+                            });
+                        }
+                    }
+
+                    return true;
+                }
+
                 if (typeof(T) == typeof(IMyLightingBlock) && block.Functions.HasFlag(BlockFunction.Alert))
                 {
                     SaveAndApply(block as Block<IMyLightingBlock>, lightingBlock =>
@@ -185,6 +252,35 @@ namespace IngameScript
                 return true;
             }
 
+            if (block.Target is IMyTextSurfaceProvider)
+            {
+                var provider = block.Target as IMyTextSurfaceProvider;
+                var i = 0;
+
+                while (i < provider.SurfaceCount)
+                {
+                    var function = block.GetEnumStyle<BlockFunction>($"Surface {i} Function", BlockFunction.None);
+                    if (function.HasFlag(BlockFunction.Alert))
+                    {
+                        SaveAndApply(block, provider.GetSurface(i), i, surface =>
+                        {
+                            surface.Font = "Debug";
+                            surface.FontColor = Colors.Red;
+                            surface.BackgroundColor = Colors.Black;
+                            surface.Alignment = TextAlignment.CENTER;
+                            surface.TextPadding = 10f;
+
+                            if (surface.IsWideScreen())
+                                surface.WriteAndScaleText("BATTLE STATIONS");
+                            else
+                                surface.WriteAndScaleText("BATTLE\nSTATIONS");
+                        });
+                    }
+                }
+
+                return true;
+            }
+
             if (typeof(T) == typeof(IMyLightingBlock) && block.Functions.HasFlag(BlockFunction.Alert))
             {
                 SaveAndApply(block as Block<IMyLightingBlock>, lightingBlock =>
@@ -231,6 +327,35 @@ namespace IngameScript
                     else
                         textPanel.WriteAndScaleText("INTRUDER\nALERT");
                 });
+
+                return true;
+            }
+
+            if (block.Target is IMyTextSurfaceProvider)
+            {
+                var provider = block.Target as IMyTextSurfaceProvider;
+                var i = 0;
+
+                while (i < provider.SurfaceCount)
+                {
+                    var function = block.GetEnumStyle<BlockFunction>($"Surface {i} Function", BlockFunction.None);
+                    if (function.HasFlag(BlockFunction.Alert))
+                    {
+                        SaveAndApply(block, provider.GetSurface(i), i, surface =>
+                        {
+                            surface.Font = "Debug";
+                            surface.FontColor = Colors.Orange;
+                            surface.BackgroundColor = Colors.Black;
+                            surface.Alignment = TextAlignment.CENTER;
+                            surface.TextPadding = 10f;
+
+                            if (surface.IsWideScreen())
+                                surface.WriteAndScaleText("INTRUDER");
+                            else
+                                surface.WriteAndScaleText("INTRUDER\nALERT");
+                        });
+                    }
+                }
 
                 return true;
             }
@@ -321,6 +446,19 @@ namespace IngameScript
                 return;
             }
 
+            if (block.Target is IMyTextSurfaceProvider)
+            {
+                var provider = block.Target as IMyTextSurfaceProvider;
+                var i = 0;
+                while (i < provider.SurfaceCount)
+                {
+                    Restore(block, provider.GetSurface(i), i, null);
+                    i++;
+                }
+
+                then?.Invoke(block.Target);
+            }
+
             if (typeof(T) == typeof(IMyLightingBlock))
             {
                 Restore(block as Block<IMyLightingBlock>, then as Action<IMyLightingBlock>);
@@ -366,17 +504,27 @@ namespace IngameScript
         {
             if (!textPanel.HasStyle)
             {
-                textPanel.SetStyle("Text", textPanel.Target.GetText());
                 textPanel.SetStyle(nameof(IMyTextPanel.Enabled), textPanel.Target.Enabled);
-                textPanel.SetStyle(nameof(IMyTextPanel.FontSize), textPanel.Target.FontSize);
-                textPanel.SetStyle(nameof(IMyTextPanel.Font), textPanel.Target.Font);
-                textPanel.SetStyle(nameof(IMyTextPanel.Alignment), textPanel.Target.Alignment.ToString());
-                textPanel.SetStyle(nameof(IMyTextPanel.FontColor), textPanel.Target.FontColor);
-                textPanel.SetStyle(nameof(IMyTextPanel.BackgroundColor), textPanel.Target.BackgroundColor);
-                textPanel.SetStyle(nameof(IMyTextPanel.ContentType), textPanel.Target.ContentType.ToString());
             }
 
-            action(textPanel.Target);
+            SaveAndApply(textPanel, textPanel.Target, 0, action);
+        }
+
+        private void SaveAndApply<T>(IBlockConfiguration provider, T surface, Int32 index, Action<T> action = null)
+            where T : IMyTextSurface
+        {
+            if (!provider.HasStyle)
+            {
+                provider.SetStyle($"Surface {index} Text", surface.GetText());
+                provider.SetStyle($"Surface {index} {nameof(IMyTextSurface.FontSize)}", surface.FontSize);
+                provider.SetStyle($"Surface {index} {nameof(IMyTextSurface.Font)}", surface.Font);
+                provider.SetStyle($"Surface {index} {nameof(IMyTextSurface.Alignment)}", surface.Alignment.ToString());
+                provider.SetStyle($"Surface {index} {nameof(IMyTextSurface.FontColor)}", surface.FontColor);
+                provider.SetStyle($"Surface {index} {nameof(IMyTextSurface.BackgroundColor)}", surface.BackgroundColor);
+                provider.SetStyle($"Surface {index} {nameof(IMyTextSurface.ContentType)}", surface.ContentType.ToString());
+            }
+
+            action?.Invoke(surface);
         }
 
         private void SaveAndApply(Block<IMyLightingBlock> lightingBlock, Action<IMyLightingBlock> action)
@@ -395,7 +543,6 @@ namespace IngameScript
 
             action(lightingBlock.Target);
         }
-
 
         private void SaveAndApply(Block<IMyDoor> door, Action<IMyDoor> action)
         {
@@ -457,16 +604,24 @@ namespace IngameScript
 
         private void Restore(Block<IMyTextPanel> textPanel, Action<IMyTextPanel> then = null)
         {
+            Restore(textPanel, textPanel.Target, 0);
             textPanel.Target.Enabled = textPanel.GetBooleanStyle(nameof(IMyTextPanel.Enabled), true);
-            textPanel.Target.WriteText(textPanel.GetStringStyle("Text"));
-            textPanel.Target.FontSize = textPanel.GetSingleStyle(nameof(IMyTextPanel.FontSize), 1f);
-            textPanel.Target.Font = textPanel.GetStringStyle(nameof(IMyTextPanel.Font), "Debug");
-            textPanel.Target.Alignment = textPanel.GetEnumStyle<TextAlignment>(nameof(IMyTextPanel.Alignment), TextAlignment.LEFT);
-            textPanel.Target.FontColor = textPanel.GetColorStyle(nameof(IMyTextPanel.FontColor), Colors.White);
-            textPanel.Target.BackgroundColor = textPanel.GetColorStyle(nameof(IMyTextPanel.BackgroundColor));
-            textPanel.Target.ContentType = textPanel.GetEnumStyle<ContentType>(nameof(IMyTextPanel.ContentType));
 
             then?.Invoke(textPanel.Target);
+        }
+
+        private void Restore<T>(IBlockConfiguration provider, T surface, Int32 index, Action<T> action = null)
+            where T : IMyTextSurface
+        {
+            surface.WriteText(provider.GetStringStyle($"Surface {index} Text"));
+            surface.FontSize = provider.GetSingleStyle($"Surface {index} {nameof(IMyTextSurface.FontSize)}", 1);
+            surface.Font = provider.GetStringStyle($"Surface {index} {nameof(IMyTextSurface.Font)}", "Debug");
+            surface.Alignment = provider.GetEnumStyle<TextAlignment>($"Surface {index} {nameof(IMyTextSurface.Alignment)}", TextAlignment.LEFT);
+            surface.FontColor = provider.GetColorStyle($"Surface {index} {nameof(IMyTextSurface.FontColor)}", Colors.White);
+            surface.BackgroundColor = provider.GetColorStyle($"Surface {index} {nameof(IMyTextSurface.BackgroundColor)}", Colors.Black);
+            surface.ContentType = provider.GetEnumStyle<ContentType>($"Surface {index} {nameof(IMyTextSurface.ContentType)}", ContentType.NONE);
+
+            action?.Invoke(surface);
         }
 
         private void Restore(Block<IMyLightingBlock> lightingBlock, Action<IMyLightingBlock> then = null)

@@ -1,5 +1,4 @@
 ﻿// <mdk sortorder="2" />
-#pragma warning disable S112
 using Sandbox.ModAPI.Ingame;
 using System.Linq;
 using System;
@@ -12,9 +11,7 @@ namespace IngameScript
         public const String IniSection = "SSM Configuration";
         public const String IniStyleSection = "SSM Original Style";
 
-#pragma warning disable S3925
         public class BreakpointException : Exception { }
-#pragma warning disable S3925
 
         public Int32 CurrentTick => StateMachine?.Current ?? -1;
 
