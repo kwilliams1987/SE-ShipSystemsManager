@@ -47,6 +47,7 @@ namespace IngameScript
 
                 Configuration.Set(ConfigSection, nameof(GridState), Convert.ToInt32(GridState));
                 Configuration.Set(ConfigSection, nameof(PowerThreshold), PowerThreshold);
+                Configuration.Set(ConfigSection, nameof(Countdown), Countdown);
 
                 Storage = Configuration.ToString();
             }
