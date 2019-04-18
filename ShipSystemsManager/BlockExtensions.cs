@@ -35,28 +35,29 @@ namespace IngameScript
             }
         }
 
-        public static void WriteAndScaleText(this IMyTextSurface textSurface, String text)
+        public static void WriteAndScaleText(this IMyTextSurface textSurface, StringBuilder textBuilder)
         {
             if (textSurface.ContentType != ContentType.TEXT_AND_IMAGE)
                 return;
 
-            var textBuilder = new StringBuilder(text);
-            var width = textSurface.SurfaceSize.X - textSurface.TextPadding;
-            var height = textSurface.SurfaceSize.Y - textSurface.TextPadding;
+            var width = textSurface.SurfaceSize.X * (100 - textSurface.TextPadding * 2) / 100;
+            var height = textSurface.SurfaceSize.Y * (100 - textSurface.TextPadding * 2) / 100;
 
             var fontSize = 10f;
-
             var size = textSurface.MeasureStringInPixels(textBuilder, textSurface.Font, fontSize);
 
             while (width < size.X || height < size.Y)
             {
-                fontSize = fontSize * 0.9f;
+                fontSize = fontSize * 0.95f;
                 size = textSurface.MeasureStringInPixels(textBuilder, textSurface.Font, fontSize);
             }
 
             textSurface.FontSize = fontSize;
-            textSurface.WriteText(text);
+            textSurface.WriteText(textBuilder);
         }
+
+        public static void WriteAndScaleText(this IMyTextSurface textSurface, String text)
+            => WriteAndScaleText(textSurface, new StringBuilder(text));
 
         public static Boolean IsWideScreen(this IMyTextSurface textSurface) 
             => textSurface.SurfaceSize.X > textSurface.SurfaceSize.Y * 1.5;
@@ -101,6 +102,18 @@ namespace IngameScript
                         door.Enabled = enabled;
                     }
                     break;
+            }
+        }
+
+        public static void ForEachSurface(this IMyTextSurfaceProvider surfaceProvider, Action<IMyTextSurface, Int32> action)
+        {
+            var surfaces = surfaceProvider.SurfaceCount;
+            var i = 0;
+
+            while (i < surfaces)
+            {
+                action(surfaceProvider.GetSurface(i), i);
+                i++;
             }
         }
     }

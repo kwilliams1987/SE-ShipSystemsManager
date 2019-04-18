@@ -10,7 +10,7 @@ namespace IngameScript
     public partial class Program
     {
         private Boolean TestDecompression(String zone, IEnumerable<Block<IMyTerminalBlock>> blocks)
-            => blocks.OfType<Block<IMyAirVent>>().Select(b => b.Target).Any(v => v.IsFunctional && !v.CanPressurize);
+            => blocks.Select(b => b.Target).OfType<IMyAirVent>().Any(v => v.IsFunctional && !v.CanPressurize);
 
         private Boolean TestIntruder(String zone, IEnumerable<Block<IMyTerminalBlock>> blocks)
         {

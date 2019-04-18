@@ -317,7 +317,7 @@ namespace IngameScript.MDK
             Assert.True(config.TryParse(programmableBlock.Storage), "The Programmable Block storage was not parsable.");
 
             var state = 0;
-            config.Get(Program.IniSection, nameof(program.GridState)).TryGetInt32(out state);
+            config.Get(Program.ConfigSection, nameof(program.GridState)).TryGetInt32(out state);
             var stateEnum = (EntityState)state;
 
             //Assert.Equals("battle", new MyConfig(programmableBlock.Storage).GetValue("custom-states").ToString().Trim(), "Activating battle state did not have desired effect.");

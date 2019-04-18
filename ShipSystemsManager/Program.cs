@@ -1,4 +1,4 @@
-﻿// <mdk sortorder="2" />
+﻿// <mdk sortorder="0" />
 using Sandbox.ModAPI.Ingame;
 using System.Linq;
 using System;
@@ -8,8 +8,8 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        public const String IniSection = "SSM Configuration";
-        public const String IniStyleSection = "SSM Original Style";
+        public const String ConfigSection = "SSM Configuration";
+        public const String StyleSection = "SSM Original Style";
 
         public class BreakpointException : Exception { }
 
@@ -18,14 +18,13 @@ namespace IngameScript
         public EntityState GridState { get; private set; } = EntityState.Default;
         public Double PowerThreshold { get; private set; } = 0.1;
         public Single Countdown { get; private set; } = 300;
+        public Boolean Execute { get; private set; } = true;
 
         private IEnumerator<Int32> StateMachine { get; set; }
 
         public Program()
         {
-            var output = Echo;
-            Echo = message => output($"[{DateTime.Now:HH:mm:ss}] {message}");
-
+            Echo = message => { };
             StateMachine = StateMachineExecutor();
             Runtime.UpdateFrequency |= UpdateFrequency.Once;
         }
@@ -67,6 +66,10 @@ namespace IngameScript
                 case "activate":
                     switch (words.ElementAtOrDefault(1).ToLower())
                     {
+                        case "":
+                            Execute = true;
+                            Runtime.UpdateFrequency |= UpdateFrequency.Once;
+                            break;
                         case "battle":
                             GridState |= EntityState.Battle;
                             break;
@@ -78,6 +81,10 @@ namespace IngameScript
                 case "deactivate":
                     switch (words.ElementAtOrDefault(1).ToLower())
                     {
+                        case "":
+                            Execute = false;
+                            Runtime.UpdateFrequency |= ~UpdateFrequency.Once;
+                            break;
                         case "battle":
                             GridState &= ~EntityState.Battle;
                             break;
@@ -89,6 +96,18 @@ namespace IngameScript
                 case "toggle":
                     switch (words.ElementAtOrDefault(1).ToLower())
                     {
+                        case "":
+                            if (Execute)
+                            {
+                                Execute = false;
+                                Runtime.UpdateFrequency |= ~UpdateFrequency.Once;
+                            }
+                            else
+                            {
+                                Execute = true;
+                                Runtime.UpdateFrequency |= UpdateFrequency.Once;
+                            }
+                            break;
                         case "battle":
                             if (GridState.HasFlag(EntityState.Battle))
                             {

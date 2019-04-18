@@ -43,8 +43,8 @@ namespace IngameScript
             where T : IMyTerminalBlock
         {
             public T Target { get; }
-            public IEnumerable<String> Zones { get; }
-            public BlockFunction Functions { get; }
+            public IEnumerable<String> Zones { get; } = new List<String>();
+            public BlockFunction Functions { get; } = BlockFunction.None;
             public MyIni Configuration { get; }
 
             public Block(T block, MyIni config)
@@ -52,7 +52,7 @@ namespace IngameScript
                 Target = block;
                 Configuration = config;
 
-                var zoneConfig = config.Get(IniSection, "zones");
+                var zoneConfig = config.Get(ConfigSection, "zones");
                 if (!zoneConfig.IsEmpty)
                 {
                     var zones = new List<String>();
@@ -60,7 +60,7 @@ namespace IngameScript
                     Zones = zones;
                 }
 
-                var functionConfig = config.Get(IniSection, "functions");
+                var functionConfig = config.Get(ConfigSection, "functions");
                 if (!functionConfig.IsEmpty)
                 {
                     var functions = new List<String>();
@@ -76,30 +76,44 @@ namespace IngameScript
                 }
             }
 
-            public Boolean HasConfig => Configuration.ContainsSection(IniSection);
-            public Boolean HasStyle => Configuration.ContainsSection(IniStyleSection);
+            public Boolean HasConfig => Configuration.ContainsSection(ConfigSection);
+            public Boolean HasStyle => Configuration.ContainsSection(StyleSection);
 
             public void Save() => Target.CustomData = Configuration.ToString();
 
-            public void SetStyle(String key, Single value) => Configuration.Set(IniStyleSection, key, value);
-            public void SetStyle(String key, Boolean value) => Configuration.Set(IniStyleSection, key, value);
-            public void SetStyle(String key, String value) => Configuration.Set(IniStyleSection, key, value);
-            public void SetStyle(String key, UInt32 value) => Configuration.Set(IniStyleSection, key, value);
-            public void SetStyle(String key, Color value) => Configuration.Set(IniStyleSection, key, value.PackedValue);
+            public TEnumType GetEnumConfig<TEnumType>(String key, TEnumType? defaultValue = null)
+                where TEnumType: struct
+            {
+                if (!defaultValue.HasValue)
+                    defaultValue = default(TEnumType);
 
-            public Single GetSingleStyle(String key, Single defaultValue = 0) => Configuration.Get(IniStyleSection, key).ToSingle(defaultValue);
-            public Boolean GetBooleanStyle(String key, Boolean defaultValue = false) => Configuration.Get(IniStyleSection, key).ToBoolean(defaultValue);
-            public String GetStringStyle(String key, String defaultValue = "") => Configuration.Get(IniStyleSection, key).ToString(defaultValue);
-            public UInt32 GetUInt32Style(String key, UInt32 defaultValue = 0) => Configuration.Get(IniStyleSection, key).ToUInt32(defaultValue);
+                var value = Configuration.Get(ConfigSection, key).ToString();
+
+                if (String.IsNullOrWhiteSpace(value))
+                    return (TEnumType)defaultValue;
+
+                return (TEnumType)Enum.Parse(typeof(TEnumType), value);
+            }
+
+            public void SetStyle(String key, Single value) => Configuration.Set(StyleSection, key, value);
+            public void SetStyle(String key, Boolean value) => Configuration.Set(StyleSection, key, value);
+            public void SetStyle(String key, String value) => Configuration.Set(StyleSection, key, value);
+            public void SetStyle(String key, UInt32 value) => Configuration.Set(StyleSection, key, value);
+            public void SetStyle(String key, Color value) => Configuration.Set(StyleSection, key, value.PackedValue);
+
+            public Single GetSingleStyle(String key, Single defaultValue = 0) => Configuration.Get(StyleSection, key).ToSingle(defaultValue);
+            public Boolean GetBooleanStyle(String key, Boolean defaultValue = false) => Configuration.Get(StyleSection, key).ToBoolean(defaultValue);
+            public String GetStringStyle(String key, String defaultValue = "") => Configuration.Get(StyleSection, key).ToString(defaultValue);
+            public UInt32 GetUInt32Style(String key, UInt32 defaultValue = 0) => Configuration.Get(StyleSection, key).ToUInt32(defaultValue);
             public Color GetColorStyle(String key, Color? defaultValue = null)
-                => new Color(Configuration.Get(IniStyleSection, key).ToUInt32(defaultValue.GetValueOrDefault(Colors.Black).PackedValue));
+                => new Color(Configuration.Get(StyleSection, key).ToUInt32(defaultValue.GetValueOrDefault(Colors.Black).PackedValue));
             public TEnumType GetEnumStyle<TEnumType>(String key, TEnumType? defaultValue = null)
                 where TEnumType : struct
             {
                 if (!defaultValue.HasValue)
                     defaultValue = default(TEnumType);
 
-                var value = Configuration.Get(IniStyleSection, key).ToString();
+                var value = Configuration.Get(StyleSection, key).ToString();
 
                 if (String.IsNullOrWhiteSpace(value))
                     return (TEnumType)defaultValue;
@@ -117,7 +131,8 @@ namespace IngameScript
             Door = AirlockDoor | SecurityDoor,
             LowPower = 1 << 3,
             SelfDestruct = 1 << 4,
-            Alert = 1 << 5
+            Alert = 1 << 5,
+            Debugger = 1 << 6
         }
 
         [Flags]

@@ -11,21 +11,37 @@ namespace IngameScript
             where T : IMyTerminalBlock
         {
             if (StyleDecompression(block, states))
+            {
+                Echo("Decompression styles applied.");
                 return;
+            }
 
             if (StyleSelfDestruct(block, states, countdown))
+            {
+                Echo("Self Destruct styles applied.");
                 return;
+            }
 
             if (StyleIntruderAlert(block, states))
+            {
+                Echo("Intruder Alert styles applied.");
                 return;
+            }
 
             if (StyleBattleStations(block, states))
+            {
+                Echo("Battle Stations styles applied.");
                 return;
+            }
 
             if (StyleLowPower(block, states))
+            {
+                Echo("Low Power styles applied.");
                 return;
+            }
 
             StyleRestore(block);
+            Echo("Default styles applied.");
         }
 
         private Boolean StyleDecompression<T>(Block<T> block, EntityState states)
@@ -55,14 +71,13 @@ namespace IngameScript
             if (block.Target is IMyTextSurfaceProvider)
             {
                 var provider = block.Target as IMyTextSurfaceProvider;
-                var i = 0;
 
-                while (i < provider.SurfaceCount)
+                provider.ForEachSurface((surface, i) =>
                 {
-                    var function = block.GetEnumStyle<BlockFunction>($"Surface {i} Function", BlockFunction.None);
+                    var function = block.GetEnumConfig<BlockFunction>($"functions-{i}", BlockFunction.None);
                     if (function.HasFlag(BlockFunction.Alert))
                     {
-                        SaveAndApply(block, provider.GetSurface(i), i, surface =>
+                        SaveAndApply(block, surface, i, _ =>
                         {
                             surface.Font = "Debug";
                             surface.FontColor = Colors.Blue;
@@ -75,7 +90,7 @@ namespace IngameScript
                                 surface.WriteAndScaleText("DECOMPRESSION\nDO NOT ENTER");
                         });
                     }
-                }
+                });
 
                 return true;
             }
@@ -110,7 +125,7 @@ namespace IngameScript
         {
             if (states.HasFlag(EntityState.Destruct))
             {
-                if (typeof(T) == typeof(IMyWarhead) && block.Functions.HasFlag(BlockFunction.SelfDestruct))
+                if (countdown >= 0 && typeof(T) == typeof(IMyWarhead) && block.Functions.HasFlag(BlockFunction.SelfDestruct))
                 {
                     SaveAndApply(block as Block<IMyWarhead>, warhead =>
                     {
@@ -126,13 +141,20 @@ namespace IngameScript
 
                 if (typeof(T) == typeof(IMyTextPanel) && block.Functions.HasFlag(BlockFunction.Alert))
                 {
-                    var timer = TimeSpan.FromSeconds(countdown);
                     var text = "SELF DESTRUCT{0}";
+                    if (countdown >= 0)
+                    {
+                        var timer = TimeSpan.FromSeconds(countdown);
 
-                    if (timer.TotalMinutes < 1)
-                        text += $"{timer:ss.fffffff}";
+                        if (timer.TotalMinutes < 1)
+                            text += $"{timer:ss.fffffff}";
+                        else
+                            text += $"{timer:mm:ss}";
+                    }
                     else
-                        text += $"{timer:mm:ss}";
+                    {
+                        text += "UNAVAILABLE";
+                    }
 
                     SaveAndApply(block as Block<IMyTextPanel>, textPanel =>
                     {
@@ -155,23 +177,30 @@ namespace IngameScript
 
                 if (block.Target is IMyTextSurfaceProvider)
                 {
-                    var timer = TimeSpan.FromSeconds(countdown);
                     var text = "SELF DESTRUCT{0}";
+                    if (countdown >= 0)
+                    {
+                        var timer = TimeSpan.FromSeconds(countdown);
 
-                    if (timer.TotalMinutes < 1)
-                        text += $"{timer:ss.fffffff}";
+                        if (timer.TotalMinutes < 1)
+                            text += $"{timer:ss.fffffff}";
+                        else
+                            text += $"{timer:mm:ss}";
+                    }
                     else
-                        text += $"{timer:mm:ss}";
+                    {
+                        text += "UNAVAILABLE";
+                    }
 
                     var provider = block.Target as IMyTextSurfaceProvider;
                     var i = 0;
 
-                    while (i < provider.SurfaceCount)
+                    provider.ForEachSurface((surface, index) =>
                     {
-                        var function = block.GetEnumStyle<BlockFunction>($"Surface {i} Function", BlockFunction.None);
+                        var function = block.GetEnumConfig<BlockFunction>($"functions-{i}", BlockFunction.None);
                         if (function.HasFlag(BlockFunction.Alert))
                         {
-                            SaveAndApply(block, provider.GetSurface(i), i, surface =>
+                            SaveAndApply(block, surface, i, _ =>
                             {
                                 if (surface.IsWideScreen())
                                     text = text.Replace("{0}", ": ");
@@ -187,7 +216,7 @@ namespace IngameScript
                                 surface.WriteAndScaleText(text);
                             });
                         }
-                    }
+                    });
 
                     return true;
                 }
@@ -255,14 +284,13 @@ namespace IngameScript
             if (block.Target is IMyTextSurfaceProvider)
             {
                 var provider = block.Target as IMyTextSurfaceProvider;
-                var i = 0;
 
-                while (i < provider.SurfaceCount)
+                provider.ForEachSurface((surface, i) =>
                 {
-                    var function = block.GetEnumStyle<BlockFunction>($"Surface {i} Function", BlockFunction.None);
+                    var function = block.GetEnumConfig<BlockFunction>($"functions-{i}", BlockFunction.None);
                     if (function.HasFlag(BlockFunction.Alert))
                     {
-                        SaveAndApply(block, provider.GetSurface(i), i, surface =>
+                        SaveAndApply(block, surface, i, _ =>
                         {
                             surface.Font = "Debug";
                             surface.FontColor = Colors.Red;
@@ -276,7 +304,7 @@ namespace IngameScript
                                 surface.WriteAndScaleText("BATTLE\nSTATIONS");
                         });
                     }
-                }
+                });
 
                 return true;
             }
@@ -334,14 +362,13 @@ namespace IngameScript
             if (block.Target is IMyTextSurfaceProvider)
             {
                 var provider = block.Target as IMyTextSurfaceProvider;
-                var i = 0;
 
-                while (i < provider.SurfaceCount)
+                provider.ForEachSurface((surface, i) =>
                 {
-                    var function = block.GetEnumStyle<BlockFunction>($"Surface {i} Function", BlockFunction.None);
+                    var function = block.GetEnumConfig<BlockFunction>($"functions-{i}", BlockFunction.None);
                     if (function.HasFlag(BlockFunction.Alert))
                     {
-                        SaveAndApply(block, provider.GetSurface(i), i, surface =>
+                        SaveAndApply(block, surface, i, _ =>
                         {
                             surface.Font = "Debug";
                             surface.FontColor = Colors.Orange;
@@ -355,7 +382,7 @@ namespace IngameScript
                                 surface.WriteAndScaleText("INTRUDER\nALERT");
                         });
                     }
-                }
+                });
 
                 return true;
             }
@@ -434,53 +461,53 @@ namespace IngameScript
         private void StyleRestore<T>(Block<T> block, Action<T> then = null)
             where T : IMyTerminalBlock
         {
-            if (typeof(T) == typeof(IMyWarhead))
+            if (block.HasStyle)
             {
-                Restore(block as Block<IMyWarhead>, then as Action<IMyWarhead>);
-                return;
-            }
-
-            if (typeof(T) == typeof(IMyTextPanel))
-            {
-                Restore(block as Block<IMyTextPanel>, then as Action<IMyTextPanel>);
-                return;
-            }
-
-            if (block.Target is IMyTextSurfaceProvider)
-            {
-                var provider = block.Target as IMyTextSurfaceProvider;
-                var i = 0;
-                while (i < provider.SurfaceCount)
+                if (typeof(T) == typeof(IMyWarhead))
                 {
-                    Restore(block, provider.GetSurface(i), i, null);
-                    i++;
+                    Restore(block as Block<IMyWarhead>, then as Action<IMyWarhead>);
+                    return;
                 }
 
-                then?.Invoke(block.Target);
-            }
+                if (typeof(T) == typeof(IMyTextPanel))
+                {
+                    Restore(block as Block<IMyTextPanel>, then as Action<IMyTextPanel>);
+                    return;
+                }
 
-            if (typeof(T) == typeof(IMyLightingBlock))
-            {
-                Restore(block as Block<IMyLightingBlock>, then as Action<IMyLightingBlock>);
-                return;
-            }
+                if (block.Target is IMyTextSurfaceProvider)
+                {
+                    var provider = block.Target as IMyTextSurfaceProvider;
 
-            if (typeof(T) == typeof(IMyDoor))
-            {
-                Restore(block as Block<IMyDoor>, then as Action<IMyDoor>);
-                return;
-            }
+                    provider.ForEachSurface((surface, i) => Restore(block, surface, i));
 
-            if (typeof(T) == typeof(IMyAssembler))
-            {
-                Restore(block as Block<IMyAssembler>, then as Action<IMyAssembler>);
-                return;
-            }
+                    then?.Invoke(block.Target);
+                    return;
+                }
 
-            if (typeof(T) == typeof(IMyRefinery))
-            {
-                Restore(block as Block<IMyRefinery>, then as Action<IMyRefinery>);
-                return;
+                if (typeof(T) == typeof(IMyLightingBlock))
+                {
+                    Restore(block as Block<IMyLightingBlock>, then as Action<IMyLightingBlock>);
+                    return;
+                }
+
+                if (typeof(T) == typeof(IMyDoor))
+                {
+                    Restore(block as Block<IMyDoor>, then as Action<IMyDoor>);
+                    return;
+                }
+
+                if (typeof(T) == typeof(IMyAssembler))
+                {
+                    Restore(block as Block<IMyAssembler>, then as Action<IMyAssembler>);
+                    return;
+                }
+
+                if (typeof(T) == typeof(IMyRefinery))
+                {
+                    Restore(block as Block<IMyRefinery>, then as Action<IMyRefinery>);
+                    return;
+                }
             }
         }
 
