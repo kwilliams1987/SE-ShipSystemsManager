@@ -43,7 +43,7 @@ namespace IngameScript
             if (StateMachine == null)
                 return;
 
-            if (StateMachine.MoveNext())
+            if (Execute && StateMachine.MoveNext())
             {
                 Echo($"Executed cycle {CurrentTick}.");
                 QueueOnce();
