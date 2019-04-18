@@ -115,7 +115,6 @@ namespace IngameScript
             AirlockDoor = 1 << 0,
             SecurityDoor = 1 << 1,
             Door = AirlockDoor | SecurityDoor,
-            Battle = 1 << 2,
             LowPower = 1 << 3,
             SelfDestruct = 1 << 4,
             Alert = 1 << 5

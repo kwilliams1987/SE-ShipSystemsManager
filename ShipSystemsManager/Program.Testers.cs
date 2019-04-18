@@ -34,6 +34,9 @@ namespace IngameScript
 
         private Boolean TestLowPower(IEnumerable<Block<IMyTerminalBlock>> blocks)
         {
+            if (PowerThreshold <= 0)
+                return false;
+
             var batteries = blocks.OfType<Block<IMyBatteryBlock>>().Select(b => b.Target)
                     .Where(b => b.ChargeMode == ChargeMode.Auto || b.ChargeMode == ChargeMode.Discharge);
 

@@ -115,17 +115,31 @@ namespace IngameScript
                     switch (words.ElementAtOrDefault(1).ToLower())
                     {
                         case "lowpower":
-                            var value = words.ElementAtOrDefault(2);
-                            var parsed = PowerThreshold;
+                            var powerValue = words.ElementAtOrDefault(2);
+                            var powerParsed = PowerThreshold;
 
-                            if (Double.TryParse(value, out parsed) && parsed > 0 && parsed < 1)
+                            if (Double.TryParse(powerValue, out powerParsed) && powerParsed >= 0 && powerParsed < 1)
                             {
-                                PowerThreshold = parsed;
-                                Echo($"Low power threshold has been set to {parsed}.");
+                                PowerThreshold = powerParsed;
+                                Echo($"Low power threshold has been set to {powerParsed}.");
                             }
                             else
                             {
-                                Echo($"Low power threshold must be a decimal value between 0 and 1.");
+                                Echo($"Low power threshold must be a decimal value >= 0 < 1.");
+                            }
+                            break;
+                        case "countdown":
+                            var countdownValue = words.ElementAtOrDefault(2);
+                            var countdownParsed = Countdown;
+
+                            if (Single.TryParse(countdownValue, out countdownParsed) && countdownParsed > 0)
+                            {
+                                Countdown = countdownParsed;
+                                Echo($"Self Destruct timer has been set to {TimeSpan.FromSeconds(Countdown)}.");
+                            }
+                            else
+                            {
+                                Echo($"Self Destruct timer must be a decimal value greater than 0.");
                             }
                             break;
                     }
