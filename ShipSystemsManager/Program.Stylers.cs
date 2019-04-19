@@ -81,6 +81,7 @@ namespace IngameScript
                             surface.FontColor = Colors.Blue;
                             surface.BackgroundColor = Colors.Black;
                             surface.Alignment = TextAlignment.CENTER;
+                            surface.ContentType = ContentType.TEXT_AND_IMAGE;
 
                             if (surface.IsWideScreen())
                                 surface.WriteAndScaleText("DECOMPRESSION");
@@ -181,7 +182,7 @@ namespace IngameScript
                             text = text.Replace("{0}", "\n\n");
 
                         textPanel.Font = "Debug";
-                        textPanel.FontColor = Colors.Red;
+                        textPanel.FontColor = countdown < 0 ? Colors.Orange : Colors.Red;
                         textPanel.BackgroundColor = Colors.Black;
                         textPanel.Alignment = TextAlignment.CENTER;
                         textPanel.TextPadding = 10f;
@@ -229,6 +230,7 @@ namespace IngameScript
                                 surface.BackgroundColor = Colors.Black;
                                 surface.Alignment = TextAlignment.CENTER;
                                 surface.TextPadding = 10f;
+                                surface.ContentType = ContentType.TEXT_AND_IMAGE;
 
                                 surface.WriteAndScaleText(text);
                             });
@@ -322,6 +324,7 @@ namespace IngameScript
                             surface.BackgroundColor = Colors.Black;
                             surface.Alignment = TextAlignment.CENTER;
                             surface.TextPadding = 10f;
+                            surface.ContentType = ContentType.TEXT_AND_IMAGE;
 
                             if (surface.IsWideScreen())
                                 surface.WriteAndScaleText("BATTLE STATIONS");
@@ -353,15 +356,15 @@ namespace IngameScript
                 return true;
             }
 
-            if (block.Target is IMyDoor && block.Functions.HasFlag(BlockFunction.Door))
-            {
-                SaveAndApply(block, block.Target as IMyDoor, door =>
-                {
-                    door.ToggleOpenAndEnable(false, true);
-                });
+            //if (block.Target is IMyDoor && block.Functions.HasFlag(BlockFunction.Door))
+            //{
+            //    SaveAndApply(block, block.Target as IMyDoor, door =>
+            //    {
+            //        door.ToggleOpenAndEnable(false, true);
+            //    });
 
-                return true;
-            }
+            //    return true;
+            //}
 
             if (block.Target is IMySoundBlock && block.Functions.HasFlag(BlockFunction.Alert))
             {
@@ -417,6 +420,7 @@ namespace IngameScript
                             surface.BackgroundColor = Colors.Black;
                             surface.Alignment = TextAlignment.CENTER;
                             surface.TextPadding = 10f;
+                            surface.ContentType = ContentType.TEXT_AND_IMAGE;
 
                             if (surface.IsWideScreen())
                                 surface.WriteAndScaleText("INTRUDER");
@@ -610,6 +614,7 @@ namespace IngameScript
                 provider.SetStyle($"Surface {index} {nameof(IMyTextSurface.FontColor)}", surface.FontColor);
                 provider.SetStyle($"Surface {index} {nameof(IMyTextSurface.BackgroundColor)}", surface.BackgroundColor);
                 provider.SetStyle($"Surface {index} {nameof(IMyTextSurface.ContentType)}", surface.ContentType.ToString());
+                provider.SetStyle($"Surface {index} {nameof(IMyTextSurface.TextPadding)}", surface.TextPadding);
             }
 
             action?.Invoke(surface);
@@ -712,6 +717,7 @@ namespace IngameScript
             surface.FontColor = provider.GetColorStyle($"Surface {index} {nameof(IMyTextSurface.FontColor)}", Colors.White);
             surface.BackgroundColor = provider.GetColorStyle($"Surface {index} {nameof(IMyTextSurface.BackgroundColor)}", Colors.Black);
             surface.ContentType = provider.GetEnumStyle<ContentType>($"Surface {index} {nameof(IMyTextSurface.ContentType)}", ContentType.NONE);
+            surface.TextPadding = provider.GetSingleStyle($"Surface {index} {nameof(IMyTextSurface.TextPadding)}", 10);
         }
 
         private void Restore(IBlockConfiguration block, IMyLightingBlock lightingBlock)

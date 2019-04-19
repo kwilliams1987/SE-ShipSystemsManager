@@ -24,6 +24,7 @@ namespace IngameScript
         public Boolean Execute { get; private set; } = true;
         public Int32 MaxIOPs { get; private set; } = 0;
         public Double MaxTime { get; private set; } = 0;
+        public Boolean UpdateNeeded { get; private set; } = false;
 
         private IEnumerator<Int32> StateMachine { get; set; }
         private IMyTextSurface TickStatSurface { get; set; }
@@ -36,7 +37,7 @@ namespace IngameScript
             TickStatSurface = Me.GetSurface(1);
             TickStatSurface.ContentType = ContentType.TEXT_AND_IMAGE;
             TickStatSurface.Font = "DEBUG";
-            TickStatSurface.FontSize = 1.4f;
+            TickStatSurface.FontSize = 2.0f;
 
             QueueOnce();
         }
@@ -86,10 +87,18 @@ namespace IngameScript
                             QueueOnce();
                             break;
                         case "battle":
-                            GridState |= EntityState.Battle;
+                            if (!GridState.HasFlag(EntityState.Battle))
+                            {
+                                UpdateNeeded = true;
+                                GridState |= EntityState.Battle;
+                            }
                             break;
                         case "destruct":
-                            GridState |= EntityState.Destruct;
+                            if (!GridState.HasFlag(EntityState.Destruct))
+                            {
+                                UpdateNeeded = true;
+                                GridState |= EntityState.Destruct;
+                            }
                             break;
                     }
                     break;
@@ -100,10 +109,18 @@ namespace IngameScript
                             Execute = false;
                             break;
                         case "battle":
-                            GridState &= ~EntityState.Battle;
+                            if (GridState.HasFlag(EntityState.Battle))
+                            {
+                                UpdateNeeded = true;
+                                GridState &= ~EntityState.Battle;
+                            }
                             break;
                         case "destruct":
-                            GridState &= ~EntityState.Destruct;
+                            if (GridState.HasFlag(EntityState.Destruct))
+                            {
+                                UpdateNeeded = true;
+                                GridState &= ~EntityState.Destruct;
+                            }
                             break;
                     }
                     break;
@@ -130,6 +147,7 @@ namespace IngameScript
                             {
                                 GridState |= EntityState.Battle;
                             }
+                            UpdateNeeded = true;
                             break;
                         case "destruct":
                             if (GridState.HasFlag(EntityState.Destruct))
@@ -140,6 +158,7 @@ namespace IngameScript
                             {
                                 GridState |= EntityState.Destruct;
                             }
+                            UpdateNeeded = true;
                             break;
                     }
                     break;

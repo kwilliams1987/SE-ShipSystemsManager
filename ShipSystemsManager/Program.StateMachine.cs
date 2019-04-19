@@ -17,7 +17,6 @@ namespace IngameScript
         {
             Echo("Starting cycle.");
 
-            var updateNeeded = false;
             var gridState = GridState;
             var debugDisplays = 0;
 
@@ -142,24 +141,24 @@ namespace IngameScript
                     {
                         Echo($"Decompression detected in zone {zone.Key}!");
                         zones[zone.Key] |= EntityState.Decompress;
-                        updateNeeded = true;
+                        UpdateNeeded = true;
                     }
                     else if (zones[zone.Key].HasFlag(EntityState.Decompress))
                     {
                         zones[zone.Key] &= ~EntityState.Decompress;
-                        updateNeeded = true;
+                        UpdateNeeded = true;
                     }
 
                     if (TestIntruder(zone.Key, grid.Where(b => b.Zones.Contains(zone.Key))) && !zones[zone.Key].HasFlag(EntityState.Intruder))
                     {
                         Echo($"Intruder detected in zone {zone.Key}!");
                         zones[zone.Key] |= EntityState.Intruder;
-                        updateNeeded = true;
+                        UpdateNeeded = true;
                     }
                     else if (zones[zone.Key].HasFlag(EntityState.Intruder))
                     {
                         zones[zone.Key] &= ~EntityState.Intruder;
-                        updateNeeded = true;
+                        UpdateNeeded = true;
                     }
                 }
 
@@ -170,21 +169,19 @@ namespace IngameScript
                 {
                     Echo("Low power detected");
                     GridState |= EntityState.LowPower;
+                    UpdateNeeded = true;
                 }
                 else if (GridState.HasFlag(EntityState.LowPower))
                 {
                     GridState &= ~EntityState.LowPower;
-                }
-
-                if (gridState != GridState)
-                {
-                    gridState = GridState;
-                    updateNeeded = true;
+                    UpdateNeeded = true;
                 }
                 
                 yield return 4;
 
-                if (updateNeeded)
+                // Force updates;
+                UpdateNeeded = true;
+                if (UpdateNeeded)
                 {
                     Echo("Applying block styles.");
 
@@ -200,7 +197,7 @@ namespace IngameScript
                         StyleBlock(block, states, countdown);
                     }
 
-                    updateNeeded = false;
+                    UpdateNeeded = false;
                 }
 
                 yield return 5;
@@ -231,7 +228,7 @@ namespace IngameScript
             var grid = new List<IMyTerminalBlock>();
             var blocks = new List<Block<IMyTerminalBlock>>();
             var zones = new List<String>();
-            GridTerminalSystem.GetBlocksOfType<IMyTerminalBlock>(grid, b => b.IsWorking);
+            GridTerminalSystem.GetBlocksOfType<IMyTerminalBlock>(grid);
 
             foreach (var block in grid)
             {
