@@ -124,6 +124,17 @@ namespace IngameScript
                 return true;
             }
 
+            if (block.Target is IMySoundBlock && block.Functions.HasFlag(BlockFunction.Alert))
+            {
+                SaveAndApply(block, block.Target as IMySoundBlock, soundBlock =>
+                {
+                    soundBlock.PlaySound("Alert 3");
+                    soundBlock.LoopPeriod = 600;
+                });
+
+                return true;
+            }
+
             return false;
         }
 
@@ -253,6 +264,8 @@ namespace IngameScript
                         soundBlock.PlaySound("Alert 1");
                         soundBlock.LoopPeriod = countdown;
                     });
+
+                    return true;
                 }
             }
             else if (block.Target is IMyWarhead && block.Functions.HasFlag(BlockFunction.SelfDestruct))
@@ -350,6 +363,17 @@ namespace IngameScript
                 return true;
             }
 
+            if (block.Target is IMySoundBlock && block.Functions.HasFlag(BlockFunction.Alert))
+            {
+                SaveAndApply(block, block.Target as IMySoundBlock, soundBlock =>
+                {
+                    soundBlock.PlaySound("Alert 2");
+                    soundBlock.LoopPeriod = 600;
+                });
+
+                return true;
+            }
+
             return false;
         }
 
@@ -429,6 +453,17 @@ namespace IngameScript
                 SaveAndApply(block, block.Target as IMyDoor, door =>
                 {
                     door.ToggleOpenAndEnable(false, true);
+                });
+
+                return true;
+            }
+
+            if (block.Target is IMySoundBlock && block.Functions.HasFlag(BlockFunction.Alert))
+            {
+                SaveAndApply(block, block.Target as IMySoundBlock, soundBlock =>
+                {
+                    soundBlock.PlaySound("Enemy Detected");
+                    soundBlock.LoopPeriod = 4;
                 });
 
                 return true;
@@ -527,6 +562,12 @@ namespace IngameScript
                 if (block.Target is IMyRefinery)
                 {
                     Restore(block, block.Target as IMyRefinery);
+                    return;
+                }
+
+                if (block.Target is IMySoundBlock)
+                {
+                    Restore(block, block.Target as IMySoundBlock);
                     return;
                 }
             }
@@ -685,10 +726,8 @@ namespace IngameScript
             lightingBlock.Radius = block.GetSingleStyle(nameof(IMyLightingBlock.Radius));
         }
 
-        private void Restore(IBlockConfiguration block, IMyDoor door)
-        {
-            door.Enabled = block.GetBooleanStyle(nameof(IMyDoor.Enabled), true);
-        }
+        private void Restore(IBlockConfiguration block, IMyDoor door) 
+            => door.Enabled = block.GetBooleanStyle(nameof(IMyDoor.Enabled), true);
 
         private void Restore(IBlockConfiguration block, IMySoundBlock soundBlock)
         {
@@ -707,14 +746,10 @@ namespace IngameScript
         }
 
         private void Restore(IBlockConfiguration block, IMyAssembler assembler)
-        {
-            assembler.Enabled = block.GetBooleanStyle(nameof(IMyAssembler.Enabled), true);
-        }
+            => assembler.Enabled = block.GetBooleanStyle(nameof(IMyAssembler.Enabled), true);
 
         private void Restore(IBlockConfiguration block, IMyRefinery refinery)
-        {
-            refinery.Enabled = block.GetBooleanStyle(nameof(IMyRefinery.Enabled), true);
-        }
+            => refinery.Enabled = block.GetBooleanStyle(nameof(IMyRefinery.Enabled), true);
 
         #endregion
     }

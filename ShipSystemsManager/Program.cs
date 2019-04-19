@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using VRage.Game.ModAPI.Ingame.Utilities;
 using VRage.Game.GUI.TextPanel;
+using System.Text;
 
 namespace IngameScript
 {
@@ -147,7 +148,7 @@ namespace IngameScript
                     {
                         case "lowpower":
                             var powerValue = words.ElementAtOrDefault(2);
-                            var powerParsed = PowerThreshold;
+                            Double powerParsed;
 
                             if (Double.TryParse(powerValue, out powerParsed) && powerParsed >= 0 && powerParsed < 1)
                             {
@@ -161,7 +162,7 @@ namespace IngameScript
                             break;
                         case "countdown":
                             var countdownValue = words.ElementAtOrDefault(2);
-                            var countdownParsed = Countdown;
+                            Single countdownParsed;
 
                             if (Single.TryParse(countdownValue, out countdownParsed) && countdownParsed > 0)
                             {

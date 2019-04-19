@@ -2,9 +2,8 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/ShipSystemsManager/bin
-/ShipSystemsManager/obj
 **/bin
 **/obj
 /.vs
 MDK.*.props
+*.user

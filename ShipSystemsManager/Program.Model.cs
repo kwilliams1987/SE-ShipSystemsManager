@@ -64,8 +64,9 @@ namespace IngameScript
                 if (!functionConfig.IsEmpty)
                 {
                     var functions = new List<String>();
-                    var func = default(BlockFunction);
+                    BlockFunction func;
                     functionConfig.GetLines(functions);
+
                     foreach (var function in functions)
                     {
                         if (Enum.TryParse(function, out func))
