@@ -70,7 +70,7 @@ namespace IngameScript
                     {
                         if (Enum.TryParse(function, out func))
                         {
-                            Functions &= func;
+                            Functions |= func;
                         }
                     }
                 }
@@ -78,8 +78,16 @@ namespace IngameScript
 
             public Boolean HasConfig => Configuration.ContainsSection(ConfigSection);
             public Boolean HasStyle => Configuration.ContainsSection(StyleSection);
+            public Boolean Changed { get; private set; } = false;
 
-            public void Save() => Target.CustomData = Configuration.ToString();
+            public void Save()
+            {
+                if (Changed)
+                {
+                    Target.CustomData = Configuration.ToString();
+                    Changed = false;
+                }
+            }
 
             public TEnumType GetEnumConfig<TEnumType>(String key, TEnumType? defaultValue = null)
                 where TEnumType: struct
@@ -95,11 +103,50 @@ namespace IngameScript
                 return (TEnumType)Enum.Parse(typeof(TEnumType), value);
             }
 
-            public void SetStyle(String key, Single value) => Configuration.Set(StyleSection, key, value);
-            public void SetStyle(String key, Boolean value) => Configuration.Set(StyleSection, key, value);
-            public void SetStyle(String key, String value) => Configuration.Set(StyleSection, key, value);
-            public void SetStyle(String key, UInt32 value) => Configuration.Set(StyleSection, key, value);
-            public void SetStyle(String key, Color value) => Configuration.Set(StyleSection, key, value.PackedValue);
+            public void SetStyle(String key, Single value)
+            {
+                if (GetSingleStyle(key, value) != value)
+                {
+                    Changed = true;
+                    Configuration.Set(StyleSection, key, value);
+                }
+            }
+
+            public void SetStyle(String key, Boolean value)
+            {
+                if (GetBooleanStyle(key, value) != value)
+                {
+                    Changed = true;
+                    Configuration.Set(StyleSection, key, value);
+                }
+            }
+
+            public void SetStyle(String key, String value)
+            {
+                if (GetStringStyle(key, value) != value)
+                {
+                    Changed = true;
+                    Configuration.Set(StyleSection, key, value);
+                }
+            }
+
+            public void SetStyle(String key, UInt32 value)
+            {
+                if (GetUInt32Style(key, value) != value)
+                {
+                    Changed = true;
+                    Configuration.Set(StyleSection, key, value);
+                }
+            }
+
+            public void SetStyle(String key, Color value)
+            {
+                if (GetUInt32Style(key, value.PackedValue) != value.PackedValue)
+                {
+                    Changed = true;
+                    Configuration.Set(StyleSection, key, value.PackedValue);
+                }
+            }
 
             public Single GetSingleStyle(String key, Single defaultValue = 0) => Configuration.Get(StyleSection, key).ToSingle(defaultValue);
             public Boolean GetBooleanStyle(String key, Boolean defaultValue = false) => Configuration.Get(StyleSection, key).ToBoolean(defaultValue);
@@ -107,6 +154,7 @@ namespace IngameScript
             public UInt32 GetUInt32Style(String key, UInt32 defaultValue = 0) => Configuration.Get(StyleSection, key).ToUInt32(defaultValue);
             public Color GetColorStyle(String key, Color? defaultValue = null)
                 => new Color(Configuration.Get(StyleSection, key).ToUInt32(defaultValue.GetValueOrDefault(Colors.Black).PackedValue));
+
             public TEnumType GetEnumStyle<TEnumType>(String key, TEnumType? defaultValue = null)
                 where TEnumType : struct
             {

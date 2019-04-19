@@ -4,6 +4,7 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using VRage.Game.ModAPI.Ingame.Utilities;
+using VRage.Game.GUI.TextPanel;
 
 namespace IngameScript
 {
@@ -20,13 +21,22 @@ namespace IngameScript
         public Double PowerThreshold { get; private set; } = 0.1;
         public Single Countdown { get; private set; } = 300;
         public Boolean Execute { get; private set; } = true;
+        public Int32 MaxIOPs { get; private set; } = 0;
+        public Double MaxTime { get; private set; } = 0;
 
         private IEnumerator<Int32> StateMachine { get; set; }
+        private IMyTextSurface TickStatSurface { get; set; }
 
         public Program()
         {
             Echo = message => { };
             StateMachine = StateMachineExecutor();
+
+            TickStatSurface = Me.GetSurface(1);
+            TickStatSurface.ContentType = ContentType.TEXT_AND_IMAGE;
+            TickStatSurface.Font = "DEBUG";
+            TickStatSurface.FontSize = 1.4f;
+
             QueueOnce();
         }
 
@@ -54,6 +64,8 @@ namespace IngameScript
                 Echo($"State machine has entered a stop state.");
                 StateMachine.Reset();
             }
+
+            UpdateTickStatistics();
         }
 
         private void QueueOnce() => Runtime.UpdateFrequency |= UpdateFrequency.Once;
@@ -164,7 +176,7 @@ namespace IngameScript
                     }
                     break;
                 case "group":
-                    var verb = words.ElementAtOrDefault(1) + " " + words.ElementAtOrDefault(2);
+                    var verb = String.Join(" ", words.Skip(1).Take(2));
                     var parameters = String.Join(" ", words.Skip(3)).Split(';');
 
                     if (parameters.Count() == 0 || parameters.Count() > 2)
@@ -265,6 +277,20 @@ namespace IngameScript
                     }
                     break;
             }
+        }
+
+        private void UpdateTickStatistics()
+        {
+            var builder = new StringBuilder();
+
+            MaxTime = Math.Max(MaxTime, Runtime.LastRunTimeMs);
+            MaxIOPs = Math.Max(MaxIOPs, Runtime.CurrentInstructionCount);
+
+            builder.AppendLine($"Time: {Runtime.LastRunTimeMs}ms ({MaxTime}ms max)");
+            builder.AppendLine($"IOPS: {Runtime.CurrentInstructionCount}/{Runtime.MaxInstructionCount}, ({MaxIOPs} max)");
+            builder.AppendLine($"Tick: {CurrentTick}/7");
+
+            TickStatSurface.WriteText(builder);
         }
     }
 }

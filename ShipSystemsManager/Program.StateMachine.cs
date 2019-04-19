@@ -1,4 +1,5 @@
-﻿using Sandbox.ModAPI.Ingame;
+﻿// <mdk sortorder="1" />
+using Sandbox.ModAPI.Ingame;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,12 @@ namespace IngameScript
         {
             Echo("Starting cycle.");
 
-            var textSurface = Me.GetSurface(0);
-            textSurface.ContentType = ContentType.TEXT_AND_IMAGE;
-            textSurface.Font = "Monospace";
-            textSurface.ClearImagesFromSelection();
+            var updateNeeded = false;
+            var gridState = GridState;
+            var debugDisplays = 0;
+
+            var zoneStatSurface = Me.GetSurface(0);
+            zoneStatSurface.ContentType = ContentType.TEXT_AND_IMAGE;
 
             yield return 0;
 
@@ -79,7 +82,7 @@ namespace IngameScript
                     Echo = message =>
                     {
                         var current = outputs.First().GetText().Split('\n').ToList();
-                        while (current.Count() > 20)
+                        while (current.Count() > 32)
                         {
                             current.RemoveAt(0);
                         }
@@ -88,18 +91,23 @@ namespace IngameScript
                         var messages = String.Join("\n", current);
                         foreach (var output in outputs)
                         {
-                            output.FontSize = 0.6f;
-                            output.TextPadding = 5;
+                            output.FontSize = 0.5f;
+                            output.TextPadding = 2;
                             output.Font = "Monospace";
                             output.WriteText(messages);
                         }
                     };
 
-                    Echo($"Found {outputs.Count()} debugging displays.");
+                    if (debugDisplays != outputs.Count)
+                    {
+                        Echo($"Found {outputs.Count()} debugging displays.");
+                        debugDisplays = outputs.Count;
+                    }
                 }
                 else
                 {
                     Echo = message => { };
+                    debugDisplays = 0;
                 }
 
                 var warheads = grid.Where(b => b.Functions.HasFlag(BlockFunction.SelfDestruct))
@@ -130,48 +138,69 @@ namespace IngameScript
                 Echo("Enumerating zone statuses.");
                 foreach (var zone in zones.ToList())
                 {
-                    if (TestDecompression(zone.Key, grid.Where(b => b.Zones.Contains(zone.Key))))
+                    if (TestDecompression(zone.Key, grid.Where(b => b.Zones.Contains(zone.Key))) && !zones[zone.Key].HasFlag(EntityState.Decompress))
                     {
                         Echo($"Decompression detected in zone {zone.Key}!");
                         zones[zone.Key] |= EntityState.Decompress;
+                        updateNeeded = true;
                     }
-                    else
+                    else if (zones[zone.Key].HasFlag(EntityState.Decompress))
+                    {
                         zones[zone.Key] &= ~EntityState.Decompress;
+                        updateNeeded = true;
+                    }
 
-                    if (TestIntruder(zone.Key, grid.Where(b => b.Zones.Contains(zone.Key))))
+                    if (TestIntruder(zone.Key, grid.Where(b => b.Zones.Contains(zone.Key))) && !zones[zone.Key].HasFlag(EntityState.Intruder))
                     {
                         Echo($"Intruder detected in zone {zone.Key}!");
                         zones[zone.Key] |= EntityState.Intruder;
+                        updateNeeded = true;
                     }
-                    else
+                    else if (zones[zone.Key].HasFlag(EntityState.Intruder))
+                    {
                         zones[zone.Key] &= ~EntityState.Intruder;
+                        updateNeeded = true;
+                    }
                 }
 
                 yield return 3;
 
                 Echo("Enumerating global statuses.");
-                if (TestLowPower(grid))
+                if (TestLowPower(grid) && !GridState.HasFlag(EntityState.LowPower))
                 {
                     Echo("Low power detected");
                     GridState |= EntityState.LowPower;
                 }
-                else
+                else if (GridState.HasFlag(EntityState.LowPower))
+                {
                     GridState &= ~EntityState.LowPower;
+                }
+
+                if (gridState != GridState)
+                {
+                    gridState = GridState;
+                    updateNeeded = true;
+                }
                 
                 yield return 4;
 
-                Echo("Applying block styles.");
-
-                foreach (var block in grid)
+                if (updateNeeded)
                 {
-                    var states = GridState;
-                    foreach (var zone in block.Zones)
+                    Echo("Applying block styles.");
+
+                    foreach (var block in grid)
                     {
-                        states |= zones[zone];
+                        var states = GridState;
+                        foreach (var zone in block.Zones)
+                        {
+                            states |= zones[zone];
+                        }
+
+                        Echo($"Styling {block.Target.DisplayNameText} in zones {String.Join(", ", block.Zones)}");
+                        StyleBlock(block, states, countdown);
                     }
 
-                    Echo($"Styling {block.Target.DisplayNameText} in zones {String.Join(", ", block.Zones)}");
-                    StyleBlock(block, states, countdown);
+                    updateNeeded = false;
                 }
 
                 yield return 5;
@@ -189,12 +218,11 @@ namespace IngameScript
                 yield return 6;
 
                 Echo("Updating status screen.");
-                UpdateStatistics(textSurface, zones);
+                UpdateZoneStatistics(zoneStatSurface, zones);
 
                 yield return 7;
             }
 
-            textSurface.AddImageToSelection("Offline");            
             yield break;
         }
 
@@ -217,7 +245,7 @@ namespace IngameScript
             return blocks;
         }
 
-        private void UpdateStatistics(IMyTextSurface textSurface, IReadOnlyDictionary<String, EntityState> zones)
+        private void UpdateZoneStatistics(IMyTextSurface textSurface, IReadOnlyDictionary<String, EntityState> zones)
         {
             var builder = new StringBuilder();
             var zonestatus = new List<String>();
