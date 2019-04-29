@@ -5,14 +5,14 @@ VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipSystemsManager", "ShipSystemsManager\ShipSystemsManager.csproj", "{7577EDAA-27FF-4D32-814B-A1077F8DCDA4}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MDK-Mockups", "MDK-Mockups\MDK-Mockups.shproj", "{33863C91-80F6-4ABC-A735-3934A61D494C}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MDK-Mockups", "Mockups\MDK-Mockups.shproj", "{33863C91-80F6-4ABC-A735-3934A61D494C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSM Utility Script", "SSM Utility Script\SSM Utility Script.csproj", "{7D6D57AE-BF0E-48B8-9275-8EF549E96AD7}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		MDK-Mockups\MDK-Mockups.projitems*{33863c91-80f6-4abc-a735-3934a61d494c}*SharedItemsImports = 13
-		MDK-Mockups\MDK-Mockups.projitems*{7577edaa-27ff-4d32-814b-a1077f8dcda4}*SharedItemsImports = 4
+		Mockups\MDK-Mockups.projitems*{33863c91-80f6-4abc-a735-3934a61d494c}*SharedItemsImports = 13
+		Mockups\MDK-Mockups.projitems*{7577edaa-27ff-4d32-814b-a1077f8dcda4}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
