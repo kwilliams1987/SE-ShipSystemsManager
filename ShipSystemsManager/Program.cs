@@ -31,6 +31,28 @@ namespace IngameScript
 
         public Program()
         {
+            Init();
+        }
+
+#if DEBUG
+        public class DebugInfo
+        {
+            public IMyGridTerminalSystem GridTerminalSystem { get; set; }
+            public IMyProgrammableBlock ProgrammableBlock { get; set; }
+            public IMyGridProgramRuntimeInfo RuntimeInfo { get; set; }
+        }
+
+        public Program(DebugInfo debugInfo)
+        {
+            Me = debugInfo.ProgrammableBlock;
+            Runtime = debugInfo.RuntimeInfo;
+            GridTerminalSystem = debugInfo.GridTerminalSystem;
+            Init();
+        }
+#endif
+
+        private void Init()
+        {
             Echo = message => { };
             StateMachine = StateMachineExecutor();
 
@@ -310,7 +332,7 @@ namespace IngameScript
             builder.AppendLine($"IOPS: {Runtime.CurrentInstructionCount}/{Runtime.MaxInstructionCount}, ({MaxIOPs} max)");
             builder.AppendLine($"Tick: {CurrentTick}/7");
 
-            TickStatSurface.WriteText(builder);
+            TickStatSurface.DrawScaledSpriteText(builder, TickStatSurface.Font, TickStatSurface.FontColor);
         }
     }
 }

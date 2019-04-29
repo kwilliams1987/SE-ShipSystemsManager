@@ -106,7 +106,7 @@ namespace IngameScript
 
             public void SetStyle(String key, Single value)
             {
-                if (GetSingleStyle(key, value) != value)
+                if (GetSingleStyle(key, value + 1) != value)
                 {
                     Changed = true;
                     Configuration.Set(StyleSection, key, value);
@@ -115,7 +115,7 @@ namespace IngameScript
 
             public void SetStyle(String key, Boolean value)
             {
-                if (GetBooleanStyle(key, value) != value)
+                if (GetBooleanStyle(key, !value) != value)
                 {
                     Changed = true;
                     Configuration.Set(StyleSection, key, value);
@@ -124,7 +124,7 @@ namespace IngameScript
 
             public void SetStyle(String key, String value)
             {
-                if (GetStringStyle(key, value) != value)
+                if (GetStringStyle(key, value + ".") != value)
                 {
                     Changed = true;
                     Configuration.Set(StyleSection, key, value);
@@ -133,7 +133,7 @@ namespace IngameScript
 
             public void SetStyle(String key, UInt32 value)
             {
-                if (GetUInt32Style(key, value) != value)
+                if (GetUInt32Style(key, value + 1) != value)
                 {
                     Changed = true;
                     Configuration.Set(StyleSection, key, value);
@@ -142,7 +142,7 @@ namespace IngameScript
 
             public void SetStyle(String key, Color value)
             {
-                if (GetUInt32Style(key, value.PackedValue) != value.PackedValue)
+                if (GetUInt32Style(key, value.PackedValue + 1) != value.PackedValue)
                 {
                     Changed = true;
                     Configuration.Set(StyleSection, key, value.PackedValue);
@@ -169,6 +169,8 @@ namespace IngameScript
 
                 return (TEnumType)Enum.Parse(typeof(TEnumType), value);
             }
+
+            public override String ToString() => Target.ToString();
         }
 
         [Flags]

@@ -34,14 +34,20 @@ namespace IngameScript
                 var power = PowerThreshold;
                 var countdown = Countdown;
 
-                Configuration.Get(ConfigSection, nameof(GridState)).TryGetInt32(out state);
-                GridState = (EntityState) state;
+                if (Configuration.Get(ConfigSection, nameof(GridState)).TryGetInt32(out state))
+                {
+                    GridState = (EntityState)state;
+                }
 
-                Configuration.Get(ConfigSection, nameof(PowerThreshold)).TryGetDouble(out power);
-                PowerThreshold = power;
+                if (Configuration.Get(ConfigSection, nameof(PowerThreshold)).TryGetDouble(out power))
+                {
+                    PowerThreshold = power;
+                }
 
-                Configuration.Get(ConfigSection, nameof(Countdown)).TryGetSingle(out countdown);
-                Countdown = countdown;
+                if (Configuration.Get(ConfigSection, nameof(Countdown)).TryGetSingle(out countdown))
+                {
+                    Countdown = countdown;
+                }
             }
             else
             {
@@ -105,7 +111,6 @@ namespace IngameScript
                 }
                 else
                 {
-                    Echo = message => { };
                     debugDisplays = 0;
                 }
 
@@ -123,7 +128,6 @@ namespace IngameScript
                 }
                 else
                 {
-                    Echo($"Self destruct is unavailable.");
                     countdown = -1;
                 }
 
@@ -190,10 +194,11 @@ namespace IngameScript
                         var states = GridState;
                         foreach (var zone in block.Zones)
                         {
-                            states |= zones[zone];
+                            if (zones[zone] != EntityState.Default)
+                                states |= zones[zone];
                         }
 
-                        Echo($"Styling {block.Target.DisplayNameText} in zones {String.Join(", ", block.Zones)}");
+                        Echo($"Styling {block.Target.DisplayName} in zones {String.Join(", ", block.Zones)}");
                         StyleBlock(block, states, countdown);
                     }
 
@@ -283,7 +288,7 @@ namespace IngameScript
                 builder.AppendLine(String.Join(", ", zonestatus.DefaultIfEmpty("Normal")));
             }
 
-            textSurface.WriteAndScaleText(builder);
+            textSurface.DrawScaledSpriteText(builder, textSurface.Font, textSurface.FontColor);
         }
     }
 }

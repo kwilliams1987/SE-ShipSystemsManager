@@ -35,29 +35,37 @@ namespace IngameScript
             }
         }
 
-        public static void WriteAndScaleText(this IMyTextSurface textSurface, StringBuilder textBuilder)
+        public static void DrawScaledSpriteText(this IMyTextSurface textSurface, StringBuilder text, String fontId, Color color, Single? scale = null, TextAlignment textAlignment = TextAlignment.CENTER)
         {
-            if (textSurface.ContentType != ContentType.TEXT_AND_IMAGE)
-                return;
+            textSurface.Script = "";
+            textSurface.ContentType = ContentType.SCRIPT;
 
-            var width = textSurface.SurfaceSize.X * (100 - textSurface.TextPadding * 2) / 100;
-            var height = textSurface.SurfaceSize.Y * (100 - textSurface.TextPadding * 2) / 100;
-
-            var fontSize = 10f;
-            var size = textSurface.MeasureStringInPixels(textBuilder, textSurface.Font, fontSize);
-
-            while (width < size.X || height < size.Y)
+            using (var frame = textSurface.DrawFrame())
             {
-                fontSize = fontSize * 0.95f;
-                size = textSurface.MeasureStringInPixels(textBuilder, textSurface.Font, fontSize);
-            }
+                var fillArea = textSurface.TextureSize - new Vector2(textSurface.TextPadding * 2);
+                
+                if (scale == null)
+                {
+                    var tryScale = 10f;
+                    var currentSize = textSurface.MeasureStringInPixels(text, fontId, tryScale);
 
-            textSurface.FontSize = fontSize;
-            textSurface.WriteText(textBuilder);
+                    while (currentSize.X > fillArea.X || currentSize.Y > fillArea.Y)
+                    {
+                        tryScale *= 0.9f;
+                        currentSize = textSurface.MeasureStringInPixels(text, fontId, tryScale);
+                    }
+
+                    scale = tryScale;
+                }
+
+                var sprite = MySprite.CreateText(text.ToString(), fontId, color, scale.Value, textAlignment);
+                sprite.Position = new Vector2(textSurface.TextPadding, textSurface.TextPadding);
+                frame.Add(sprite);
+            }
         }
 
-        public static void WriteAndScaleText(this IMyTextSurface textSurface, String text)
-            => WriteAndScaleText(textSurface, new StringBuilder(text));
+        public static void DrawScaledSpriteText(this IMyTextSurface textSurface, String text, String fontId, Color color, Single? scale = null, TextAlignment textAlignment = TextAlignment.CENTER)
+            => DrawScaledSpriteText(textSurface, new StringBuilder(text), fontId, color, scale, textAlignment);
 
         public static Boolean IsWideScreen(this IMyTextSurface textSurface) 
             => textSurface.SurfaceSize.X > textSurface.SurfaceSize.Y * 1.5;

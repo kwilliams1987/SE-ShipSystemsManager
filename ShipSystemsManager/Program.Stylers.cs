@@ -52,15 +52,12 @@ namespace IngameScript
             {
                 SaveAndApply(block, block.Target as IMyTextPanel, textPanel =>
                 {
-                    textPanel.Font = "Debug";
-                    textPanel.FontColor = Colors.Blue;
                     textPanel.BackgroundColor = Colors.Black;
-                    textPanel.Alignment = TextAlignment.CENTER;
 
                     if (textPanel.IsWideScreen())
-                        textPanel.WriteAndScaleText("DECOMPRESSION");
+                        textPanel.DrawScaledSpriteText("DECOMPRESSION", "Debug", Colors.Blue);
                     else
-                        textPanel.WriteAndScaleText("DECOMPRESSION\nDO NOT ENTER");
+                        textPanel.DrawScaledSpriteText("DECOMPRESSION\nDO NOT ENTER", "Debug", Colors.Blue);
                 });
 
                 return true;
@@ -77,16 +74,12 @@ namespace IngameScript
                     {
                         SaveAndApply(block, surface, i, _ =>
                         {
-                            surface.Font = "Debug";
-                            surface.FontColor = Colors.Blue;
                             surface.BackgroundColor = Colors.Black;
-                            surface.Alignment = TextAlignment.CENTER;
-                            surface.ContentType = ContentType.TEXT_AND_IMAGE;
 
                             if (surface.IsWideScreen())
-                                surface.WriteAndScaleText("DECOMPRESSION");
+                                surface.DrawScaledSpriteText("DECOMPRESSION", "Debug", Colors.Blue);
                             else
-                                surface.WriteAndScaleText("DECOMPRESSION\nDO NOT ENTER");
+                                surface.DrawScaledSpriteText("DECOMPRESSION\nDO NOT ENTER", "Debug", Colors.Blue);
                         });
                     }
                 });
@@ -181,13 +174,10 @@ namespace IngameScript
                         else
                             text = text.Replace("{0}", "\n\n");
 
-                        textPanel.Font = "Debug";
-                        textPanel.FontColor = countdown < 0 ? Colors.Orange : Colors.Red;
                         textPanel.BackgroundColor = Colors.Black;
-                        textPanel.Alignment = TextAlignment.CENTER;
                         textPanel.TextPadding = 10f;
 
-                        textPanel.WriteAndScaleText(text);
+                        textPanel.DrawScaledSpriteText(text, "Debug", countdown < 0 ? Colors.Orange : Colors.Red);
                     });
 
                     return true;
@@ -225,14 +215,10 @@ namespace IngameScript
                                 else
                                     text = text.Replace("{0}", "\n\n");
 
-                                surface.Font = "Debug";
-                                surface.FontColor = Colors.Red;
                                 surface.BackgroundColor = Colors.Black;
-                                surface.Alignment = TextAlignment.CENTER;
                                 surface.TextPadding = 10f;
-                                surface.ContentType = ContentType.TEXT_AND_IMAGE;
 
-                                surface.WriteAndScaleText(text);
+                                surface.DrawScaledSpriteText(text, "Debug", countdown < 0 ? Colors.Orange : Colors.Red);
                             });
                         }
                     });
@@ -293,16 +279,13 @@ namespace IngameScript
             {
                 SaveAndApply(block, block.Target as IMyTextPanel, textPanel =>
                 {
-                    textPanel.Font = "Debug";
-                    textPanel.FontColor = Colors.Red;
                     textPanel.BackgroundColor = Colors.Black;
-                    textPanel.Alignment = TextAlignment.CENTER;
                     textPanel.TextPadding = 10f;
 
                     if (textPanel.IsWideScreen())
-                        textPanel.WriteAndScaleText("BATTLE STATIONS");
+                        textPanel.DrawScaledSpriteText("BATTLE STATIONS", "Debug", Colors.Red);
                     else
-                        textPanel.WriteAndScaleText("BATTLE\nSTATIONS");
+                        textPanel.DrawScaledSpriteText("BATTLE\nSTATIONS", "Debug", Colors.Red);
                 });
 
                 return true;
@@ -319,17 +302,13 @@ namespace IngameScript
                     {
                         SaveAndApply(block, surface, i, _ =>
                         {
-                            surface.Font = "Debug";
-                            surface.FontColor = Colors.Red;
                             surface.BackgroundColor = Colors.Black;
-                            surface.Alignment = TextAlignment.CENTER;
                             surface.TextPadding = 10f;
-                            surface.ContentType = ContentType.TEXT_AND_IMAGE;
 
                             if (surface.IsWideScreen())
-                                surface.WriteAndScaleText("BATTLE STATIONS");
+                                surface.DrawScaledSpriteText("BATTLE STATIONS", "Debug", Colors.Red);
                             else
-                                surface.WriteAndScaleText("BATTLE\nSTATIONS");
+                                surface.DrawScaledSpriteText("BATTLE\nSTATIONS", "Debug", Colors.Red);
                         });
                     }
                 });
@@ -389,16 +368,13 @@ namespace IngameScript
             {
                 SaveAndApply(block, block.Target as IMyTextPanel, textPanel =>
                 {
-                    textPanel.Font = "Debug";
-                    textPanel.FontColor = Colors.Orange;
                     textPanel.BackgroundColor = Colors.Black;
-                    textPanel.Alignment = TextAlignment.CENTER;
                     textPanel.TextPadding = 10f;
 
                     if (textPanel.IsWideScreen())
-                        textPanel.WriteAndScaleText("INTRUDER");
+                        textPanel.DrawScaledSpriteText("INTRUDER", "Debug", Colors.Orange);
                     else
-                        textPanel.WriteAndScaleText("INTRUDER\nALERT");
+                        textPanel.DrawScaledSpriteText("INTRUDER\nALERT", "Debug", Colors.Orange);
                 });
 
                 return true;
@@ -415,17 +391,13 @@ namespace IngameScript
                     {
                         SaveAndApply(block, surface, i, _ =>
                         {
-                            surface.Font = "Debug";
-                            surface.FontColor = Colors.Orange;
                             surface.BackgroundColor = Colors.Black;
-                            surface.Alignment = TextAlignment.CENTER;
                             surface.TextPadding = 10f;
-                            surface.ContentType = ContentType.TEXT_AND_IMAGE;
 
                             if (surface.IsWideScreen())
-                                surface.WriteAndScaleText("INTRUDER");
+                                surface.DrawScaledSpriteText("INTRUDER", "Debug", Colors.Orange);
                             else
-                                surface.WriteAndScaleText("INTRUDER\nALERT");
+                                surface.DrawScaledSpriteText("INTRUDER\nALERT", "Debug", Colors.Orange);
                         });
                     }
                 });

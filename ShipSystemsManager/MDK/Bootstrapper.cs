@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Timers;
 using IngameScript.Mockups;
 using IngameScript.Mockups.Asserts;
+using IngameScript.Mockups.Base;
 using IngameScript.Mockups.Blocks;
 using Malware.MDKUtilities;
 using Sandbox.ModAPI.Ingame;
-using SpaceEngineers.Game.ModAPI.Ingame;
+using VRage.Game.GUI.TextPanel;
 using VRage.Game.ModAPI.Ingame.Utilities;
 using VRageMath;
 using static IngameScript.Program;
@@ -21,395 +19,219 @@ namespace IngameScript.MDK
         // from the build process. You can use this to create utilites for testing your scripts directly in 
         // Visual Studio.
 
+        static Int64 NextEntityId = 1L;
         static TestBootstrapper()
         {
             // Initialize the MDK utility framework
             MDKUtilityFramework.Load();
         }
 
+        public static void RunCycle(MockProgrammableBlock programmableBlock)
+            => RunCycle(programmableBlock.Program as Program);
+
+        public static void RunUntil(MockProgrammableBlock programmableBlock, Func<Program, Boolean> predicate)
+            => RunUntil(programmableBlock.Program as Program, predicate);
+
         public static void RunCycle(Program program)
         {
+            if (program == null)
+                throw new ArgumentNullException(nameof(program));
+
+            MDKFactory.Run(program, updateType: UpdateType.Once);
+            MDKFactory.Run(program, updateType: UpdateType.Once);
             MDKFactory.Run(program, updateType: UpdateType.Once);
 
-            while (program.CurrentTick > 0)
-                MDKFactory.Run(program, updateType: UpdateType.Once);
+            RunUntil(program, p => p.CurrentTick == 2);
+        }
 
-            Assert.Equals(program.CurrentTick, 0, "State machine was unexpected terminated.");
+        public static void RunUntil(Program program, Func<Program, Boolean> predicate)
+        {
+            while(!predicate(program))
+                MDKFactory.Run(program, updateType: UpdateType.Once);
         }
 
         public static void Main()
         {
             // In order for your program to actually run, you will need to provide a mockup of all the facilities 
             // your script uses from the game, since they're not available outside of the game.
-
-            var nextEntityId = 1L;
             var grid = new MockGridTerminalSystem();
-            var tickrate = UpdateType.Once;
-
-            var programmableBlock = new MockProgrammableBlock()
+            var cubeGrid = new MockCubeGrid()
             {
-                CustomName = "Programmable Block [SSM]"
+                CustomName = "Debug Test Station",
+                IsStatic = true,
+                GridSizeEnum = VRage.Game.MyCubeSize.Large
             };
 
-            grid.Add(new MockTextPanel()
+            var programmableBlock = Mock<MockProgrammableBlock>(options: b => b.CubeGrid = cubeGrid);
+            programmableBlock.Program = new Program(new DebugInfo
             {
-                EntityId = nextEntityId++,
-                CustomName = "Debug Panel",
-                CustomData = "[Ship Systems Manager]\nfunctions=debug lcd"
-            });
-
-            var zones = new List<Zone>();
-            var airlock = new MockDoor()
-            {
-                EntityId = nextEntityId++,
-                CustomName = "Zone 1/2 Airlock",
-                CustomData = "[Ship Systems Manager]\nzones=\n|zone-1\n|zone-2\nfunctions=airlock"
-            };
-
-            airlock.OpenDoor();
-
-            {
-                var room = new Zone("zone-1");
-                room.AddBlock(airlock);
-
-                room.AddBlock(new MockAirVent()
-                {
-                    EntityId = nextEntityId++,
-                    Status = VentStatus.Pressurized,
-                    CustomName = "Air Vent (Zone 1)",
-                    ShowInTerminal = false,
-                    IsDepressurizing = false,
-                    CanPressurize = true
-                });
-
-                room.AddBlock(new MockInteriorLight()
-                {
-                    EntityId = nextEntityId++,
-                    CustomName = "Alert Light (Zone 1)",
-                    ShowInTerminal = false,
-                    CustomData = "[Ship Systems Manager]\nzones=zone-1\nfunctions=warnlight"
-                });
-
-                room.AddBlock(new MockInteriorLight()
-                {
-                    EntityId = nextEntityId++,
-                    CustomName = "Normal Light (Zone 1)",
-                    ShowInTerminal = false,
-                });
-
-                room.AddBlock(new MockTextPanel()
-                {
-                    EntityId = nextEntityId++,
-                    CustomName = "Door Sign (Zone 1)",
-                    CustomData = "[Ship Systems Manager]\nzones=zone-1\nfunctions=doorsign"
-                });
-
-                room.OfType<IMyTextPanel>().First(b => b.CustomName == "Door Sign (Zone 1)")
-                    .WriteText("ZONE 1");
-
-                var motorSubgrid = new MockCubeGrid();
-                var motorhead = new MockMotorRotor()
-                {
-                    EntityId = nextEntityId++,
-                    CubeGrid = motorSubgrid
-                };
-
-                grid.Add(new MockInteriorLight()
-                {
-                    CubeGrid = motorSubgrid
-                });
-
-                room.AddBlock(new MockMotorStator()
-                {
-                    EntityId = nextEntityId++,
-                    CustomName = "Klaxon (Zone 1)",
-                    CustomData = "[Ship Systems Manager]\nzones=zone-1\nfunctions=siren",
-                    MockPendingAttachment = motorhead 
-                });
-
-                zones.Add(room);
-
-                room.AddToGrid(grid);
-            }
-
-            {
-                var room = new Zone("zone-2");
-                room.AddBlock(airlock);
-
-                room.AddBlock(new MockAirVent()
-                {
-                    EntityId = nextEntityId++,
-                    Status = VentStatus.Pressurized,
-                    CustomName = "Air Vent (Zone 2)",
-                    ShowInTerminal = false,
-                    IsDepressurizing = false,
-                    CanPressurize = true
-                });
-
-                room.AddBlock(new MockInteriorLight()
-                {
-                    EntityId = nextEntityId++,
-                    CustomName = "Alert Light (Zone 2)",
-                    ShowInTerminal = false,
-                    CustomData = "[Ship Systems Manager]\nzones=zone-2\nfunctions=warnlight"
-                });
-
-                room.AddBlock(new MockInteriorLight()
-                {
-                    EntityId = nextEntityId++,
-                    CustomName = "Normal Light (Zone 2)",
-                    ShowInTerminal = false,
-                });
-
-                room.AddBlock(new MockTextPanel()
-                {
-                    EntityId = nextEntityId++,
-                    CustomName = "Door Sign (Zone 2)",
-                    CustomData = "[Ship Systems Manager]\nzones=zone-2\nfunctions=doorsign"
-                });
-
-                room.OfType<IMyTextPanel>().First(b => b.CustomName == "Door Sign (Zone 2)")
-                    .WriteText("ZONE 2");
-
-                zones.Add(room);
-
-                room.AddToGrid(grid);
-            }
-
-            var program = MDKFactory.CreateProgram<Program>(new MDKFactory.ProgramConfig()
-            {
-                Echo = message => Console.WriteLine("[{0}] {1}", DateTime.Now.ToString("U"), message),
+                ProgrammableBlock = programmableBlock,
                 GridTerminalSystem = grid,
-                ProgrammableBlock = programmableBlock
+                RuntimeInfo = new MockGridProgramRuntimeInfo()
             });
 
-            Console.WriteLine("Executing Run Cycle #1 (Normal)");
-            RunCycle(program);
-
-            var lights = new List<IMyInteriorLight>();
-            grid.GetBlocksOfType(lights);
-
-            foreach (var light in lights)
+            var echo = programmableBlock.Program.Echo;
+            programmableBlock.Program.Echo = message =>
             {
-                Assert.Equals(new Color(255,255,255), light.Color, $"Light {light.EntityId} does not have the expected color.");
-                Assert.Equals(0, light.BlinkIntervalSeconds, $"Light {light.EntityId} does not have the expected blink interval.");
-                Assert.Equals(0, light.BlinkLength, $"Light {light.EntityId} does not have the expected blink length.");
-                Assert.Equals(0, light.BlinkOffset, $"Light {light.EntityId} does not have the expected blink offset.");
-            }
+                echo(message);
+                Console.WriteLine(message);
+            };
 
-            var lcds = new List<IMyTextPanel>();
-            grid.GetBlocksOfType(lcds);
-            foreach (var lcd in lcds)
+            var ventZone1 = Mock<MockAirVent>(options: b => b.CanPressurize = true, zones: "room-1");
+            var lightNormalZone1 = Mock<MockInteriorLight>(zones: "room-1");
+            var lightAlertZone1 = Mock<MockInteriorLight>(BlockFunction.Alert, zones: "room-1");
+            var ventZone2 = Mock<MockAirVent>(options: b => b.CanPressurize = true, zones: "room-2");
+            var lightNormalZone2 = Mock<MockInteriorLight>(zones: "room-2");
+            var lightAlertZone2 = Mock<MockInteriorLight>(BlockFunction.Alert, zones: "room-2");
+
+            grid.Add(new IMyTerminalBlock[] 
             {
-                switch (lcd.CustomName)
-                {
-                    case "Door Sign (Zone 1)":
-                        Assert.Equals("ZONE 1", lcd.GetText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
-                        break;
-                    case "Door Sign (Zone 2)":
-                        Assert.Equals("ZONE 2", lcd.GetText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
-                        break;
-                }
-            }
-
-            var doors = new List<IMyDoor>();
-            grid.GetBlocksOfType(doors, d => d.CustomData.Contains("zone-1") && d.CustomData.Contains("zone-2"));
-            foreach (var door in doors)
-            {
-                Assert.True(DoorStatus.Open == door.Status, $"Airlock joined to Zone 1 and a 2 should be open.");
-            }
-
-            var vents = new List<MockAirVent>();
-            grid.GetBlocksOfType(vents, v => v.CustomData.Contains("zone-1"));
-            foreach (var vent in vents)
-            {
-                vent.IsDepressurizing = true;
-                vent.CanPressurize = false;
-            }
-
-            Console.WriteLine("Executing Run Cycle #2 (Decompression - Zone 1)");
-            RunCycle(program);
-
-            var lights1 = new List<IMyLightingBlock>();
-            grid.GetBlocksOfType(lights1, l=>l.CustomData.Contains("zone-1"));
-            foreach (var light in lights1)
-            {
-                if (light.CustomData.Contains(Program.BlockFunction.Alert.ToString()))
-                {
-                    //Assert.Equals(Styler.Get<Color>("decompression.light.color"), light.Color, $"Light {light.EntityId} does not have the expected color.");
-                    //Assert.Equals(Styler.Get<Single>("decompression.light.interval"), light.BlinkIntervalSeconds, $"Light {light.EntityId} does not have the expected blink interval.");
-                    //Assert.Equals(Styler.Get<Single>("decompression.light.duration"), light.BlinkLength, $"Light {light.EntityId} does not have the expected blink length.");
-                    //Assert.Equals(Styler.Get<Single>("decompression.light.offset"), light.BlinkOffset, $"Light {light.EntityId} does not have the expected blink offset.");
-                    Assert.True(light.Enabled, $"Light {light.EntityId} should be enabled.");
-                }
-                else
-                {
-                    Assert.False(light.Enabled, $"Light {light.EntityId} should not be enabled.");
-                }
-            }
-
-            var lcds1 = new List<IMyTextPanel>();
-            grid.GetBlocksOfType(lcds1, l => l.CustomData.Contains("zone-1"));
-            foreach (var lcd in lcds1)
-            {
-                switch (lcd.CustomName)
-                {
-                    case "Door Sign (Zone 1)":
-                        //Assert.Equals(Styler.Get<String>("decompression.text"), lcd.GetText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
-                        Assert.True(1.327 < lcd.FontSize, $"LCD {lcd.EntityId} did not properly rescale.");
-                        Assert.True(1.328 > lcd.FontSize, $"LCD {lcd.EntityId} did not properly rescale.");
-                        break;
-                }
-            }
-
-            var doors1 = new List<IMyDoor>();
-            grid.GetBlocksOfType(doors1, d => d.CustomData.Contains("zone-1") && d.CustomData.Contains("zone-2"));
-            foreach (var door in doors1)
-            {
-                Assert.True(DoorStatus.Closed == door.Status || DoorStatus.Closing == door.Status, $"Airlock joined to Zone 1 and a 2 should be closed or closing.");
-                Assert.True(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be enabled.");
-            }
-
-            Console.WriteLine("Executing Run #4 (Decompression - Zone 1)");
-            MDKFactory.Run(program, updateType: tickrate);
+                programmableBlock,
+                ventZone1, lightNormalZone1, lightAlertZone1,
+                ventZone2, lightNormalZone2, lightAlertZone2
+            });
             
-            foreach (var door in doors1)
             {
-                Assert.True(DoorStatus.Closed == door.Status, $"Airlock joined to Zone 1 and a 2 should be closed.");
-                Assert.False(door.Enabled, $"Airlock joined to Zone 1 and a 2 should be disabled.");
+                RunUntil(programmableBlock, p => p.CurrentTick > 2);
+                Assert.Equals("", programmableBlock.GetSurface(0).GetText(), "Programmable Block Grid Status");
             }
 
-            foreach (var vent in vents)
             {
-                vent.IsDepressurizing = false;
-                vent.CanPressurize = true;
-            }
-            
-            MDKFactory.Run(program, updateType: tickrate);
+                RunCycle(programmableBlock);
 
-            foreach (var light in lights1)
-            {
-                Assert.True(light.Enabled, $"Light {light.EntityId} should be enabled.");
-                Assert.Equals(new Color(255, 255, 255), light.Color, $"Light {light.EntityId} does not have the expected color.");
-                Assert.Equals(0, light.BlinkIntervalSeconds, $"Light {light.EntityId} does not have the expected blink interval.");
-                Assert.Equals(0, light.BlinkLength, $"Light {light.EntityId} does not have the expected blink length.");
-                Assert.Equals(0, light.BlinkOffset, $"Light {light.EntityId} does not have the expected blink offset.");
-            }
+                var pbSurface0 = programmableBlock.GetSurface(0) as MockTextSurface;
+                var pbSprite0 = pbSurface0.SpriteBuffer.First();
+                
+                var pbSurface1 = programmableBlock.GetSurface(1) as MockTextSurface;
+                var pbSprite1 = pbSurface1.SpriteBuffer.First();
 
-            foreach (var lcd in lcds1)
-            {
-                switch (lcd.CustomName)
-                {
-                    case "Door Sign (Zone 1)":
-                        Assert.Equals("ZONE 1", lcd.GetText(), $"LCD {lcd.EntityId} doesn't have the expected text.");
-                        Assert.Equals(new Color(255, 255, 255), lcd.FontColor, $"LCD {lcd.EntityId} doesn't have the expected text color.");
-                        Assert.Equals(new Color(0, 0, 0), lcd.BackgroundColor, $"LCD {lcd.EntityId} doesn't have the expected background color.");
-                        Assert.Equals(1, lcd.FontSize, $"LCD {lcd.EntityId} Font Size was not correctly restored.");
-                        break;
-                }
+                Assert.True(SpriteType.TEXT == pbSprite0.Type, "Programmable Block main screen texture type");
+                Assert.Equals("Station Normal\r\n room-1 Normal\r\n room-2 Normal\r\n", pbSprite0.Data, "Programmable Block main screen text");
+
+                Assert.True(SpriteType.TEXT == pbSprite1.Type, "Programmable Block keyboard texture type");
+                Assert.Equals("Time: 0ms (0ms max)\r\nIOPS: 0/0, (0 max)\r\nTick: 2/7\r\n", pbSprite1.Data, "Programmable Block keyboard text");
+
+                Assert.Equals(lightNormalZone1.Color, new Color(255, 255, 255), "Zone 1 normal light color");
+                Assert.True(lightNormalZone1.Enabled, "Zone 2 normal light should be enabled");
+                Assert.Equals(lightAlertZone1.Color, new Color(255, 255, 255), "Zone 1 alert light color");
+                Assert.True(lightAlertZone1.Enabled, "Zone 1 alert light should be enabled");
+
+                Assert.Equals(lightNormalZone2.Color, new Color(255, 255, 255), "Zone 1 normal light color");
+                Assert.True(lightNormalZone2.Enabled, "Zone 2 normal light should be enabled");
+                Assert.Equals(lightAlertZone2.Color, new Color(255, 255, 255), "Zone 1 alert light color");
+                Assert.True(lightAlertZone2.Enabled, "Zone 1 alert light should be enabled");
             }
 
-            var config = new MyIni();
+            ventZone1.CanPressurize = false;
 
-            Console.WriteLine("Executing Run #5 (Enable Battle Stations)");
-            MDKFactory.Run(program, argument: "activate battle");
+            {
+                RunCycle(programmableBlock);
 
-            Assert.True(config.TryParse(programmableBlock.Storage), "The Programmable Block storage was not parsable.");
+                Assert.Equals("Station Normal\r\n room-1 Decompressed\r\n room-2 Normal\r\n", GetMockSpriteText(programmableBlock, 0), "Programmable Block main screen text");
+                Assert.Equals("Time: 0ms (0ms max)\r\nIOPS: 0/0, (0 max)\r\nTick: 2/7\r\n", GetMockSpriteText(programmableBlock, 1), "Programmable Block keyboard text");
 
-            var state = 0;
-            config.Get(Program.ConfigSection, nameof(program.GridState)).TryGetInt32(out state);
-            var stateEnum = (EntityState)state;
+                Assert.Equals(lightNormalZone1.Color, new Color(255, 255, 255), "Zone 1 normal light color");
+                Assert.False(lightNormalZone1.Enabled, "Zone 1 normal light should be disabled");
+                Assert.Equals(lightAlertZone1.Color, new Color(0, 0, 255, 255), "Zone 1 alert light color");
+                Assert.True(lightAlertZone1.Enabled, "Zone 1 alert light should be enabled");
 
-            //Assert.Equals("battle", new MyConfig(programmableBlock.Storage).GetValue("custom-states").ToString().Trim(), "Activating battle state did not have desired effect.");
+                Assert.Equals(lightNormalZone2.Color, new Color(255, 255, 255), "Zone 1 normal light color");
+                Assert.True(lightNormalZone2.Enabled, "Zone 2 normal light should be enabled");
+                Assert.Equals(lightAlertZone2.Color, new Color(255, 255, 255), "Zone 1 alert light color");
+                Assert.True(lightAlertZone2.Enabled, "Zone 2 alert light should be enabled");
+            }
 
-            Console.WriteLine("Executing Run #6 (Enable Self-Destruct)");
-            MDKFactory.Run(program, argument: "activate destruct");
+            programmableBlock.Run("toggle battle", UpdateType.Terminal);
 
-            //Assert.Equals("battle\ndestruct", new MyConfig(programmableBlock).GetValue("custom-states").ToString().Trim(), "Activating destruct state did not have desired effect.");
+            {
+                RunCycle(programmableBlock);
 
-            Console.WriteLine("Executing Run #7 (Toggle Battle Stations)");
-            MDKFactory.Run(program, argument: "toggle battle");
+                Assert.Equals("Station Battle Stations\r\n room-1 Decompressed\r\n room-2 Normal\r\n", GetMockSpriteText(programmableBlock, 0), "Programmable Block main screen text");
+                Assert.Equals("Time: 0ms (0ms max)\r\nIOPS: 0/0, (0 max)\r\nTick: 2/7\r\n", GetMockSpriteText(programmableBlock, 1), "Programmable Block keyboard text");
 
-            Console.WriteLine("Executing Run #8 (Self Destruct)");
-            MDKFactory.Run(program, updateType: tickrate);
-            //Assert.Equals("destruct", new MyConfig(programmableBlock).GetValue("custom-states").ToString().Trim(), "Toggling battle state did not have desired effect.");
+                Assert.Equals(lightNormalZone1.Color, new Color(255, 255, 255), "Zone 1 normal light color");
+                Assert.False(lightNormalZone1.Enabled, "Zone 1 normal light should be disabled");
+                Assert.Equals(lightAlertZone1.Color, new Color(0, 0, 255, 255), "Zone 1 alert light color");
+                Assert.True(lightAlertZone1.Enabled, "Zone 1 alert light should be enabled");
 
-            Console.WriteLine("Executing Run #9 (Toggle Self-Destruct)");
-            MDKFactory.Run(program, argument: "deactivate destruct");
+                Assert.Equals(lightNormalZone2.Color, new Color(255, 255, 255), "Zone 1 normal light color");
+                Assert.False(lightNormalZone1.Enabled, "Zone 2 normal light should be disabled");
+                Assert.Equals(lightAlertZone2.Color, new Color(255, 0, 0), "Zone 1 alert light color");
+                Assert.True(lightAlertZone2.Enabled, "Zone 2 alert light should be enabled");
+            }
 
-            //Assert.Equals("", new MyConfig(programmableBlock).GetValue("custom-states").ToString(), "Disabling destruct state did not have desired effect.");
+            programmableBlock.Run("toggle battle", UpdateType.Terminal);
+            ventZone1.CanPressurize = true;
+            ventZone2.CanPressurize = false;
 
-            Console.WriteLine();
-            Console.WriteLine("-----------------------------------");
-            Console.WriteLine("DEBUG LCD OUTPUT:");
-            Console.WriteLine("-----------------------------------");
-            var blocks = new List<IMyTextPanel>();
-            //grid.GetBlocksOfType(blocks, t => (new MyConfig(t)).IsA("debug lcd"));
-            Console.WriteLine(blocks.FirstOrDefault()?.GetText()?.Trim() ?? ">> NO LCD FOUND <<");
-            Console.WriteLine("-----------------------------------");
-            Console.WriteLine("Press any key to exit.");
+            {
+                RunCycle(programmableBlock);
+
+                Assert.Equals("Station Normal\r\n room-1 Normal\r\n room-2 Decompressed\r\n", GetMockSpriteText(programmableBlock, 0), "Programmable Block main screen text");
+                Assert.Equals("Time: 0ms (0ms max)\r\nIOPS: 0/0, (0 max)\r\nTick: 2/7\r\n", GetMockSpriteText(programmableBlock, 1), "Programmable Block keyboard text");
+
+                Assert.Equals(lightNormalZone1.Color, new Color(255, 255, 255), "Zone 1 normal light color");
+                Assert.True(lightNormalZone1.Enabled, "Zone 1 normal light should be enabled");
+                Assert.Equals(lightAlertZone1.Color, new Color(255, 255, 255, 255), "Zone 1 alert light color");
+                Assert.True(lightAlertZone1.Enabled, "Zone 1 alert light should be enabled");
+
+                Assert.Equals(lightNormalZone2.Color, new Color(255, 255, 255), "Zone 1 normal light color");
+                Assert.False(lightNormalZone2.Enabled, "Zone 1 normal light should be disabled");
+                Assert.Equals(lightAlertZone2.Color, new Color(0, 0, 255), "Zone 1 alert light color");
+                Assert.True(lightAlertZone2.Enabled, "Zone 1 alert light should be enabled");
+            }
+
+            Console.WriteLine("Mock completed, press any key to exit.");
             Console.ReadKey(true);
         }
 
-        class Zone : IReadOnlyList<IMyTerminalBlock>
+        private static T Mock<T>(BlockFunction functions = BlockFunction.None, Action<T> options = null, params String[] zones)
+            where T : class, new()
         {
-            public String Name { get; }
-            //public IEnumerable<String> AdjacentZones => Blocks.SelectMany(b => new MyConfig(b).GetZones()).Distinct().Where(z => z != Name);
-            public List<IMyTerminalBlock> Blocks { get; } = new List<IMyTerminalBlock>();
+            if (!typeof(MockTerminalBlock).IsAssignableFrom(typeof(T)))
+                throw new InvalidOperationException();
 
-            public Int32 Count => ((IReadOnlyList<IMyTerminalBlock>)Blocks).Count;
+            var serializer = new MyIni();
+            var block = new T() as MockTerminalBlock;
+            block.EntityId = NextEntityId++;
 
-            public IMyTerminalBlock this[Int32 index] => ((IReadOnlyList<IMyTerminalBlock>)Blocks)[index];
+            var name = $"{typeof(T).Name.Substring(4)}";
 
-            public Zone(String name)
-                : base()
+            if (functions != BlockFunction.None)
             {
-                Name = name;
+                serializer.Set("SSM Configuration", "functions", Convert.ToInt32(functions));
+                name += $" ({functions})";
             }
 
-            public void AddBlock(IMyTerminalBlock block)
+            if (zones.Any())
             {
-                Blocks.Add(block);
-                //using (var config = new MyConfig(block))
-                //{
-                //    config.AddValue("zones", Name);
-                //}
+                serializer.Set("SSM Configuration", "zones", String.Join("\n", zones));
+                name += $" [{String.Join(", ", zones)}]";
             }
 
-            public void RemoveBlock(IMyTerminalBlock block)
-            {
-                Blocks.Remove(block);
-                //using (var config = new MyConfig(block))
-                //{
-                //    config.ClearValue("zones", Name);
-                //}
-            }
+            block.CustomName = name;
+            block.DisplayName = name;
+            block.CustomData = serializer.ToString();
 
-            public void AddBlocks(IEnumerable<IMyTerminalBlock> blocks)
-            {
-                Blocks.AddRange(blocks);
-                foreach (var block in blocks)
-                {
-                    //using (var config = new MyConfig(block))
-                    //{
-                    //    config.AddValue("zones", Name);
-                    //}
-                }
-            }
+            var cast = block as T;
+            options?.Invoke(cast);
+            return cast;
+        }
 
-            public void AddToGrid(MockGridTerminalSystem grid)
-            {
-                var existing = new List<IMyTerminalBlock>();
-                grid.GetBlocks(existing);
+        private static String GetMockSpriteText(IMyTextSurfaceProvider provider, Int32 surfaceIndex, Int32 spriteIndex = 0)
+            => GetMockSpriteText(provider.GetSurface(surfaceIndex), spriteIndex);
 
-                foreach (var block in Blocks.Where(b => !existing.Contains(b)))
-                {
-                    grid.Add(block);
-                }
-            }
+        private static String GetMockSpriteText(IMyTextSurface surface, Int32 index = 0)
+        {
+            var mockSurface = surface as MockTextSurface;
+            if (mockSurface == null)
+                return "";
 
-            public IEnumerator<IMyTerminalBlock> GetEnumerator() => ((IReadOnlyList<IMyTerminalBlock>)Blocks).GetEnumerator();
-            IEnumerator IEnumerable.GetEnumerator() => ((IReadOnlyList<IMyTerminalBlock>)Blocks).GetEnumerator();
+            var sprite = mockSurface.SpriteBuffer.ElementAtOrDefault(index);
+            if (sprite.Type == SpriteType.TEXT)
+                return sprite.Data;
+
+            return "";
         }
     }
 }
